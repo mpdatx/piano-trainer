@@ -102,6 +102,20 @@
         }
         #feedback.correct { color: #8f8; }
         #feedback.wrong { color: #f88; }
+        #controls {
+            margin-bottom: 20px;
+        }
+        #controls label {
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        #controls input {
+            margin-right: 6px;
+            cursor: pointer;
+        }
+        .labels-hidden .key-label {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -110,6 +124,9 @@
         <div id="staff"></div>
     </div>
     <div id="feedback"></div>
+    <div id="controls">
+        <label><input type="checkbox" id="show-labels" checked> Show key names</label>
+    </div>
     <div id="keyboard-container">
         <div id="keyboard"></div>
     </div>
@@ -251,6 +268,14 @@
 
         buildKeyboard();
         startQuiz();
+
+        // ============================================================
+        // Controls
+        // ============================================================
+        document.getElementById("show-labels").addEventListener("change", (e) => {
+            const keyboard = document.getElementById("keyboard");
+            keyboard.classList.toggle("labels-hidden", !e.target.checked);
+        });
     </script>
 </body>
 </html>
