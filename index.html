@@ -116,6 +116,42 @@
         .labels-hidden .key-label {
             display: none;
         }
+        #stats {
+            margin-top: 30px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 15px 20px;
+        }
+        #stats h2 {
+            font-size: 1rem;
+            font-weight: 300;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+        #stats-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+        }
+        .note-stat {
+            text-align: center;
+            padding: 8px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 4px;
+        }
+        .note-stat .note-name {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+        .note-stat .note-accuracy {
+            font-size: 0.8rem;
+            color: #aaa;
+        }
+        .note-stat.perfect { background: rgba(0,200,0,0.3); }
+        .note-stat.good { background: rgba(100,200,0,0.2); }
+        .note-stat.struggling { background: rgba(200,100,0,0.2); }
+        .note-stat.bad { background: rgba(200,0,0,0.2); }
     </style>
 </head>
 <body>
@@ -130,6 +166,10 @@
     <div id="keyboard-container">
         <div id="keyboard"></div>
     </div>
+    <div id="stats">
+        <h2>ACCURACY BY NOTE</h2>
+        <div id="stats-grid"></div>
+    </div>
     <script>
         // ============================================================
         // Audio
@@ -141,11 +181,51 @@
         }
 
         // ============================================================
-        // Quiz State
+        // Quiz State & Stats
         // ============================================================
         const QUIZ_NOTES = ["C", "D", "E", "F", "G", "A", "B"];
         const QUIZ_OCTAVE = 4;
         let currentNote = null;
+        let firstAttempt = true; // Track if this is the first attempt for current note
+
+        // Stats: { C: { correct: 0, total: 0 }, ... }
+        const noteStats = {};
+        QUIZ_NOTES.forEach(note => noteStats[note] = { correct: 0, total: 0 });
+
+        function updateStatsDisplay() {
+            const grid = document.getElementById("stats-grid");
+            grid.innerHTML = "";
+
+            for (const note of QUIZ_NOTES) {
+                const stat = noteStats[note];
+                const accuracy = stat.total > 0 ? Math.round((stat.correct / stat.total) * 100) : null;
+
+                const div = document.createElement("div");
+                div.className = "note-stat";
+
+                if (accuracy !== null) {
+                    if (accuracy === 100) div.classList.add("perfect");
+                    else if (accuracy >= 80) div.classList.add("good");
+                    else if (accuracy >= 50) div.classList.add("struggling");
+                    else div.classList.add("bad");
+                }
+
+                div.innerHTML = `
+                    <div class="note-name">${note}</div>
+                    <div class="note-accuracy">${accuracy !== null ? `${accuracy}%` : '-'}</div>
+                `;
+                grid.appendChild(div);
+            }
+        }
+
+        function recordAttempt(note, wasCorrect) {
+            if (firstAttempt) {
+                noteStats[note].total++;
+                if (wasCorrect) noteStats[note].correct++;
+                updateStatsDisplay();
+            }
+            firstAttempt = false;
+        }
 
         // ============================================================
         // Staff Rendering (Single Note Quiz)
@@ -176,11 +256,13 @@
                 newNote = QUIZ_NOTES[Math.floor(Math.random() * QUIZ_NOTES.length)];
             } while (newNote === currentNote);
             currentNote = newNote;
+            firstAttempt = true;
             return currentNote;
         }
 
         function startQuiz() {
             renderQuizNote(pickRandomNote());
+            updateStatsDisplay();
         }
 
         // ============================================================
@@ -201,6 +283,7 @@
         function handleKeyClick(noteName, keyElement) {
             if (noteName === currentNote) {
                 // Correct - play note, flash green, show feedback, then next note
+                recordAttempt(currentNote, true);
                 playNote(noteName, QUIZ_OCTAVE);
                 keyElement.classList.add("correct");
                 showFeedback(true, noteName);
@@ -210,6 +293,7 @@
                 }, 400);
             } else {
                 // Wrong - flash red, show feedback
+                recordAttempt(currentNote, false);
                 keyElement.classList.add("wrong");
                 showFeedback(false, currentNote);
                 setTimeout(() => keyElement.classList.remove("wrong"), 200);
