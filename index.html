@@ -45,7 +45,84 @@
         <div id="keyboard"></div>
     </div>
     <script>
-        // JS will go here in subsequent tasks
+        // ============================================================
+        // Staff Rendering
+        // ============================================================
+        const { Factory, StaveConnector } = Vex.Flow;
+
+        function renderStaff() {
+            const MEASURE_WIDTH = 250;
+            const FIRST_MEASURE_EXTRA = 70;
+            const STAVE_Y_TREBLE = 10;
+            const STAVE_Y_BASS = 120;
+            const STAVE_PADDING = 20;
+
+            const song = {
+                title: "Mary Had a Little Lamb",
+                timeSignature: "4/4",
+                treble: [
+                    ["E4/q", "D4", "C4", "D4"],
+                    ["E4/q", "E4", "E4/h"],
+                    ["D4/q", "D4", "D4/h"],
+                    ["E4/q", "G4", "G4/h"],
+                    ["E4/q", "D4", "C4", "D4"],
+                    ["E4/q", "E4", "E4", "E4"],
+                    ["D4/q", "D4", "E4", "D4"],
+                    ["C4/w"],
+                ],
+                bass: [
+                    ["(C3 E3 G3)/w"],
+                    ["(C3 E3 G3)/w"],
+                    ["(G2 B2 D3)/w"],
+                    ["(C3 E3 G3)/w"],
+                    ["(C3 E3 G3)/w"],
+                    ["(C3 E3 G3)/w"],
+                    ["(G2 B2 D3)/w"],
+                    ["(C3 E3 G3)/w"],
+                ],
+            };
+
+            const numMeasures = song.treble.length;
+            const totalWidth = FIRST_MEASURE_EXTRA + MEASURE_WIDTH * numMeasures + STAVE_PADDING;
+            const totalHeight = STAVE_Y_BASS + 100;
+
+            const factory = new Factory({
+                renderer: { elementId: "staff", width: totalWidth, height: totalHeight },
+            });
+            const score = factory.EasyScore();
+
+            for (let i = 0; i < numMeasures; i++) {
+                const isFirst = i === 0;
+                const x = isFirst ? 0 : FIRST_MEASURE_EXTRA + MEASURE_WIDTH * i;
+                const width = isFirst ? MEASURE_WIDTH + FIRST_MEASURE_EXTRA : MEASURE_WIDTH;
+
+                const system = factory.System({ x, y: 0, width });
+
+                const trebleVoice = score.voice(
+                    score.notes(song.treble[i].join(", "))
+                );
+                const trebleStave = system.addStave({ voices: [trebleVoice] });
+                if (isFirst) {
+                    trebleStave.addClef("treble").addTimeSignature(song.timeSignature);
+                }
+
+                const bassVoice = score.voice(
+                    score.notes(song.bass[i].join(", "), { clef: "bass" })
+                );
+                const bassStave = system.addStave({ voices: [bassVoice] });
+                if (isFirst) {
+                    bassStave.addClef("bass").addTimeSignature(song.timeSignature);
+                }
+
+                system.addConnector("brace");
+                system.addConnector("singleLeft");
+                system.addConnector("singleRight");
+            }
+
+            factory.draw();
+        }
+
+        renderStaff();
     </script>
 </body>
 </html>
