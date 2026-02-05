@@ -34,6 +34,57 @@
             display: flex;
             justify-content: center;
         }
+        #keyboard {
+            display: flex;
+            position: relative;
+            cursor: pointer;
+            user-select: none;
+        }
+        .key {
+            position: relative;
+            border: 1px solid #333;
+            border-radius: 0 0 6px 6px;
+            transition: background 0.08s;
+        }
+        .key.white {
+            width: 50px;
+            height: 180px;
+            background: linear-gradient(to bottom, #f8f8f8, #fff);
+            z-index: 1;
+        }
+        .key.white:hover {
+            background: linear-gradient(to bottom, #e8e8e8, #f0f0f0);
+        }
+        .key.white.active {
+            background: linear-gradient(to bottom, #c8d8f8, #d8e8ff);
+        }
+        .key.black {
+            width: 30px;
+            height: 110px;
+            background: linear-gradient(to bottom, #333, #111);
+            margin-left: -15px;
+            margin-right: -15px;
+            z-index: 2;
+            border-color: #000;
+        }
+        .key.black:hover {
+            background: linear-gradient(to bottom, #555, #333);
+        }
+        .key.black.active {
+            background: linear-gradient(to bottom, #446, #335);
+        }
+        .key-label {
+            position: absolute;
+            bottom: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10px;
+            color: #999;
+            pointer-events: none;
+        }
+        .key.black .key-label {
+            color: #888;
+        }
     </style>
 </head>
 <body>
@@ -123,6 +174,62 @@
         }
 
         renderStaff();
+
+        // ============================================================
+        // Piano Keyboard
+        // ============================================================
+        const NUM_OCTAVES = 2;
+        const START_OCTAVE = 4;
+
+        const NOTE_NAMES = ["C", "D", "E", "F", "G", "A", "B"];
+        const BLACK_KEY_MAP = {
+            C: "C#", D: "D#", F: "F#", G: "G#", A: "A#",
+        };
+        const HAS_BLACK_AFTER = new Set(["C", "D", "F", "G", "A"]);
+
+        function buildKeyboard() {
+            const keyboard = document.getElementById("keyboard");
+            keyboard.innerHTML = "";
+
+            for (let oct = START_OCTAVE; oct < START_OCTAVE + NUM_OCTAVES; oct++) {
+                for (const note of NOTE_NAMES) {
+                    const whiteKey = document.createElement("div");
+                    whiteKey.className = "key white";
+                    whiteKey.dataset.note = `${note}${oct}`;
+
+                    const label = document.createElement("span");
+                    label.className = "key-label";
+                    label.textContent = `${note}${oct}`;
+                    whiteKey.appendChild(label);
+
+                    whiteKey.addEventListener("mousedown", () => whiteKey.classList.add("active"));
+                    whiteKey.addEventListener("mouseup", () => whiteKey.classList.remove("active"));
+                    whiteKey.addEventListener("mouseleave", () => whiteKey.classList.remove("active"));
+
+                    keyboard.appendChild(whiteKey);
+
+                    if (HAS_BLACK_AFTER.has(note)) {
+                        const blackNote = BLACK_KEY_MAP[note];
+                        const blackKey = document.createElement("div");
+                        blackKey.className = "key black";
+                        blackKey.dataset.note = `${blackNote}${oct}`;
+
+                        const bLabel = document.createElement("span");
+                        bLabel.className = "key-label";
+                        bLabel.textContent = `${blackNote}${oct}`;
+                        blackKey.appendChild(bLabel);
+
+                        blackKey.addEventListener("mousedown", () => blackKey.classList.add("active"));
+                        blackKey.addEventListener("mouseup", () => blackKey.classList.remove("active"));
+                        blackKey.addEventListener("mouseleave", () => blackKey.classList.remove("active"));
+
+                        keyboard.appendChild(blackKey);
+                    }
+                }
+            }
+        }
+
+        buildKeyboard();
     </script>
 </body>
 </html>
