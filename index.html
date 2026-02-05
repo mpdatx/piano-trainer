@@ -146,8 +146,14 @@
         }
 
         // ============================================================
-        // Piano Keyboard (Quiz Mode - 1 octave, white keys only)
+        // Piano Keyboard (2 octaves with black keys)
         // ============================================================
+        const NUM_OCTAVES = 2;
+        const START_OCTAVE = 4;
+        const NOTE_NAMES = ["C", "D", "E", "F", "G", "A", "B"];
+        const BLACK_KEY_MAP = { C: "C#", D: "D#", F: "F#", G: "G#", A: "A#" };
+        const HAS_BLACK_AFTER = new Set(["C", "D", "F", "G", "A"]);
+
         function handleKeyClick(noteName, keyElement) {
             if (noteName === currentNote) {
                 // Correct - show next note immediately
@@ -163,24 +169,49 @@
             const keyboard = document.getElementById("keyboard");
             keyboard.innerHTML = "";
 
-            for (const note of QUIZ_NOTES) {
-                const whiteKey = document.createElement("div");
-                whiteKey.className = "key white";
-                whiteKey.dataset.note = `${note}${QUIZ_OCTAVE}`;
+            for (let oct = START_OCTAVE; oct < START_OCTAVE + NUM_OCTAVES; oct++) {
+                for (const note of NOTE_NAMES) {
+                    const whiteKey = document.createElement("div");
+                    whiteKey.className = "key white";
+                    whiteKey.dataset.note = `${note}${oct}`;
 
-                const label = document.createElement("span");
-                label.className = "key-label";
-                label.textContent = `${note}${QUIZ_OCTAVE}`;
-                whiteKey.appendChild(label);
+                    const label = document.createElement("span");
+                    label.className = "key-label";
+                    label.textContent = `${note}${oct}`;
+                    whiteKey.appendChild(label);
 
-                whiteKey.addEventListener("mousedown", () => {
-                    whiteKey.classList.add("active");
-                    handleKeyClick(note, whiteKey);
-                });
-                whiteKey.addEventListener("mouseup", () => whiteKey.classList.remove("active"));
-                whiteKey.addEventListener("mouseleave", () => whiteKey.classList.remove("active"));
+                    whiteKey.addEventListener("mousedown", () => {
+                        whiteKey.classList.add("active");
+                        handleKeyClick(note, whiteKey);
+                    });
+                    whiteKey.addEventListener("mouseup", () => whiteKey.classList.remove("active"));
+                    whiteKey.addEventListener("mouseleave", () => whiteKey.classList.remove("active"));
 
-                keyboard.appendChild(whiteKey);
+                    keyboard.appendChild(whiteKey);
+
+                    if (HAS_BLACK_AFTER.has(note)) {
+                        const blackNote = BLACK_KEY_MAP[note];
+                        const blackKey = document.createElement("div");
+                        blackKey.className = "key black";
+                        blackKey.dataset.note = `${blackNote}${oct}`;
+
+                        const bLabel = document.createElement("span");
+                        bLabel.className = "key-label";
+                        bLabel.textContent = `${blackNote}${oct}`;
+                        blackKey.appendChild(bLabel);
+
+                        blackKey.addEventListener("mousedown", () => {
+                            blackKey.classList.add("active");
+                            // Black keys always wrong for this quiz (white keys only)
+                            blackKey.classList.add("wrong");
+                            setTimeout(() => blackKey.classList.remove("wrong"), 200);
+                        });
+                        blackKey.addEventListener("mouseup", () => blackKey.classList.remove("active"));
+                        blackKey.addEventListener("mouseleave", () => blackKey.classList.remove("active"));
+
+                        keyboard.appendChild(blackKey);
+                    }
+                }
             }
         }
 
