@@ -88,6 +88,9 @@
         .key.black .key-label {
             color: #888;
         }
+        .key.wrong {
+            background: linear-gradient(to bottom, #f88, #faa) !important;
+        }
     </style>
 </head>
 <body>
@@ -100,139 +103,89 @@
     </div>
     <script>
         // ============================================================
-        // Staff Rendering
+        // Quiz State
         // ============================================================
-        const { Factory, StaveConnector } = Vex.Flow;
+        const QUIZ_NOTES = ["C", "D", "E", "F", "G", "A", "B"];
+        const QUIZ_OCTAVE = 4;
+        let currentNote = null;
 
-        function renderStaff() {
-            const MEASURE_WIDTH = 250;
-            const FIRST_MEASURE_EXTRA = 70;
-            const STAVE_Y_TREBLE = 10;
-            const STAVE_Y_BASS = 120;
-            const STAVE_PADDING = 20;
+        // ============================================================
+        // Staff Rendering (Single Note Quiz)
+        // ============================================================
+        const { Factory } = Vex.Flow;
 
-            const song = {
-                title: "Mary Had a Little Lamb",
-                timeSignature: "4/4",
-                treble: [
-                    ["E4/q", "D4", "C4", "D4"],
-                    ["E4/q", "E4", "E4/h"],
-                    ["D4/q", "D4", "D4/h"],
-                    ["E4/q", "G4", "G4/h"],
-                    ["E4/q", "D4", "C4", "D4"],
-                    ["E4/q", "E4", "E4", "E4"],
-                    ["D4/q", "D4", "E4", "D4"],
-                    ["C4/w"],
-                ],
-                bass: [
-                    ["(C3 E3 G3)/w"],
-                    ["(C3 E3 G3)/w"],
-                    ["(G2 B2 D3)/w"],
-                    ["(C3 E3 G3)/w"],
-                    ["(C3 E3 G3)/w"],
-                    ["(C3 E3 G3)/w"],
-                    ["(G2 B2 D3)/w"],
-                    ["(C3 E3 G3)/w"],
-                ],
-            };
-
-            const numMeasures = song.treble.length;
-            const totalWidth = FIRST_MEASURE_EXTRA + MEASURE_WIDTH * numMeasures + STAVE_PADDING;
-            const totalHeight = STAVE_Y_BASS + 100;
+        function renderQuizNote(noteName) {
+            const staffDiv = document.getElementById("staff");
+            staffDiv.innerHTML = "";
 
             const factory = new Factory({
-                renderer: { elementId: "staff", width: totalWidth, height: totalHeight },
+                renderer: { elementId: "staff", width: 200, height: 150 },
             });
             const score = factory.EasyScore();
+            const system = factory.System({ x: 0, y: 0, width: 180 });
 
-            for (let i = 0; i < numMeasures; i++) {
-                const isFirst = i === 0;
-                const x = isFirst ? 0 : FIRST_MEASURE_EXTRA + MEASURE_WIDTH * i;
-                const width = isFirst ? MEASURE_WIDTH + FIRST_MEASURE_EXTRA : MEASURE_WIDTH;
-
-                const system = factory.System({ x, y: 0, width });
-
-                const trebleVoice = score.voice(
-                    score.notes(song.treble[i].join(", "))
-                );
-                const trebleStave = system.addStave({ voices: [trebleVoice] });
-                if (isFirst) {
-                    trebleStave.addClef("treble").addTimeSignature(song.timeSignature);
-                }
-
-                const bassVoice = score.voice(
-                    score.notes(song.bass[i].join(", "), { clef: "bass" })
-                );
-                const bassStave = system.addStave({ voices: [bassVoice] });
-                if (isFirst) {
-                    bassStave.addClef("bass").addTimeSignature(song.timeSignature);
-                }
-
-                system.addConnector("brace");
-                system.addConnector("singleLeft");
-                system.addConnector("singleRight");
-            }
+            const voice = score.voice(
+                score.notes(`${noteName}${QUIZ_OCTAVE}/w`)
+            );
+            system.addStave({ voices: [voice] }).addClef("treble");
 
             factory.draw();
         }
 
-        renderStaff();
+        function pickRandomNote() {
+            let newNote;
+            do {
+                newNote = QUIZ_NOTES[Math.floor(Math.random() * QUIZ_NOTES.length)];
+            } while (newNote === currentNote);
+            currentNote = newNote;
+            return currentNote;
+        }
+
+        function startQuiz() {
+            renderQuizNote(pickRandomNote());
+        }
 
         // ============================================================
-        // Piano Keyboard
+        // Piano Keyboard (Quiz Mode - 1 octave, white keys only)
         // ============================================================
-        const NUM_OCTAVES = 2;
-        const START_OCTAVE = 4;
-
-        const NOTE_NAMES = ["C", "D", "E", "F", "G", "A", "B"];
-        const BLACK_KEY_MAP = {
-            C: "C#", D: "D#", F: "F#", G: "G#", A: "A#",
-        };
-        const HAS_BLACK_AFTER = new Set(["C", "D", "F", "G", "A"]);
+        function handleKeyClick(noteName, keyElement) {
+            if (noteName === currentNote) {
+                // Correct - show next note immediately
+                renderQuizNote(pickRandomNote());
+            } else {
+                // Wrong - flash red
+                keyElement.classList.add("wrong");
+                setTimeout(() => keyElement.classList.remove("wrong"), 200);
+            }
+        }
 
         function buildKeyboard() {
             const keyboard = document.getElementById("keyboard");
             keyboard.innerHTML = "";
 
-            for (let oct = START_OCTAVE; oct < START_OCTAVE + NUM_OCTAVES; oct++) {
-                for (const note of NOTE_NAMES) {
-                    const whiteKey = document.createElement("div");
-                    whiteKey.className = "key white";
-                    whiteKey.dataset.note = `${note}${oct}`;
+            for (const note of QUIZ_NOTES) {
+                const whiteKey = document.createElement("div");
+                whiteKey.className = "key white";
+                whiteKey.dataset.note = `${note}${QUIZ_OCTAVE}`;
 
-                    const label = document.createElement("span");
-                    label.className = "key-label";
-                    label.textContent = `${note}${oct}`;
-                    whiteKey.appendChild(label);
+                const label = document.createElement("span");
+                label.className = "key-label";
+                label.textContent = `${note}${QUIZ_OCTAVE}`;
+                whiteKey.appendChild(label);
 
-                    whiteKey.addEventListener("mousedown", () => whiteKey.classList.add("active"));
-                    whiteKey.addEventListener("mouseup", () => whiteKey.classList.remove("active"));
-                    whiteKey.addEventListener("mouseleave", () => whiteKey.classList.remove("active"));
+                whiteKey.addEventListener("mousedown", () => {
+                    whiteKey.classList.add("active");
+                    handleKeyClick(note, whiteKey);
+                });
+                whiteKey.addEventListener("mouseup", () => whiteKey.classList.remove("active"));
+                whiteKey.addEventListener("mouseleave", () => whiteKey.classList.remove("active"));
 
-                    keyboard.appendChild(whiteKey);
-
-                    if (HAS_BLACK_AFTER.has(note)) {
-                        const blackNote = BLACK_KEY_MAP[note];
-                        const blackKey = document.createElement("div");
-                        blackKey.className = "key black";
-                        blackKey.dataset.note = `${blackNote}${oct}`;
-
-                        const bLabel = document.createElement("span");
-                        bLabel.className = "key-label";
-                        bLabel.textContent = `${blackNote}${oct}`;
-                        blackKey.appendChild(bLabel);
-
-                        blackKey.addEventListener("mousedown", () => blackKey.classList.add("active"));
-                        blackKey.addEventListener("mouseup", () => blackKey.classList.remove("active"));
-                        blackKey.addEventListener("mouseleave", () => blackKey.classList.remove("active"));
-
-                        keyboard.appendChild(blackKey);
-                    }
-                }
+                keyboard.appendChild(whiteKey);
             }
         }
 
         buildKeyboard();
+        startQuiz();
     </script>
 </body>
 </html>
