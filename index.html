@@ -91,6 +91,16 @@
         .key.wrong {
             background: linear-gradient(to bottom, #f88, #faa) !important;
         }
+        .key.correct {
+            background: linear-gradient(to bottom, #8f8, #afa) !important;
+        }
+        #feedback {
+            font-size: 1.2rem;
+            height: 2rem;
+            margin-bottom: 10px;
+        }
+        #feedback.correct { color: #8f8; }
+        #feedback.wrong { color: #f88; }
     </style>
 </head>
 <body>
@@ -98,6 +108,7 @@
     <div id="staff-container">
         <div id="staff"></div>
     </div>
+    <div id="feedback"></div>
     <div id="keyboard-container">
         <div id="keyboard"></div>
     </div>
@@ -154,13 +165,25 @@
         const BLACK_KEY_MAP = { C: "C#", D: "D#", F: "F#", G: "G#", A: "A#" };
         const HAS_BLACK_AFTER = new Set(["C", "D", "F", "G", "A"]);
 
+        function showFeedback(isCorrect, noteName) {
+            const feedback = document.getElementById("feedback");
+            feedback.textContent = isCorrect ? "Correct!" : `Wrong - that was ${noteName}`;
+            feedback.className = isCorrect ? "correct" : "wrong";
+        }
+
         function handleKeyClick(noteName, keyElement) {
             if (noteName === currentNote) {
-                // Correct - show next note immediately
-                renderQuizNote(pickRandomNote());
+                // Correct - flash green, show feedback, then next note
+                keyElement.classList.add("correct");
+                showFeedback(true, noteName);
+                setTimeout(() => {
+                    keyElement.classList.remove("correct");
+                    renderQuizNote(pickRandomNote());
+                }, 400);
             } else {
-                // Wrong - flash red
+                // Wrong - flash red, show feedback
                 keyElement.classList.add("wrong");
+                showFeedback(false, currentNote);
                 setTimeout(() => keyElement.classList.remove("wrong"), 200);
             }
         }
