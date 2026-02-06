@@ -113,6 +113,19 @@
             margin-right: 6px;
             cursor: pointer;
         }
+        #controls button {
+            margin-left: 20px;
+            padding: 4px 12px;
+            background: #444;
+            border: 1px solid #666;
+            color: #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+        #controls button:hover {
+            background: #555;
+        }
         .labels-hidden .key-label {
             display: none;
         }
@@ -212,6 +225,7 @@
     <div id="response-time"></div>
     <div id="controls">
         <label><input type="checkbox" id="show-labels" checked> Show key names</label>
+        <button id="reset-btn">Reset Progress</button>
     </div>
     <div id="keyboard-container">
         <div id="keyboard"></div>
@@ -221,6 +235,50 @@
         <div id="stats-grid"></div>
     </div>
     <script>
+        // ============================================================
+        // Local Storage
+        // ============================================================
+        const STORAGE_KEY = "pianoTrainerProgress";
+
+        function saveProgress() {
+            const data = {
+                currentLevel,
+                noteStats,
+                noteMemory,
+                currentStreak,
+                longestStreak,
+                roundNumber,
+            };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        }
+
+        function loadProgress() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (!saved) return false;
+
+            try {
+                const data = JSON.parse(saved);
+                currentLevel = data.currentLevel || 0;
+                Object.assign(noteStats, data.noteStats || {});
+                Object.assign(noteMemory, data.noteMemory || {});
+                currentStreak = data.currentStreak || 0;
+                longestStreak = data.longestStreak || 0;
+                roundNumber = data.roundNumber || 0;
+                return true;
+            } catch (e) {
+                console.error("Failed to load progress:", e);
+                return false;
+            }
+        }
+
+        function resetProgress() {
+            if (!confirm("Reset all progress? This will clear your level, stats, and streaks.")) {
+                return;
+            }
+            localStorage.removeItem(STORAGE_KEY);
+            location.reload();
+        }
+
         // ============================================================
         // Audio
         // ============================================================
@@ -465,6 +523,7 @@
             firstAttempt = false;
             updateStatsDisplay();
             checkLevelUp();
+            saveProgress();
         }
 
         // ============================================================
@@ -528,6 +587,7 @@
         }
 
         function startQuiz() {
+            loadProgress();
             updateLevelDisplay();
             updateStreakDisplay();
             rebuildKeyboard();
@@ -681,6 +741,8 @@
             const keyboard = document.getElementById("keyboard");
             keyboard.classList.toggle("labels-hidden", !e.target.checked);
         });
+
+        document.getElementById("reset-btn").addEventListener("click", resetProgress);
     </script>
 </body>
 </html>
