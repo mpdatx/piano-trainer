@@ -593,35 +593,43 @@
         const { Factory } = Vex.Flow;
 
         function renderQuizNote(noteStr) {
-            const staffDiv = document.getElementById("staff");
-            staffDiv.innerHTML = "";
+            try {
+                const staffDiv = document.getElementById("staff");
+                staffDiv.innerHTML = "";
 
-            const parsed = parseNote(noteStr);
-            if (!parsed) return;
+                const parsed = parseNote(noteStr);
+                if (!parsed) {
+                    console.error("Failed to parse note:", noteStr);
+                    return;
+                }
 
-            const clef = getClefForNote(noteStr);
-            // VexFlow note format: "C#4/w" or "C4/w"
-            const vexNote = `${parsed.name}${parsed.accidental}${parsed.octave}/w`;
+                const clef = getClefForNote(noteStr);
+                // VexFlow note format: "C#4/w" or "C4/w"
+                const vexNote = `${parsed.name}${parsed.accidental}${parsed.octave}/w`;
 
-            // Make staff responsive
-            const containerWidth = Math.min(window.innerWidth * 0.9, 400);
-            const staffWidth = containerWidth - 40;
-            const staffHeight = Math.min(150, window.innerWidth * 0.35);
+                // Make staff responsive
+                const containerWidth = Math.min(window.innerWidth * 0.9, 400);
+                const staffWidth = Math.max(containerWidth - 40, 140);
+                const staffHeight = Math.min(150, Math.max(window.innerWidth * 0.35, 100));
 
-            const factory = new Factory({
-                renderer: { elementId: "staff", width: containerWidth, height: staffHeight },
-            });
-            const score = factory.EasyScore();
-            const system = factory.System({ x: 0, y: 0, width: staffWidth });
+                const factory = new Factory({
+                    renderer: { elementId: "staff", width: containerWidth, height: staffHeight },
+                });
+                const score = factory.EasyScore();
+                const system = factory.System({ x: 0, y: 0, width: staffWidth });
 
-            const voice = score.voice(
-                score.notes(vexNote, { clef })
-            );
-            system.addStave({ voices: [voice] }).addClef(clef);
+                const voice = score.voice(
+                    score.notes(vexNote, { clef })
+                );
+                system.addStave({ voices: [voice] }).addClef(clef);
 
-            factory.draw();
+                factory.draw();
 
-            noteDisplayTime = Date.now();
+                noteDisplayTime = Date.now();
+            } catch (error) {
+                console.error("Error rendering note:", error);
+                console.error("Note string:", noteStr);
+            }
         }
 
         function pickNextNote() {
