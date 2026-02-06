@@ -130,8 +130,9 @@
         }
         #stats-grid {
             display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 8px;
+            grid-template-columns: repeat(auto-fill, minmax(45px, 1fr));
+            gap: 6px;
+            max-width: 500px;
         }
         .note-stat {
             text-align: center;
@@ -140,12 +141,12 @@
             border-radius: 4px;
         }
         .note-stat .note-name {
-            font-size: 1.1rem;
+            font-size: 0.9rem;
             font-weight: bold;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
         .note-stat .note-accuracy {
-            font-size: 0.8rem;
+            font-size: 0.7rem;
             color: #aaa;
         }
         .note-stat.perfect { background: rgba(0,200,0,0.3); }
@@ -214,20 +215,61 @@
         }
 
         // ============================================================
-        // Progressive Difficulty Levels
+        // Progressive Difficulty Levels (Pedagogical Progression)
         // ============================================================
-        const ALL_NOTES = ["C", "D", "E", "F", "G", "A", "B"];
+        // Notes are stored as "NoteName+Octave" e.g. "C4", "G3"
+        // Clef is determined by octave: 4+ = treble, 3 and below = bass
+
         const DIFFICULTY_LEVELS = [
-            { notes: ["C", "E", "G"], threshold: 0.80, minAttempts: 3 },
-            { notes: ["C", "D", "E", "G"], threshold: 0.80, minAttempts: 3 },
-            { notes: ["C", "D", "E", "F", "G"], threshold: 0.75, minAttempts: 3 },
-            { notes: ["C", "D", "E", "F", "G", "A"], threshold: 0.75, minAttempts: 3 },
-            { notes: ["C", "D", "E", "F", "G", "A", "B"], threshold: 0.70, minAttempts: 3 },
+            // Level 1-3: Treble clef C position (landmarks: Middle C, Treble G)
+            { name: "C Position", notes: ["C4", "E4", "G4"], threshold: 0.80, minAttempts: 3 },
+            { name: "C Position+", notes: ["C4", "D4", "E4", "F4", "G4"], threshold: 0.80, minAttempts: 3 },
+            { name: "Full Treble Octave", notes: ["C4", "D4", "E4", "F4", "G4", "A4", "B4"], threshold: 0.75, minAttempts: 3 },
+
+            // Level 4-5: Introduce Bass clef (landmark: Bass F)
+            { name: "Bass Introduction", notes: ["C4", "D4", "E4", "F4", "G4", "A4", "B4", "C3", "E3", "G3"], threshold: 0.75, minAttempts: 2 },
+            { name: "Bass C Position", notes: ["C4", "D4", "E4", "F4", "G4", "A4", "B4", "C3", "D3", "E3", "F3", "G3"], threshold: 0.75, minAttempts: 2 },
+
+            // Level 6-7: Extend both clefs
+            { name: "Extended Bass", notes: ["C4", "D4", "E4", "F4", "G4", "A4", "B4", "G2", "A2", "B2", "C3", "D3", "E3", "F3", "G3"], threshold: 0.70, minAttempts: 2 },
+            { name: "High Treble", notes: ["C4", "D4", "E4", "F4", "G4", "A4", "B4", "C5", "D5", "E5", "G2", "A2", "B2", "C3", "D3", "E3", "F3", "G3"], threshold: 0.70, minAttempts: 2 },
+
+            // Level 8-9: Ledger lines
+            { name: "Ledger Lines", notes: ["B3", "C4", "D4", "E4", "F4", "G4", "A4", "B4", "C5", "D5", "E5", "G2", "A2", "B2", "C3", "D3", "E3", "F3", "G3", "A3"], threshold: 0.70, minAttempts: 2 },
+
+            // Level 10: Accidentals (sharps/flats on familiar range)
+            { name: "Accidentals", notes: ["C4", "C#4", "D4", "D#4", "E4", "F4", "F#4", "G4", "G#4", "A4", "A#4", "B4"], threshold: 0.70, minAttempts: 2 },
         ];
+
+        // Build list of all possible notes from all levels
+        const ALL_NOTES = [...new Set(DIFFICULTY_LEVELS.flatMap(l => l.notes))];
+
         let currentLevel = 0;
 
         function getActiveNotes() {
             return DIFFICULTY_LEVELS[currentLevel].notes;
+        }
+
+        function parseNote(noteStr) {
+            // Parse "C4" or "C#4" into { name: "C", accidental: "", octave: 4 }
+            const match = noteStr.match(/^([A-G])(#|b)?(\d)$/);
+            if (!match) return null;
+            return {
+                name: match[1],
+                accidental: match[2] || "",
+                octave: parseInt(match[3]),
+                full: noteStr,
+            };
+        }
+
+        function getClefForNote(noteStr) {
+            const parsed = parseNote(noteStr);
+            if (!parsed) return "treble";
+            // Octave 4+ = treble, 3 and below = bass
+            // Exception: B3 and A3 are ledger lines below treble
+            if (parsed.octave >= 4) return "treble";
+            if (parsed.octave <= 3 && parsed.name <= "G") return "bass";
+            return "bass";
         }
 
         function checkLevelUp() {
@@ -239,6 +281,7 @@
 
             for (const note of level.notes) {
                 const stat = noteStats[note];
+                if (!stat) continue;
                 totalCorrect += stat.correct;
                 totalAttempts += stat.total;
                 if (stat.total < level.minAttempts) allHaveMinAttempts = false;
@@ -249,6 +292,7 @@
             if (accuracy >= level.threshold && allHaveMinAttempts) {
                 currentLevel++;
                 showLevelUp();
+                rebuildKeyboard(); // May need more octaves
                 return true;
             }
             return false;
@@ -256,23 +300,23 @@
 
         function showLevelUp() {
             const levelDisplay = document.getElementById("level-display");
-            levelDisplay.innerHTML = `<span id="level-up-msg">Level Up! New note unlocked!</span>`;
+            const newLevel = DIFFICULTY_LEVELS[currentLevel];
+            levelDisplay.innerHTML = `<span id="level-up-msg">Level Up! ${newLevel.name}</span>`;
             setTimeout(updateLevelDisplay, 2000);
         }
 
         function updateLevelDisplay() {
             const levelDisplay = document.getElementById("level-display");
-            const notes = getActiveNotes();
-            levelDisplay.textContent = `Level ${currentLevel + 1} - Notes: ${notes.join(", ")}`;
+            const level = DIFFICULTY_LEVELS[currentLevel];
+            levelDisplay.textContent = `Level ${currentLevel + 1}: ${level.name}`;
         }
 
         // ============================================================
         // Quiz State & Stats
         // ============================================================
-        const QUIZ_OCTAVE = 4;
-        let currentNote = null;
+        let currentNote = null; // Full note string like "C4" or "F#4"
         let firstAttempt = true;
-        let noteDisplayTime = null; // For response time tracking
+        let noteDisplayTime = null;
 
         // Streak tracking
         let currentStreak = 0;
@@ -283,27 +327,28 @@
             streakDisplay.textContent = `Streak: ${currentStreak} | Best: ${longestStreak}`;
         }
 
-        // Stats: { C: { correct: 0, total: 0 }, ... }
+        // Stats: { "C4": { correct: 0, total: 0 }, "G3": {...}, ... }
         const noteStats = {};
         ALL_NOTES.forEach(note => noteStats[note] = { correct: 0, total: 0 });
 
-        // Spaced Repetition Memory: tracks how well each note is known
+        // Spaced Repetition Memory
         const noteMemory = {};
         ALL_NOTES.forEach(note => noteMemory[note] = {
-            easiness: 2.5,      // How easy this note is (higher = easier)
-            interval: 1,        // Current interval in "rounds"
-            repetitions: 0,     // Consecutive correct answers
-            lastSeen: 0,        // Round number when last shown
-            priority: 1,        // Higher = more likely to be picked
+            easiness: 2.5,
+            interval: 1,
+            repetitions: 0,
+            lastSeen: 0,
+            priority: 1,
         });
         let roundNumber = 0;
 
-        function updateSpacedRepetition(note, quality) {
-            // quality: 0-5 (5=perfect fast recall, 3=correct but slow, 0-2=wrong)
-            const mem = noteMemory[note];
+        function updateSpacedRepetition(noteStr, quality) {
+            if (!noteMemory[noteStr]) {
+                noteMemory[noteStr] = { easiness: 2.5, interval: 1, repetitions: 0, lastSeen: 0, priority: 1 };
+            }
+            const mem = noteMemory[noteStr];
 
             if (quality >= 3) {
-                // Correct answer
                 if (mem.repetitions === 0) {
                     mem.interval = 1;
                 } else if (mem.repetitions === 1) {
@@ -313,18 +358,16 @@
                 }
                 mem.repetitions++;
             } else {
-                // Wrong answer - reset
                 mem.repetitions = 0;
                 mem.interval = 1;
             }
 
-            // Update easiness factor (min 1.3)
             mem.easiness = Math.max(1.3,
                 mem.easiness + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02))
             );
 
             mem.lastSeen = roundNumber;
-            mem.priority = Math.max(0.1, 1 / mem.easiness); // Lower easiness = higher priority
+            mem.priority = Math.max(0.1, 1 / mem.easiness);
         }
 
         function calculateQuality(responseTimeMs, isCorrect, wasFirstAttempt) {
@@ -342,42 +385,45 @@
 
             const activeNotes = getActiveNotes();
 
-            for (const note of ALL_NOTES) {
+            // Sort notes by octave then by note name for display
+            const sortedActive = [...activeNotes].sort((a, b) => {
+                const pa = parseNote(a), pb = parseNote(b);
+                if (pa.octave !== pb.octave) return pa.octave - pb.octave;
+                const order = "CDEFGAB";
+                return order.indexOf(pa.name) - order.indexOf(pb.name);
+            });
+
+            for (const note of sortedActive) {
                 const stat = noteStats[note];
-                const isActive = activeNotes.includes(note);
+                if (!stat) continue;
                 const accuracy = stat.total > 0 ? Math.round((stat.correct / stat.total) * 100) : null;
 
                 const div = document.createElement("div");
                 div.className = "note-stat";
 
-                if (!isActive) {
-                    div.classList.add("locked");
-                } else if (accuracy !== null) {
+                if (accuracy !== null) {
                     if (accuracy === 100) div.classList.add("perfect");
                     else if (accuracy >= 80) div.classList.add("good");
                     else if (accuracy >= 50) div.classList.add("struggling");
                     else div.classList.add("bad");
                 }
 
-                const mem = noteMemory[note];
-                const easeLabel = mem.repetitions > 0 ? `(${mem.easiness.toFixed(1)})` : '';
-
                 div.innerHTML = `
                     <div class="note-name">${note}</div>
-                    <div class="note-accuracy">${isActive ? (accuracy !== null ? `${accuracy}%` : '-') : '🔒'}</div>
+                    <div class="note-accuracy">${accuracy !== null ? `${accuracy}%` : '-'}</div>
                 `;
                 grid.appendChild(div);
             }
         }
 
-        function recordAttempt(note, wasCorrect, responseTimeMs) {
+        function recordAttempt(noteStr, wasCorrect, responseTimeMs) {
             const wasFirstAttempt = firstAttempt;
 
             if (firstAttempt) {
-                noteStats[note].total++;
-                if (wasCorrect) noteStats[note].correct++;
+                if (!noteStats[noteStr]) noteStats[noteStr] = { correct: 0, total: 0 };
+                noteStats[noteStr].total++;
+                if (wasCorrect) noteStats[noteStr].correct++;
 
-                // Update streak
                 if (wasCorrect) {
                     currentStreak++;
                     longestStreak = Math.max(longestStreak, currentStreak);
@@ -389,15 +435,14 @@
 
             if (wasCorrect) {
                 const quality = calculateQuality(responseTimeMs, true, wasFirstAttempt);
-                updateSpacedRepetition(note, quality);
+                updateSpacedRepetition(noteStr, quality);
 
-                // Show response time feedback
                 const rtDisplay = document.getElementById("response-time");
                 const timeStr = (responseTimeMs / 1000).toFixed(1);
                 const speedLabel = responseTimeMs < 1500 ? "Fast!" : responseTimeMs < 3000 ? "Good" : "Keep practicing";
                 rtDisplay.textContent = `${timeStr}s - ${speedLabel}`;
             } else if (firstAttempt) {
-                updateSpacedRepetition(note, 0);
+                updateSpacedRepetition(noteStr, 0);
                 document.getElementById("response-time").textContent = "";
             }
 
@@ -411,9 +456,16 @@
         // ============================================================
         const { Factory } = Vex.Flow;
 
-        function renderQuizNote(noteName) {
+        function renderQuizNote(noteStr) {
             const staffDiv = document.getElementById("staff");
             staffDiv.innerHTML = "";
+
+            const parsed = parseNote(noteStr);
+            if (!parsed) return;
+
+            const clef = getClefForNote(noteStr);
+            // VexFlow note format: "C#4/w" or "C4/w"
+            const vexNote = `${parsed.name}${parsed.accidental}${parsed.octave}/w`;
 
             const factory = new Factory({
                 renderer: { elementId: "staff", width: 200, height: 150 },
@@ -422,35 +474,32 @@
             const system = factory.System({ x: 0, y: 0, width: 180 });
 
             const voice = score.voice(
-                score.notes(`${noteName}${QUIZ_OCTAVE}/w`)
+                score.notes(vexNote, { clef })
             );
-            system.addStave({ voices: [voice] }).addClef("treble");
+            system.addStave({ voices: [voice] }).addClef(clef);
 
             factory.draw();
 
-            // Start response time tracking
             noteDisplayTime = Date.now();
         }
 
         function pickNextNote() {
-            // Spaced repetition: pick notes that need review
             const activeNotes = getActiveNotes();
             roundNumber++;
 
-            // Calculate priority scores for active notes
             const candidates = activeNotes
-                .filter(note => note !== currentNote) // Don't repeat same note
+                .filter(note => note !== currentNote)
                 .map(note => {
+                    if (!noteMemory[note]) {
+                        noteMemory[note] = { easiness: 2.5, interval: 1, repetitions: 0, lastSeen: 0, priority: 1 };
+                    }
                     const mem = noteMemory[note];
                     const roundsSinceLastSeen = roundNumber - mem.lastSeen;
                     const isDue = roundsSinceLastSeen >= mem.interval;
 
-                    // Priority: due notes first, then by difficulty (lower easiness = higher priority)
                     let score = mem.priority;
                     if (isDue) score += 10;
-                    if (roundsSinceLastSeen > mem.interval * 2) score += 5; // Overdue bonus
-
-                    // Add some randomness to prevent predictability
+                    if (roundsSinceLastSeen > mem.interval * 2) score += 5;
                     score += Math.random() * 0.5;
 
                     return { note, score };
@@ -465,40 +514,58 @@
         function startQuiz() {
             updateLevelDisplay();
             updateStreakDisplay();
+            rebuildKeyboard();
             renderQuizNote(pickNextNote());
             updateStatsDisplay();
         }
 
         // ============================================================
-        // Piano Keyboard (2 octaves with black keys)
+        // Piano Keyboard (Dynamic range based on level)
         // ============================================================
-        const NUM_OCTAVES = 2;
-        const START_OCTAVE = 4;
         const NOTE_NAMES = ["C", "D", "E", "F", "G", "A", "B"];
         const BLACK_KEY_MAP = { C: "C#", D: "D#", F: "F#", G: "G#", A: "A#" };
         const HAS_BLACK_AFTER = new Set(["C", "D", "F", "G", "A"]);
 
-        function showFeedback(isCorrect, noteName) {
+        function getKeyboardRange() {
+            // Determine keyboard range based on active notes
+            const activeNotes = getActiveNotes();
+            let minOctave = 4, maxOctave = 5;
+
+            for (const noteStr of activeNotes) {
+                const parsed = parseNote(noteStr);
+                if (parsed) {
+                    minOctave = Math.min(minOctave, parsed.octave);
+                    maxOctave = Math.max(maxOctave, parsed.octave);
+                }
+            }
+
+            // Ensure at least 2 octaves, max 4
+            const range = maxOctave - minOctave + 1;
+            if (range < 2) maxOctave = minOctave + 1;
+
+            return { start: minOctave, end: maxOctave };
+        }
+
+        function showFeedback(isCorrect, noteStr) {
             const feedback = document.getElementById("feedback");
-            feedback.textContent = isCorrect ? "Correct!" : `Wrong - that was ${noteName}`;
+            feedback.textContent = isCorrect ? "Correct!" : `Wrong - that was ${noteStr}`;
             feedback.className = isCorrect ? "correct" : "wrong";
         }
 
-        function handleKeyClick(noteName, keyElement) {
+        function handleKeyClick(noteStr, keyElement) {
             const responseTime = Date.now() - noteDisplayTime;
+            const parsed = parseNote(noteStr);
 
-            if (noteName === currentNote) {
-                // Correct - play note, flash green, show feedback, then next note
+            if (noteStr === currentNote) {
                 recordAttempt(currentNote, true, responseTime);
-                playNote(noteName, QUIZ_OCTAVE);
+                playNote(parsed.name + parsed.accidental, parsed.octave);
                 keyElement.classList.add("correct");
-                showFeedback(true, noteName);
+                showFeedback(true, noteStr);
                 setTimeout(() => {
                     keyElement.classList.remove("correct");
                     renderQuizNote(pickNextNote());
                 }, 400);
             } else {
-                // Wrong - flash red, show feedback
                 recordAttempt(currentNote, false, responseTime);
                 keyElement.classList.add("wrong");
                 showFeedback(false, currentNote);
@@ -506,24 +573,30 @@
             }
         }
 
-        function buildKeyboard() {
+        function rebuildKeyboard() {
             const keyboard = document.getElementById("keyboard");
             keyboard.innerHTML = "";
 
-            for (let oct = START_OCTAVE; oct < START_OCTAVE + NUM_OCTAVES; oct++) {
+            const range = getKeyboardRange();
+            const activeNotes = getActiveNotes();
+            const hasAccidentals = activeNotes.some(n => n.includes("#"));
+
+            for (let oct = range.start; oct <= range.end; oct++) {
                 for (const note of NOTE_NAMES) {
+                    const noteStr = `${note}${oct}`;
+
                     const whiteKey = document.createElement("div");
                     whiteKey.className = "key white";
-                    whiteKey.dataset.note = `${note}${oct}`;
+                    whiteKey.dataset.note = noteStr;
 
                     const label = document.createElement("span");
                     label.className = "key-label";
-                    label.textContent = `${note}${oct}`;
+                    label.textContent = noteStr;
                     whiteKey.appendChild(label);
 
                     whiteKey.addEventListener("mousedown", () => {
                         whiteKey.classList.add("active");
-                        handleKeyClick(note, whiteKey);
+                        handleKeyClick(noteStr, whiteKey);
                     });
                     whiteKey.addEventListener("mouseup", () => whiteKey.classList.remove("active"));
                     whiteKey.addEventListener("mouseleave", () => whiteKey.classList.remove("active"));
@@ -531,21 +604,26 @@
                     keyboard.appendChild(whiteKey);
 
                     if (HAS_BLACK_AFTER.has(note)) {
-                        const blackNote = BLACK_KEY_MAP[note];
+                        const blackNoteStr = `${BLACK_KEY_MAP[note]}${oct}`;
                         const blackKey = document.createElement("div");
                         blackKey.className = "key black";
-                        blackKey.dataset.note = `${blackNote}${oct}`;
+                        blackKey.dataset.note = blackNoteStr;
 
                         const bLabel = document.createElement("span");
                         bLabel.className = "key-label";
-                        bLabel.textContent = `${blackNote}${oct}`;
+                        bLabel.textContent = blackNoteStr;
                         blackKey.appendChild(bLabel);
 
                         blackKey.addEventListener("mousedown", () => {
                             blackKey.classList.add("active");
-                            // Black keys always wrong for this quiz (white keys only)
-                            blackKey.classList.add("wrong");
-                            setTimeout(() => blackKey.classList.remove("wrong"), 200);
+                            if (hasAccidentals && activeNotes.includes(blackNoteStr)) {
+                                // Accidentals are valid answers at this level
+                                handleKeyClick(blackNoteStr, blackKey);
+                            } else {
+                                // Black keys not valid yet
+                                blackKey.classList.add("wrong");
+                                setTimeout(() => blackKey.classList.remove("wrong"), 200);
+                            }
                         });
                         blackKey.addEventListener("mouseup", () => blackKey.classList.remove("active"));
                         blackKey.addEventListener("mouseleave", () => blackKey.classList.remove("active"));
@@ -556,7 +634,6 @@
             }
         }
 
-        buildKeyboard();
         startQuiz();
 
         // ============================================================
