@@ -240,6 +240,8 @@
         // ============================================================
         const STORAGE_KEY = "pianoTrainerProgress";
 
+        let showLabels = true;
+
         function saveProgress() {
             const data = {
                 currentLevel,
@@ -248,6 +250,7 @@
                 currentStreak,
                 longestStreak,
                 roundNumber,
+                showLabels,
             };
             localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
         }
@@ -264,6 +267,7 @@
                 currentStreak = data.currentStreak || 0;
                 longestStreak = data.longestStreak || 0;
                 roundNumber = data.roundNumber || 0;
+                showLabels = data.showLabels !== false; // default true
                 return true;
             } catch (e) {
                 console.error("Failed to load progress:", e);
@@ -730,6 +734,9 @@
                     keyboard.appendChild(separator);
                 }
             }
+
+            // Apply labels visibility state
+            keyboard.classList.toggle("labels-hidden", !showLabels);
         }
 
         startQuiz();
@@ -737,9 +744,14 @@
         // ============================================================
         // Controls
         // ============================================================
+        // Sync checkbox with saved state
+        document.getElementById("show-labels").checked = showLabels;
+
         document.getElementById("show-labels").addEventListener("change", (e) => {
+            showLabels = e.target.checked;
             const keyboard = document.getElementById("keyboard");
-            keyboard.classList.toggle("labels-hidden", !e.target.checked);
+            keyboard.classList.toggle("labels-hidden", !showLabels);
+            saveProgress();
         });
 
         document.getElementById("reset-btn").addEventListener("click", resetProgress);
