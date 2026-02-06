@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Piano Trainer</title>
     <script src="vexflow.js"></script>
     <script src="tone.js"></script>
@@ -16,42 +16,69 @@
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
-            padding: 20px;
+            padding: max(10px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(10px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
+            overflow-x: hidden;
         }
         h1 {
-            font-size: 1.5rem;
-            margin-bottom: 20px;
+            font-size: clamp(1.2rem, 4vw, 1.5rem);
+            margin-bottom: 15px;
             font-weight: 300;
             letter-spacing: 2px;
+            text-align: center;
         }
         #staff-container {
             background: #fff;
             border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 30px;
+            padding: 15px;
+            margin-bottom: 20px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.3);
             overflow-x: auto;
-            max-width: 95vw;
+            width: 100%;
+            max-width: min(95vw, 400px);
+            display: flex;
+            justify-content: center;
         }
         #keyboard-container {
             display: flex;
             justify-content: center;
+            overflow-x: auto;
+            overflow-y: hidden;
+            width: 100%;
+            max-width: 100vw;
+            padding: 10px 0;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+        }
+        #keyboard-container::-webkit-scrollbar {
+            height: 8px;
+        }
+        #keyboard-container::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+        }
+        #keyboard-container::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.3);
+            border-radius: 4px;
         }
         #keyboard {
             display: flex;
             position: relative;
             cursor: pointer;
             user-select: none;
+            touch-action: manipulation;
+            --key-width: min(50px, 12vw);
+            --key-height: min(180px, 40vw);
         }
         .key {
             position: relative;
             border: 1px solid #333;
             border-radius: 0 0 6px 6px;
             transition: background 0.08s;
+            touch-action: manipulation;
         }
         .key.white {
-            width: 50px;
-            height: 180px;
+            width: var(--key-width);
+            height: var(--key-height);
             background: linear-gradient(to bottom, #f8f8f8, #fff);
             z-index: 1;
         }
@@ -62,11 +89,11 @@
             background: linear-gradient(to bottom, #c8d8f8, #d8e8ff);
         }
         .key.black {
-            width: 30px;
-            height: 110px;
+            width: calc(var(--key-width) * 0.6);
+            height: calc(var(--key-height) * 0.61);
             background: linear-gradient(to bottom, #333, #111);
-            margin-left: -15px;
-            margin-right: -15px;
+            margin-left: calc(var(--key-width) * -0.3);
+            margin-right: calc(var(--key-width) * -0.3);
             z-index: 2;
             border-color: #000;
             box-shadow: 2px 2px 5px rgba(0,0,0,0.4);
@@ -77,17 +104,31 @@
         .key.black.active {
             background: linear-gradient(to bottom, #446, #335);
         }
+        @media (max-width: 768px) {
+            #keyboard {
+                --key-width: 45px;
+                --key-height: 160px;
+            }
+        }
+        @media (max-width: 480px) {
+            #keyboard {
+                --key-width: 40px;
+                --key-height: 140px;
+            }
+        }
         .key-label {
             position: absolute;
             bottom: 8px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 10px;
+            font-size: clamp(8px, 2vw, 10px);
             color: #999;
             pointer-events: none;
+            white-space: nowrap;
         }
         .key.black .key-label {
             color: #888;
+            font-size: clamp(7px, 1.8vw, 9px);
         }
         .key.wrong {
             background: linear-gradient(to bottom, #f88, #faa) !important;
@@ -96,34 +137,44 @@
             background: linear-gradient(to bottom, #8f8, #afa) !important;
         }
         #feedback {
-            font-size: 1.2rem;
-            height: 2rem;
+            font-size: clamp(1rem, 3.5vw, 1.2rem);
+            min-height: 2rem;
             margin-bottom: 10px;
+            text-align: center;
         }
         #feedback.correct { color: #8f8; }
         #feedback.wrong { color: #f88; }
         #controls {
             margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            align-items: center;
         }
         #controls label {
             cursor: pointer;
-            font-size: 0.9rem;
+            font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
         #controls input {
-            margin-right: 6px;
             cursor: pointer;
+            width: 18px;
+            height: 18px;
         }
         #controls button {
-            margin-left: 20px;
-            padding: 4px 12px;
+            padding: 8px 16px;
             background: #444;
             border: 1px solid #666;
             color: #ccc;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 0.85rem;
+            font-size: clamp(0.75rem, 2.5vw, 0.85rem);
+            touch-action: manipulation;
         }
-        #controls button:hover {
+        #controls button:hover, #controls button:active {
             background: #555;
         }
         .labels-hidden .key-label {
@@ -131,7 +182,7 @@
         }
         .octave-marker {
             width: 2px;
-            height: 180px;
+            height: var(--key-height);
             background: #666;
             margin: 0 2px;
             z-index: 0;
@@ -141,41 +192,45 @@
             top: -20px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 11px;
+            font-size: clamp(9px, 2.2vw, 11px);
             color: #888;
             white-space: nowrap;
         }
         #stats {
-            margin-top: 30px;
+            margin-top: 20px;
             background: rgba(255,255,255,0.1);
             border-radius: 8px;
-            padding: 15px 20px;
+            padding: 12px 15px;
+            width: 100%;
+            max-width: 95vw;
         }
         #stats h2 {
-            font-size: 1rem;
+            font-size: clamp(0.85rem, 3vw, 1rem);
             font-weight: 300;
             margin-bottom: 10px;
             letter-spacing: 1px;
+            text-align: center;
         }
         #stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(45px, 1fr));
-            gap: 6px;
+            grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+            gap: 5px;
             max-width: 500px;
+            margin: 0 auto;
         }
         .note-stat {
             text-align: center;
-            padding: 8px;
+            padding: 6px 4px;
             background: rgba(0,0,0,0.2);
             border-radius: 4px;
         }
         .note-stat .note-name {
-            font-size: 0.9rem;
+            font-size: clamp(0.75rem, 2.5vw, 0.9rem);
             font-weight: bold;
             margin-bottom: 2px;
         }
         .note-stat .note-accuracy {
-            font-size: 0.7rem;
+            font-size: clamp(0.6rem, 2vw, 0.7rem);
             color: #aaa;
         }
         .note-stat.perfect { background: rgba(0,200,0,0.3); }
@@ -186,19 +241,20 @@
         #level-info {
             margin-bottom: 15px;
             text-align: center;
+            width: 100%;
         }
         #level-display {
-            font-size: 0.9rem;
+            font-size: clamp(0.8rem, 2.8vw, 0.9rem);
             color: #aaa;
         }
         #streak-display {
-            font-size: 0.85rem;
+            font-size: clamp(0.75rem, 2.5vw, 0.85rem);
             color: #888;
             margin-top: 5px;
         }
         #level-up-msg {
             color: #8f8;
-            font-size: 1.1rem;
+            font-size: clamp(0.95rem, 3.2vw, 1.1rem);
             animation: pulse 0.5s ease-in-out;
         }
         @keyframes pulse {
@@ -206,9 +262,10 @@
             50% { transform: scale(1.1); }
         }
         #response-time {
-            font-size: 0.8rem;
+            font-size: clamp(0.7rem, 2.4vw, 0.8rem);
             color: #888;
             margin-top: 5px;
+            text-align: center;
         }
     </style>
 </head>
@@ -546,11 +603,16 @@
             // VexFlow note format: "C#4/w" or "C4/w"
             const vexNote = `${parsed.name}${parsed.accidental}${parsed.octave}/w`;
 
+            // Make staff responsive
+            const containerWidth = Math.min(window.innerWidth * 0.9, 400);
+            const staffWidth = containerWidth - 40;
+            const staffHeight = Math.min(150, window.innerWidth * 0.35);
+
             const factory = new Factory({
-                renderer: { elementId: "staff", width: 200, height: 150 },
+                renderer: { elementId: "staff", width: containerWidth, height: staffHeight },
             });
             const score = factory.EasyScore();
-            const system = factory.System({ x: 0, y: 0, width: 180 });
+            const system = factory.System({ x: 0, y: 0, width: staffWidth });
 
             const voice = score.voice(
                 score.notes(vexNote, { clef })
@@ -689,12 +751,23 @@
                     label.textContent = noteStr;
                     whiteKey.appendChild(label);
 
-                    whiteKey.addEventListener("mousedown", () => {
+                    const handleWhiteKeyDown = () => {
                         whiteKey.classList.add("active");
                         handleKeyClick(noteStr, whiteKey);
-                    });
-                    whiteKey.addEventListener("mouseup", () => whiteKey.classList.remove("active"));
-                    whiteKey.addEventListener("mouseleave", () => whiteKey.classList.remove("active"));
+                    };
+                    const handleWhiteKeyUp = () => whiteKey.classList.remove("active");
+
+                    whiteKey.addEventListener("mousedown", handleWhiteKeyDown);
+                    whiteKey.addEventListener("mouseup", handleWhiteKeyUp);
+                    whiteKey.addEventListener("mouseleave", handleWhiteKeyUp);
+                    whiteKey.addEventListener("touchstart", (e) => {
+                        e.preventDefault();
+                        handleWhiteKeyDown();
+                    }, { passive: false });
+                    whiteKey.addEventListener("touchend", (e) => {
+                        e.preventDefault();
+                        handleWhiteKeyUp();
+                    }, { passive: false });
 
                     octaveWrapper.appendChild(whiteKey);
 
@@ -709,7 +782,7 @@
                         bLabel.textContent = blackNoteStr;
                         blackKey.appendChild(bLabel);
 
-                        blackKey.addEventListener("mousedown", () => {
+                        const handleBlackKeyDown = () => {
                             blackKey.classList.add("active");
                             if (hasAccidentals && activeNotes.includes(blackNoteStr)) {
                                 handleKeyClick(blackNoteStr, blackKey);
@@ -717,9 +790,20 @@
                                 blackKey.classList.add("wrong");
                                 setTimeout(() => blackKey.classList.remove("wrong"), 200);
                             }
-                        });
-                        blackKey.addEventListener("mouseup", () => blackKey.classList.remove("active"));
-                        blackKey.addEventListener("mouseleave", () => blackKey.classList.remove("active"));
+                        };
+                        const handleBlackKeyUp = () => blackKey.classList.remove("active");
+
+                        blackKey.addEventListener("mousedown", handleBlackKeyDown);
+                        blackKey.addEventListener("mouseup", handleBlackKeyUp);
+                        blackKey.addEventListener("mouseleave", handleBlackKeyUp);
+                        blackKey.addEventListener("touchstart", (e) => {
+                            e.preventDefault();
+                            handleBlackKeyDown();
+                        }, { passive: false });
+                        blackKey.addEventListener("touchend", (e) => {
+                            e.preventDefault();
+                            handleBlackKeyUp();
+                        }, { passive: false });
 
                         octaveWrapper.appendChild(blackKey);
                     }
