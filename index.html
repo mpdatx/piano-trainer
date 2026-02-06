@@ -68,8 +68,8 @@
             cursor: pointer;
             user-select: none;
             touch-action: manipulation;
-            --key-width: min(50px, 12vw);
-            --key-height: min(180px, 40vw);
+            --key-width: 50px;
+            --key-height: 180px;
         }
         .key {
             position: relative;
@@ -108,14 +108,14 @@
         }
         @media (max-width: 768px) {
             #keyboard {
-                --key-width: 45px;
-                --key-height: 160px;
+                --key-width: 55px;
+                --key-height: 180px;
             }
         }
         @media (max-width: 480px) {
             #keyboard {
-                --key-width: 40px;
-                --key-height: 140px;
+                --key-width: 50px;
+                --key-height: 160px;
             }
         }
         .key-label {
@@ -601,10 +601,7 @@
                 staffDiv.innerHTML = "";
 
                 const parsed = parseNote(noteStr);
-                if (!parsed) {
-                    console.error("Failed to parse note:", noteStr);
-                    return;
-                }
+                if (!parsed) return;
 
                 const clef = getClefForNote(noteStr);
                 // VexFlow note format: "C#4/w" or "C4/w"
@@ -631,13 +628,11 @@
                 noteDisplayTime = Date.now();
             } catch (error) {
                 console.error("Error rendering note:", error);
-                console.error("Note string:", noteStr);
             }
         }
 
         function pickNextNote() {
             const activeNotes = getActiveNotes();
-            console.log("pickNextNote - active notes:", activeNotes);
             roundNumber++;
 
             const candidates = activeNotes
@@ -661,7 +656,6 @@
 
             currentNote = candidates[0].note;
             firstAttempt = true;
-            console.log("pickNextNote - selected:", currentNote, "firstAttempt reset to true");
             return currentNote;
         }
 
@@ -710,29 +704,20 @@
         }
 
         function handleKeyClick(noteStr, keyElement) {
-            console.log("handleKeyClick called:", noteStr, "current:", currentNote, "firstAttempt:", firstAttempt, "isProcessing:", isProcessingClick);
-
-            if (isProcessingClick) {
-                console.log("Already processing a click, ignoring");
-                return;
-            }
+            if (isProcessingClick) return;
 
             const responseTime = Date.now() - noteDisplayTime;
             const parsed = parseNote(noteStr);
 
             if (noteStr === currentNote) {
-                console.log("Correct answer!");
                 isProcessingClick = true;
                 recordAttempt(currentNote, true, responseTime);
                 playNote(parsed.name + parsed.accidental, parsed.octave);
                 keyElement.classList.add("correct");
-                console.log("Added 'correct' class to:", keyElement);
                 showFeedback(true, noteStr);
                 setTimeout(() => {
-                    console.log("Removing correct class and picking next note");
                     keyElement.classList.remove("correct");
                     const nextNote = pickNextNote();
-                    console.log("Next note:", nextNote);
                     renderQuizNote(nextNote);
                     isProcessingClick = false;
                 }, 400);
