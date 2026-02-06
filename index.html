@@ -452,6 +452,7 @@
         let currentNote = null; // Full note string like "C4" or "F#4"
         let firstAttempt = true;
         let noteDisplayTime = null;
+        let isProcessingClick = false; // Prevent double-clicks
 
         // Streak tracking
         let currentStreak = 0;
@@ -634,6 +635,7 @@
 
         function pickNextNote() {
             const activeNotes = getActiveNotes();
+            console.log("pickNextNote - active notes:", activeNotes);
             roundNumber++;
 
             const candidates = activeNotes
@@ -657,6 +659,7 @@
 
             currentNote = candidates[0].note;
             firstAttempt = true;
+            console.log("pickNextNote - selected:", currentNote, "firstAttempt reset to true");
             return currentNote;
         }
 
@@ -705,17 +708,31 @@
         }
 
         function handleKeyClick(noteStr, keyElement) {
+            console.log("handleKeyClick called:", noteStr, "current:", currentNote, "firstAttempt:", firstAttempt, "isProcessing:", isProcessingClick);
+
+            if (isProcessingClick) {
+                console.log("Already processing a click, ignoring");
+                return;
+            }
+
             const responseTime = Date.now() - noteDisplayTime;
             const parsed = parseNote(noteStr);
 
             if (noteStr === currentNote) {
+                console.log("Correct answer!");
+                isProcessingClick = true;
                 recordAttempt(currentNote, true, responseTime);
                 playNote(parsed.name + parsed.accidental, parsed.octave);
                 keyElement.classList.add("correct");
+                console.log("Added 'correct' class to:", keyElement);
                 showFeedback(true, noteStr);
                 setTimeout(() => {
+                    console.log("Removing correct class and picking next note");
                     keyElement.classList.remove("correct");
-                    renderQuizNote(pickNextNote());
+                    const nextNote = pickNextNote();
+                    console.log("Next note:", nextNote);
+                    renderQuizNote(nextNote);
+                    isProcessingClick = false;
                 }, 400);
             } else {
                 recordAttempt(currentNote, false, responseTime);
