@@ -116,6 +116,22 @@
         .labels-hidden .key-label {
             display: none;
         }
+        .octave-marker {
+            width: 2px;
+            height: 180px;
+            background: #666;
+            margin: 0 2px;
+            z-index: 0;
+        }
+        .octave-label {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 11px;
+            color: #888;
+            white-space: nowrap;
+        }
         #stats {
             margin-top: 30px;
             background: rgba(255,255,255,0.1);
@@ -529,7 +545,7 @@
         function getKeyboardRange() {
             // Determine keyboard range based on active notes
             const activeNotes = getActiveNotes();
-            let minOctave = 4, maxOctave = 5;
+            let minOctave = 9, maxOctave = 0;
 
             for (const noteStr of activeNotes) {
                 const parsed = parseNote(noteStr);
@@ -539,9 +555,11 @@
                 }
             }
 
-            // Ensure at least 2 octaves, max 4
-            const range = maxOctave - minOctave + 1;
-            if (range < 2) maxOctave = minOctave + 1;
+            // Default to octave 4 if no notes found
+            if (minOctave > maxOctave) {
+                minOctave = 4;
+                maxOctave = 4;
+            }
 
             return { start: minOctave, end: maxOctave };
         }
@@ -580,8 +598,21 @@
             const range = getKeyboardRange();
             const activeNotes = getActiveNotes();
             const hasAccidentals = activeNotes.some(n => n.includes("#"));
+            const numOctaves = range.end - range.start + 1;
 
             for (let oct = range.start; oct <= range.end; oct++) {
+                // Add octave label/wrapper for multi-octave keyboards
+                const octaveWrapper = document.createElement("div");
+                octaveWrapper.style.position = "relative";
+                octaveWrapper.style.display = "flex";
+
+                if (numOctaves > 1) {
+                    const octaveLabel = document.createElement("span");
+                    octaveLabel.className = "octave-label";
+                    octaveLabel.textContent = `Octave ${oct}`;
+                    octaveWrapper.appendChild(octaveLabel);
+                }
+
                 for (const note of NOTE_NAMES) {
                     const noteStr = `${note}${oct}`;
 
@@ -601,7 +632,7 @@
                     whiteKey.addEventListener("mouseup", () => whiteKey.classList.remove("active"));
                     whiteKey.addEventListener("mouseleave", () => whiteKey.classList.remove("active"));
 
-                    keyboard.appendChild(whiteKey);
+                    octaveWrapper.appendChild(whiteKey);
 
                     if (HAS_BLACK_AFTER.has(note)) {
                         const blackNoteStr = `${BLACK_KEY_MAP[note]}${oct}`;
@@ -617,10 +648,8 @@
                         blackKey.addEventListener("mousedown", () => {
                             blackKey.classList.add("active");
                             if (hasAccidentals && activeNotes.includes(blackNoteStr)) {
-                                // Accidentals are valid answers at this level
                                 handleKeyClick(blackNoteStr, blackKey);
                             } else {
-                                // Black keys not valid yet
                                 blackKey.classList.add("wrong");
                                 setTimeout(() => blackKey.classList.remove("wrong"), 200);
                             }
@@ -628,8 +657,17 @@
                         blackKey.addEventListener("mouseup", () => blackKey.classList.remove("active"));
                         blackKey.addEventListener("mouseleave", () => blackKey.classList.remove("active"));
 
-                        keyboard.appendChild(blackKey);
+                        octaveWrapper.appendChild(blackKey);
                     }
+                }
+
+                keyboard.appendChild(octaveWrapper);
+
+                // Add visual separator between octaves
+                if (oct < range.end) {
+                    const separator = document.createElement("div");
+                    separator.className = "octave-marker";
+                    keyboard.appendChild(separator);
                 }
             }
         }
