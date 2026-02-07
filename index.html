@@ -179,6 +179,35 @@
         #controls button:hover, #controls button:active {
             background: #555;
         }
+        #mode-toggle {
+            display: flex;
+            gap: 0;
+        }
+        .mode-btn {
+            padding: 8px 16px;
+            background: #333;
+            border: 1px solid #555;
+            color: #888;
+            cursor: pointer;
+            font-size: clamp(0.75rem, 2.5vw, 0.85rem);
+        }
+        .mode-btn:first-child {
+            border-radius: 4px 0 0 4px;
+        }
+        .mode-btn:last-child {
+            border-radius: 0 4px 4px 0;
+            border-left: none;
+        }
+        .mode-btn.active {
+            background: #555;
+            color: #fff;
+            border-color: #777;
+        }
+        #audio-prompt {
+            font-size: 3rem;
+            color: #666;
+            margin: 20px 0;
+        }
         .labels-hidden .key-label {
             display: none;
         }
@@ -283,6 +312,11 @@
     <div id="feedback"></div>
     <div id="response-time"></div>
     <div id="controls">
+        <div id="mode-toggle">
+            <button id="mode-visual" class="mode-btn active">Visual</button>
+            <button id="mode-audio" class="mode-btn">Audio</button>
+        </div>
+        <button id="replay-btn" style="display: none;">Replay Note</button>
         <label><input type="checkbox" id="show-labels" checked> Show key names</label>
         <button id="reset-btn">Reset Progress</button>
     </div>
@@ -300,6 +334,7 @@
         const STORAGE_KEY = "pianoTrainerProgress";
 
         let showLabels = true;
+        let quizMode = "visual"; // "visual" or "audio"
 
         function saveProgress() {
             const data = {
@@ -310,6 +345,7 @@
                 longestStreak,
                 roundNumber,
                 showLabels,
+                quizMode,
             };
             localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
         }
@@ -327,6 +363,7 @@
                 longestStreak = data.longestStreak || 0;
                 roundNumber = data.roundNumber || 0;
                 showLabels = data.showLabels !== false; // default true
+                quizMode = data.quizMode || "visual";
                 return true;
             } catch (e) {
                 console.error("Failed to load progress:", e);
@@ -595,6 +632,18 @@
         // ============================================================
         const { Factory } = Vex.Flow;
 
+        function playQuizNote(parsed) {
+            // Play the note for audio mode quiz
+            playNote(parsed.name + parsed.accidental, parsed.octave);
+        }
+
+        function replayCurrentNote() {
+            if (currentNote && quizMode === "audio") {
+                const parsed = parseNote(currentNote);
+                if (parsed) playQuizNote(parsed);
+            }
+        }
+
         function renderQuizNote(noteStr) {
             try {
                 const staffDiv = document.getElementById("staff");
@@ -602,6 +651,18 @@
 
                 const parsed = parseNote(noteStr);
                 if (!parsed) return;
+
+                if (quizMode === "audio") {
+                    // Audio mode: show speaker icon and play the note
+                    staffDiv.innerHTML = '<div id="audio-prompt">🔊</div>';
+                    document.getElementById("replay-btn").style.display = "inline-block";
+                    playQuizNote(parsed);
+                    noteDisplayTime = Date.now();
+                    return;
+                }
+
+                // Visual mode: hide replay button, show note on staff
+                document.getElementById("replay-btn").style.display = "none";
 
                 const clef = getClefForNote(noteStr);
                 // VexFlow note format: "C#4/w" or "C4/w"
@@ -851,6 +912,35 @@
         });
 
         document.getElementById("reset-btn").addEventListener("click", resetProgress);
+
+        // Mode toggle handlers
+        function updateModeButtons() {
+            document.getElementById("mode-visual").classList.toggle("active", quizMode === "visual");
+            document.getElementById("mode-audio").classList.toggle("active", quizMode === "audio");
+        }
+
+        document.getElementById("mode-visual").addEventListener("click", () => {
+            if (quizMode !== "visual") {
+                quizMode = "visual";
+                updateModeButtons();
+                saveProgress();
+                renderQuizNote(currentNote);
+            }
+        });
+
+        document.getElementById("mode-audio").addEventListener("click", () => {
+            if (quizMode !== "audio") {
+                quizMode = "audio";
+                updateModeButtons();
+                saveProgress();
+                renderQuizNote(currentNote);
+            }
+        });
+
+        document.getElementById("replay-btn").addEventListener("click", replayCurrentNote);
+
+        // Sync mode buttons on load
+        updateModeButtons();
     </script>
 </body>
 </html>
