@@ -1160,12 +1160,13 @@
                 playNote(parsed.name + parsed.accidental, parsed.octave);
                 keyElement.classList.add("correct");
                 showFeedback(true, noteStr);
+                const delay = quizMode === "audio" ? 1200 : 400;
                 setTimeout(() => {
                     keyElement.classList.remove("correct");
                     const nextNote = pickNextNote();
                     renderQuizNote(nextNote);
                     isProcessingClick = false;
-                }, 400);
+                }, delay);
             } else {
                 recordAttempt(currentNote, false, responseTime);
                 keyElement.classList.add("wrong");
