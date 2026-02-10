@@ -183,34 +183,179 @@
         #controls button:hover, #controls button:active {
             background: #555;
         }
-        #mode-toggle {
-            display: flex;
-            gap: 0;
-        }
-        .mode-btn {
-            padding: 8px 16px;
-            background: #333;
-            border: 1px solid #555;
-            color: #888;
-            cursor: pointer;
-            font-size: clamp(0.75rem, 2.5vw, 0.85rem);
-        }
-        .mode-btn:first-child {
-            border-radius: 4px 0 0 4px;
-        }
-        .mode-btn:last-child {
-            border-radius: 0 4px 4px 0;
-            border-left: none;
-        }
-        .mode-btn.active {
-            background: #555;
-            color: #fff;
-            border-color: #777;
-        }
         #audio-prompt {
             font-size: 3rem;
             color: #666;
             margin: 20px 0;
+        }
+        #note-prompt {
+            font-size: clamp(2.5rem, 8vw, 4rem);
+            color: #fff;
+            margin: 20px 0;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+        /* Main Menu */
+        #main-menu {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            padding: 20px;
+        }
+        #main-menu.hidden { display: none; }
+        .menu-title {
+            font-size: clamp(1rem, 3vw, 1.2rem);
+            color: #aaa;
+            margin-bottom: 10px;
+        }
+        .mode-cards {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            max-width: 400px;
+            width: 100%;
+        }
+        .mode-card {
+            background: rgba(255,255,255,0.08);
+            border: 2px solid #444;
+            border-radius: 12px;
+            padding: 20px 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        .mode-card:hover {
+            background: rgba(255,255,255,0.12);
+            border-color: #666;
+            transform: translateY(-2px);
+        }
+        .mode-card:active {
+            transform: translateY(0);
+        }
+        .mode-card h3 {
+            font-size: clamp(0.9rem, 3vw, 1.1rem);
+            margin-bottom: 8px;
+            font-weight: 400;
+        }
+        .mode-icon {
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+        .mode-level {
+            font-size: clamp(0.7rem, 2.2vw, 0.8rem);
+            color: #8f8;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+        .mode-accuracy {
+            font-size: clamp(0.65rem, 2vw, 0.75rem);
+            color: #888;
+        }
+        /* Quiz Screen */
+        #quiz-screen {
+            display: none;
+            width: 100%;
+            flex-direction: column;
+            align-items: center;
+        }
+        #quiz-screen.active { display: flex; }
+        .back-btn {
+            padding: 8px 16px;
+            background: #333;
+            border: 1px solid #555;
+            color: #aaa;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: clamp(0.75rem, 2.5vw, 0.85rem);
+            margin-bottom: 15px;
+            align-self: flex-start;
+        }
+        .back-btn:hover { background: #444; }
+        /* Level Complete Overlay */
+        #level-complete {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 100;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+        .level-complete-content {
+            text-align: center;
+            padding: 40px;
+        }
+        .level-complete-content h2 {
+            color: #8f8;
+            font-size: clamp(1.5rem, 5vw, 2rem);
+            font-weight: 400;
+            margin-bottom: 15px;
+        }
+        .level-complete-content .next-level-name {
+            color: #aaa;
+            font-size: clamp(1rem, 3vw, 1.2rem);
+            margin-bottom: 25px;
+        }
+        .level-btns {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+        .level-btns button {
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: clamp(0.85rem, 2.8vw, 1rem);
+            touch-action: manipulation;
+        }
+        #continue-btn {
+            background: #22aa55;
+            border: none;
+            color: #fff;
+        }
+        #continue-btn:hover { background: #2bc462; }
+        #menu-btn {
+            background: #444;
+            border: 1px solid #666;
+            color: #ccc;
+        }
+        #menu-btn:hover { background: #555; }
+        /* Interval Buttons */
+        #interval-buttons {
+            display: none;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            max-width: 500px;
+            padding: 10px 0;
+        }
+        .interval-btn {
+            padding: 10px 16px;
+            background: #333;
+            border: 2px solid #555;
+            color: #ccc;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+            transition: all 0.15s;
+            touch-action: manipulation;
+        }
+        .interval-btn:hover {
+            background: #444;
+            border-color: #777;
+        }
+        .interval-btn.correct {
+            background: #2a6;
+            border-color: #3c8;
+            color: #fff;
+        }
+        .interval-btn.wrong {
+            background: #a33;
+            border-color: #c44;
+            color: #fff;
         }
         .labels-hidden .key-label {
             display: none;
@@ -306,79 +451,230 @@
 </head>
 <body>
     <h1>PIANO TRAINER</h1>
-    <div id="staff-container">
-        <div id="staff"></div>
-    </div>
-    <div id="level-info">
-        <div id="level-display"></div>
-        <div id="streak-display"></div>
-    </div>
-    <div id="feedback"></div>
-    <div id="response-time"></div>
-    <div id="controls">
-        <div id="mode-toggle">
-            <button id="mode-visual" class="mode-btn active">Visual</button>
-            <button id="mode-audio" class="mode-btn">Audio</button>
+
+    <!-- Main Menu -->
+    <div id="main-menu">
+        <div class="menu-title">Choose a training mode</div>
+        <div class="mode-cards">
+            <div class="mode-card" id="card-visual">
+                <div class="mode-icon">&#x1F3B5;</div>
+                <h3>Note Reading</h3>
+                <div class="mode-level" id="menu-visual-level">Level 1</div>
+                <div class="mode-accuracy" id="menu-visual-accuracy">No attempts yet</div>
+            </div>
+            <div class="mode-card" id="card-audio">
+                <div class="mode-icon">&#x1F50A;</div>
+                <h3>Ear Training</h3>
+                <div class="mode-level" id="menu-audio-level">Level 1</div>
+                <div class="mode-accuracy" id="menu-audio-accuracy">No attempts yet</div>
+            </div>
+            <div class="mode-card" id="card-reverse">
+                <div class="mode-icon">&#x1F3B9;</div>
+                <h3>Note Finding</h3>
+                <div class="mode-level" id="menu-reverse-level">Level 1</div>
+                <div class="mode-accuracy" id="menu-reverse-accuracy">No attempts yet</div>
+            </div>
+            <div class="mode-card" id="card-interval">
+                <div class="mode-icon">&#x1F3B6;</div>
+                <h3>Intervals</h3>
+                <div class="mode-level" id="menu-interval-level">Level 1</div>
+                <div class="mode-accuracy" id="menu-interval-accuracy">No attempts yet</div>
+            </div>
         </div>
-        <button id="replay-btn" style="display: none;">Replay Note</button>
-        <label><input type="checkbox" id="show-labels" checked> Show key names</label>
-        <button id="reset-btn">Reset Progress</button>
+        <button id="reset-btn" style="padding:8px 16px;background:#444;border:1px solid #666;color:#ccc;border-radius:4px;cursor:pointer;margin-top:10px;">Reset All Progress</button>
     </div>
-    <div id="keyboard-container">
-        <div id="keyboard"></div>
+
+    <!-- Quiz Screen -->
+    <div id="quiz-screen">
+        <button class="back-btn" id="back-to-menu">&larr; Back to Menu</button>
+        <div id="staff-container">
+            <div id="staff"></div>
+        </div>
+        <div id="level-info">
+            <div id="level-display"></div>
+            <div id="streak-display"></div>
+        </div>
+        <div id="feedback"></div>
+        <div id="response-time"></div>
+        <div id="controls">
+            <button id="replay-btn" style="display: none;">Replay</button>
+            <button id="start-btn">Start</button>
+            <label><input type="checkbox" id="show-labels" checked> Show key names</label>
+        </div>
+        <div id="keyboard-container">
+            <div id="keyboard"></div>
+        </div>
+        <div id="interval-buttons"></div>
+        <div id="stats">
+            <h2>ACCURACY BY NOTE</h2>
+            <div id="stats-grid"></div>
+        </div>
     </div>
-    <div id="stats">
-        <h2>ACCURACY BY NOTE</h2>
-        <div id="stats-grid"></div>
+
+    <!-- Level Complete Overlay -->
+    <div id="level-complete">
+        <div class="level-complete-content">
+            <h2>Level Complete!</h2>
+            <div class="next-level-name" id="next-level-name"></div>
+            <div class="level-btns">
+                <button id="continue-btn">Continue to Next Level</button>
+                <button id="menu-btn">Back to Menu</button>
+            </div>
+        </div>
     </div>
     <script>
         // ============================================================
-        // Local Storage
+        // Local Storage & State
         // ============================================================
         const STORAGE_KEY = "pianoTrainerProgress";
 
         let showLabels = true;
-        let quizMode = "visual"; // "visual" or "audio"
+        let quizMode = "visual"; // "visual", "audio", "reverse", "interval"
+
+        // ============================================================
+        // Progressive Difficulty Levels
+        // ============================================================
+        const DIFFICULTY_LEVELS = [
+            { name: "C Position", notes: ["C4", "E4", "G4"], threshold: 0.80, minAttempts: 3 },
+            { name: "C Position+", notes: ["C4", "D4", "E4", "F4", "G4"], threshold: 0.80, minAttempts: 3 },
+            { name: "Full Treble Octave", notes: ["C4", "D4", "E4", "F4", "G4", "A4", "B4"], threshold: 0.75, minAttempts: 3 },
+            { name: "Bass Introduction", notes: ["C4", "D4", "E4", "F4", "G4", "A4", "B4", "C3", "E3", "G3"], threshold: 0.75, minAttempts: 2 },
+            { name: "Bass C Position", notes: ["C4", "D4", "E4", "F4", "G4", "A4", "B4", "C3", "D3", "E3", "F3", "G3"], threshold: 0.75, minAttempts: 2 },
+            { name: "Extended Bass", notes: ["C4", "D4", "E4", "F4", "G4", "A4", "B4", "G2", "A2", "B2", "C3", "D3", "E3", "F3", "G3"], threshold: 0.70, minAttempts: 2 },
+            { name: "High Treble", notes: ["C4", "D4", "E4", "F4", "G4", "A4", "B4", "C5", "D5", "E5", "G2", "A2", "B2", "C3", "D3", "E3", "F3", "G3"], threshold: 0.70, minAttempts: 2 },
+            { name: "Ledger Lines", notes: ["B3", "C4", "D4", "E4", "F4", "G4", "A4", "B4", "C5", "D5", "E5", "G2", "A2", "B2", "C3", "D3", "E3", "F3", "G3", "A3"], threshold: 0.70, minAttempts: 2 },
+            { name: "Accidentals", notes: ["C4", "C#4", "D4", "D#4", "E4", "F4", "F#4", "G4", "G#4", "A4", "A#4", "B4"], threshold: 0.70, minAttempts: 2 },
+        ];
+
+        const ALL_NOTES = [...new Set(DIFFICULTY_LEVELS.flatMap(l => l.notes))];
+
+        // ============================================================
+        // Interval Training Data
+        // ============================================================
+        const INTERVALS = {
+            "m2": { semitones: 1, name: "Minor 2nd" },
+            "M2": { semitones: 2, name: "Major 2nd" },
+            "m3": { semitones: 3, name: "Minor 3rd" },
+            "M3": { semitones: 4, name: "Major 3rd" },
+            "P4": { semitones: 5, name: "Perfect 4th" },
+            "TT": { semitones: 6, name: "Tritone" },
+            "P5": { semitones: 7, name: "Perfect 5th" },
+            "m6": { semitones: 8, name: "Minor 6th" },
+            "M6": { semitones: 9, name: "Major 6th" },
+            "m7": { semitones: 10, name: "Minor 7th" },
+            "M7": { semitones: 11, name: "Major 7th" },
+            "P8": { semitones: 12, name: "Octave" },
+        };
+
+        const INTERVAL_LEVELS = [
+            { name: "Perfect Intervals", intervals: ["P4", "P5", "P8"], threshold: 0.80, minAttempts: 3 },
+            { name: "Major Intervals", intervals: ["M2", "M3", "P4", "P5", "P8"], threshold: 0.75, minAttempts: 3 },
+            { name: "Minor Intervals", intervals: ["m2", "M2", "m3", "M3", "P4", "P5"], threshold: 0.75, minAttempts: 2 },
+            { name: "All Simple", intervals: ["m2", "M2", "m3", "M3", "P4", "TT", "P5"], threshold: 0.70, minAttempts: 2 },
+            { name: "Extended", intervals: ["m2", "M2", "m3", "M3", "P4", "TT", "P5", "m6", "M6"], threshold: 0.70, minAttempts: 2 },
+            { name: "All Intervals", intervals: ["m2", "M2", "m3", "M3", "P4", "TT", "P5", "m6", "M6", "m7", "M7", "P8"], threshold: 0.70, minAttempts: 2 },
+        ];
+
+        const ALL_INTERVALS = [...new Set(INTERVAL_LEVELS.flatMap(l => l.intervals))];
+
+        const NOTE_ORDER = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+
+        function noteToMidi(noteStr) {
+            const parsed = parseNote(noteStr);
+            if (!parsed) return 0;
+            const noteName = parsed.name + parsed.accidental;
+            const idx = NOTE_ORDER.indexOf(noteName);
+            return (parsed.octave + 1) * 12 + idx;
+        }
+
+        function midiToNote(midi) {
+            const octave = Math.floor(midi / 12) - 1;
+            const idx = midi % 12;
+            return NOTE_ORDER[idx] + octave;
+        }
+
+        function getLevelsForMode(mode) {
+            return mode === "interval" ? INTERVAL_LEVELS : DIFFICULTY_LEVELS;
+        }
+
+        // ============================================================
+        // Per-Mode Progress
+        // ============================================================
+        function createDefaultProgress(allItems) {
+            const stats = {};
+            const memory = {};
+            allItems.forEach(item => {
+                stats[item] = { correct: 0, total: 0 };
+                memory[item] = { easiness: 2.5, interval: 1, repetitions: 0, lastSeen: 0, priority: 1 };
+            });
+            return {
+                currentLevel: 0,
+                noteStats: stats,
+                noteMemory: memory,
+                currentStreak: 0,
+                longestStreak: 0,
+                roundNumber: 0,
+            };
+        }
+
+        const modeProgress = {
+            visual: createDefaultProgress(ALL_NOTES),
+            audio: createDefaultProgress(ALL_NOTES),
+            reverse: createDefaultProgress(ALL_NOTES),
+            interval: createDefaultProgress(ALL_INTERVALS),
+        };
+
+        function getCurrentProgress() {
+            return modeProgress[quizMode];
+        }
 
         function saveProgress() {
-            const data = {
-                currentLevel,
-                noteStats,
-                noteMemory,
-                currentStreak,
-                longestStreak,
-                roundNumber,
-                showLabels,
-                quizMode,
-            };
+            const data = { modeProgress, showLabels };
             localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
         }
 
         function loadProgress() {
             const saved = localStorage.getItem(STORAGE_KEY);
-            if (!saved) return false;
+            if (!saved) return;
 
             try {
                 const data = JSON.parse(saved);
-                currentLevel = data.currentLevel || 0;
-                Object.assign(noteStats, data.noteStats || {});
-                Object.assign(noteMemory, data.noteMemory || {});
-                currentStreak = data.currentStreak || 0;
-                longestStreak = data.longestStreak || 0;
-                roundNumber = data.roundNumber || 0;
-                showLabels = data.showLabels !== false; // default true
-                quizMode = data.quizMode || "visual";
-                return true;
+
+                if (data.modeProgress) {
+                    // New format
+                    for (const mode of ["visual", "audio", "reverse", "interval"]) {
+                        if (data.modeProgress[mode]) {
+                            Object.assign(modeProgress[mode], data.modeProgress[mode]);
+                            // Ensure all items exist in stats/memory
+                            const allItems = mode === "interval" ? ALL_INTERVALS : ALL_NOTES;
+                            allItems.forEach(item => {
+                                if (!modeProgress[mode].noteStats[item]) {
+                                    modeProgress[mode].noteStats[item] = { correct: 0, total: 0 };
+                                }
+                                if (!modeProgress[mode].noteMemory[item]) {
+                                    modeProgress[mode].noteMemory[item] = { easiness: 2.5, interval: 1, repetitions: 0, lastSeen: 0, priority: 1 };
+                                }
+                            });
+                        }
+                    }
+                } else if (data.currentLevel !== undefined) {
+                    // Legacy flat format → migrate to visual mode
+                    modeProgress.visual.currentLevel = data.currentLevel || 0;
+                    if (data.noteStats) Object.assign(modeProgress.visual.noteStats, data.noteStats);
+                    if (data.noteMemory) Object.assign(modeProgress.visual.noteMemory, data.noteMemory);
+                    modeProgress.visual.currentStreak = data.currentStreak || 0;
+                    modeProgress.visual.longestStreak = data.longestStreak || 0;
+                    modeProgress.visual.roundNumber = data.roundNumber || 0;
+                }
+
+                showLabels = data.showLabels !== false;
             } catch (e) {
                 console.error("Failed to load progress:", e);
-                return false;
             }
         }
 
         function resetProgress() {
-            if (!confirm("Reset all progress? This will clear your level, stats, and streaks.")) {
-                return;
-            }
+            if (!confirm("Reset all progress? This will clear your level, stats, and streaks for all modes.")) return;
             localStorage.removeItem(STORAGE_KEY);
             location.reload();
         }
@@ -392,44 +688,15 @@
             synth.triggerAttackRelease(`${noteName}${octave}`, "4n");
         }
 
-        // ============================================================
-        // Progressive Difficulty Levels (Pedagogical Progression)
-        // ============================================================
-        // Notes are stored as "NoteName+Octave" e.g. "C4", "G3"
-        // Clef is determined by octave: 4+ = treble, 3 and below = bass
-
-        const DIFFICULTY_LEVELS = [
-            // Level 1-3: Treble clef C position (landmarks: Middle C, Treble G)
-            { name: "C Position", notes: ["C4", "E4", "G4"], threshold: 0.80, minAttempts: 3 },
-            { name: "C Position+", notes: ["C4", "D4", "E4", "F4", "G4"], threshold: 0.80, minAttempts: 3 },
-            { name: "Full Treble Octave", notes: ["C4", "D4", "E4", "F4", "G4", "A4", "B4"], threshold: 0.75, minAttempts: 3 },
-
-            // Level 4-5: Introduce Bass clef (landmark: Bass F)
-            { name: "Bass Introduction", notes: ["C4", "D4", "E4", "F4", "G4", "A4", "B4", "C3", "E3", "G3"], threshold: 0.75, minAttempts: 2 },
-            { name: "Bass C Position", notes: ["C4", "D4", "E4", "F4", "G4", "A4", "B4", "C3", "D3", "E3", "F3", "G3"], threshold: 0.75, minAttempts: 2 },
-
-            // Level 6-7: Extend both clefs
-            { name: "Extended Bass", notes: ["C4", "D4", "E4", "F4", "G4", "A4", "B4", "G2", "A2", "B2", "C3", "D3", "E3", "F3", "G3"], threshold: 0.70, minAttempts: 2 },
-            { name: "High Treble", notes: ["C4", "D4", "E4", "F4", "G4", "A4", "B4", "C5", "D5", "E5", "G2", "A2", "B2", "C3", "D3", "E3", "F3", "G3"], threshold: 0.70, minAttempts: 2 },
-
-            // Level 8-9: Ledger lines
-            { name: "Ledger Lines", notes: ["B3", "C4", "D4", "E4", "F4", "G4", "A4", "B4", "C5", "D5", "E5", "G2", "A2", "B2", "C3", "D3", "E3", "F3", "G3", "A3"], threshold: 0.70, minAttempts: 2 },
-
-            // Level 10: Accidentals (sharps/flats on familiar range)
-            { name: "Accidentals", notes: ["C4", "C#4", "D4", "D#4", "E4", "F4", "F#4", "G4", "G#4", "A4", "A#4", "B4"], threshold: 0.70, minAttempts: 2 },
-        ];
-
-        // Build list of all possible notes from all levels
-        const ALL_NOTES = [...new Set(DIFFICULTY_LEVELS.flatMap(l => l.notes))];
-
-        let currentLevel = 0;
-
-        function getActiveNotes() {
-            return DIFFICULTY_LEVELS[currentLevel].notes;
+        function playNoteStr(noteStr) {
+            const parsed = parseNote(noteStr);
+            if (parsed) playNote(parsed.name + parsed.accidental, parsed.octave);
         }
 
+        // ============================================================
+        // Note Parsing
+        // ============================================================
         function parseNote(noteStr) {
-            // Parse "C4" or "C#4" into { name: "C", accidental: "", octave: 4 }
             const match = noteStr.match(/^([A-G])(#|b)?(\d)$/);
             if (!match) return null;
             return {
@@ -443,98 +710,45 @@
         function getClefForNote(noteStr) {
             const parsed = parseNote(noteStr);
             if (!parsed) return "treble";
-            // Octave 4+ = treble, 3 and below = bass
-            // Exception: B3 and A3 are ledger lines below treble
             if (parsed.octave >= 4) return "treble";
-            if (parsed.octave <= 3 && parsed.name <= "G") return "bass";
             return "bass";
         }
 
-        function checkLevelUp() {
-            if (currentLevel >= DIFFICULTY_LEVELS.length - 1) return false;
-
-            const level = DIFFICULTY_LEVELS[currentLevel];
-            let totalCorrect = 0, totalAttempts = 0;
-            let allHaveMinAttempts = true;
-
-            for (const note of level.notes) {
-                const stat = noteStats[note];
-                if (!stat) continue;
-                totalCorrect += stat.correct;
-                totalAttempts += stat.total;
-                if (stat.total < level.minAttempts) allHaveMinAttempts = false;
+        // ============================================================
+        // Active Notes / Items
+        // ============================================================
+        function getActiveNotes() {
+            const progress = getCurrentProgress();
+            if (quizMode === "interval") {
+                const levels = INTERVAL_LEVELS;
+                return levels[progress.currentLevel].intervals;
             }
-
-            const accuracy = totalAttempts > 0 ? totalCorrect / totalAttempts : 0;
-
-            if (accuracy >= level.threshold && allHaveMinAttempts) {
-                currentLevel++;
-                showLevelUp();
-                rebuildKeyboard(); // May need more octaves
-                return true;
-            }
-            return false;
-        }
-
-        function showLevelUp() {
-            const levelDisplay = document.getElementById("level-display");
-            const newLevel = DIFFICULTY_LEVELS[currentLevel];
-            levelDisplay.innerHTML = `<span id="level-up-msg">Level Up! ${newLevel.name}</span>`;
-            setTimeout(updateLevelDisplay, 2000);
-        }
-
-        function updateLevelDisplay() {
-            const levelDisplay = document.getElementById("level-display");
-            const level = DIFFICULTY_LEVELS[currentLevel];
-            levelDisplay.textContent = `Level ${currentLevel + 1}: ${level.name}`;
+            return DIFFICULTY_LEVELS[progress.currentLevel].notes;
         }
 
         // ============================================================
-        // Quiz State & Stats
+        // Quiz State
         // ============================================================
-        let currentNote = null; // Full note string like "C4" or "F#4"
+        let currentNote = null;
+        let currentInterval = null; // { root: "C4", target: "G4", interval: "P5" }
         let firstAttempt = true;
         let noteDisplayTime = null;
-        let isProcessingClick = false; // Prevent double-clicks
+        let isProcessingClick = false;
 
-        // Streak tracking
-        let currentStreak = 0;
-        let longestStreak = 0;
-
-        function updateStreakDisplay() {
-            const streakDisplay = document.getElementById("streak-display");
-            streakDisplay.textContent = `Streak: ${currentStreak} | Best: ${longestStreak}`;
-        }
-
-        // Stats: { "C4": { correct: 0, total: 0 }, "G3": {...}, ... }
-        const noteStats = {};
-        ALL_NOTES.forEach(note => noteStats[note] = { correct: 0, total: 0 });
-
-        // Spaced Repetition Memory
-        const noteMemory = {};
-        ALL_NOTES.forEach(note => noteMemory[note] = {
-            easiness: 2.5,
-            interval: 1,
-            repetitions: 0,
-            lastSeen: 0,
-            priority: 1,
-        });
-        let roundNumber = 0;
-
-        function updateSpacedRepetition(noteStr, quality) {
-            if (!noteMemory[noteStr]) {
-                noteMemory[noteStr] = { easiness: 2.5, interval: 1, repetitions: 0, lastSeen: 0, priority: 1 };
+        // ============================================================
+        // Spaced Repetition
+        // ============================================================
+        function updateSpacedRepetition(itemStr, quality) {
+            const progress = getCurrentProgress();
+            if (!progress.noteMemory[itemStr]) {
+                progress.noteMemory[itemStr] = { easiness: 2.5, interval: 1, repetitions: 0, lastSeen: 0, priority: 1 };
             }
-            const mem = noteMemory[noteStr];
+            const mem = progress.noteMemory[itemStr];
 
             if (quality >= 3) {
-                if (mem.repetitions === 0) {
-                    mem.interval = 1;
-                } else if (mem.repetitions === 1) {
-                    mem.interval = 3;
-                } else {
-                    mem.interval = Math.round(mem.interval * mem.easiness);
-                }
+                if (mem.repetitions === 0) mem.interval = 1;
+                else if (mem.repetitions === 1) mem.interval = 3;
+                else mem.interval = Math.round(mem.interval * mem.easiness);
                 mem.repetitions++;
             } else {
                 mem.repetitions = 0;
@@ -544,36 +758,57 @@
             mem.easiness = Math.max(1.3,
                 mem.easiness + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02))
             );
-
-            mem.lastSeen = roundNumber;
+            mem.lastSeen = progress.roundNumber;
             mem.priority = Math.max(0.1, 1 / mem.easiness);
         }
 
         function calculateQuality(responseTimeMs, isCorrect, wasFirstAttempt) {
             if (!isCorrect) return 0;
             if (!wasFirstAttempt) return 2;
-            if (responseTimeMs < 1500) return 5;  // Fast
-            if (responseTimeMs < 3000) return 4;  // Good
-            if (responseTimeMs < 5000) return 3;  // Slow but correct
+            if (responseTimeMs < 1500) return 5;
+            if (responseTimeMs < 3000) return 4;
             return 3;
+        }
+
+        // ============================================================
+        // Display Updates
+        // ============================================================
+        function updateStreakDisplay() {
+            const progress = getCurrentProgress();
+            const streakDisplay = document.getElementById("streak-display");
+            streakDisplay.textContent = `Streak: ${progress.currentStreak} | Best: ${progress.longestStreak}`;
+        }
+
+        function updateLevelDisplay() {
+            const progress = getCurrentProgress();
+            const levels = getLevelsForMode(quizMode);
+            const level = levels[progress.currentLevel];
+            const levelDisplay = document.getElementById("level-display");
+            const modeLabel = quizMode === "visual" ? "Note Reading" : quizMode === "audio" ? "Ear Training" : quizMode === "reverse" ? "Note Finding" : "Intervals";
+            levelDisplay.textContent = `${modeLabel} - Level ${progress.currentLevel + 1}: ${level.name}`;
         }
 
         function updateStatsDisplay() {
             const grid = document.getElementById("stats-grid");
             grid.innerHTML = "";
 
-            const activeNotes = getActiveNotes();
+            const progress = getCurrentProgress();
+            const activeItems = getActiveNotes();
 
-            // Sort notes by octave then by note name for display
-            const sortedActive = [...activeNotes].sort((a, b) => {
-                const pa = parseNote(a), pb = parseNote(b);
-                if (pa.octave !== pb.octave) return pa.octave - pb.octave;
-                const order = "CDEFGAB";
-                return order.indexOf(pa.name) - order.indexOf(pb.name);
-            });
+            let sortedActive;
+            if (quizMode === "interval") {
+                sortedActive = [...activeItems];
+            } else {
+                sortedActive = [...activeItems].sort((a, b) => {
+                    const pa = parseNote(a), pb = parseNote(b);
+                    if (pa.octave !== pb.octave) return pa.octave - pb.octave;
+                    const order = "CDEFGAB";
+                    return order.indexOf(pa.name) - order.indexOf(pb.name);
+                });
+            }
 
-            for (const note of sortedActive) {
-                const stat = noteStats[note];
+            for (const item of sortedActive) {
+                const stat = progress.noteStats[item];
                 if (!stat) continue;
                 const accuracy = stat.total > 0 ? Math.round((stat.correct / stat.total) * 100) : null;
 
@@ -587,41 +822,46 @@
                     else div.classList.add("bad");
                 }
 
+                const displayName = quizMode === "interval" ? INTERVALS[item].name : item;
                 div.innerHTML = `
-                    <div class="note-name">${note}</div>
+                    <div class="note-name">${displayName}</div>
                     <div class="note-accuracy">${accuracy !== null ? `${accuracy}%` : '-'}</div>
                 `;
                 grid.appendChild(div);
             }
         }
 
-        function recordAttempt(noteStr, wasCorrect, responseTimeMs) {
+        // ============================================================
+        // Record Attempt
+        // ============================================================
+        function recordAttempt(itemStr, wasCorrect, responseTimeMs) {
+            const progress = getCurrentProgress();
             const wasFirstAttempt = firstAttempt;
 
             if (firstAttempt) {
-                if (!noteStats[noteStr]) noteStats[noteStr] = { correct: 0, total: 0 };
-                noteStats[noteStr].total++;
-                if (wasCorrect) noteStats[noteStr].correct++;
+                if (!progress.noteStats[itemStr]) progress.noteStats[itemStr] = { correct: 0, total: 0 };
+                progress.noteStats[itemStr].total++;
+                if (wasCorrect) progress.noteStats[itemStr].correct++;
 
                 if (wasCorrect) {
-                    currentStreak++;
-                    longestStreak = Math.max(longestStreak, currentStreak);
+                    progress.currentStreak++;
+                    progress.longestStreak = Math.max(progress.longestStreak, progress.currentStreak);
                 } else {
-                    currentStreak = 0;
+                    progress.currentStreak = 0;
                 }
                 updateStreakDisplay();
             }
 
             if (wasCorrect) {
                 const quality = calculateQuality(responseTimeMs, true, wasFirstAttempt);
-                updateSpacedRepetition(noteStr, quality);
+                updateSpacedRepetition(itemStr, quality);
 
                 const rtDisplay = document.getElementById("response-time");
                 const timeStr = (responseTimeMs / 1000).toFixed(1);
                 const speedLabel = responseTimeMs < 1500 ? "Fast!" : responseTimeMs < 3000 ? "Good" : "Keep practicing";
                 rtDisplay.textContent = `${timeStr}s - ${speedLabel}`;
             } else if (firstAttempt) {
-                updateSpacedRepetition(noteStr, 0);
+                updateSpacedRepetition(itemStr, 0);
                 document.getElementById("response-time").textContent = "";
             }
 
@@ -632,47 +872,94 @@
         }
 
         // ============================================================
-        // Staff Rendering (Single Note Quiz)
+        // Level Up
+        // ============================================================
+        function checkLevelUp() {
+            const progress = getCurrentProgress();
+            const levels = getLevelsForMode(quizMode);
+            if (progress.currentLevel >= levels.length - 1) return false;
+
+            const level = levels[progress.currentLevel];
+            const items = quizMode === "interval" ? level.intervals : level.notes;
+            let totalCorrect = 0, totalAttempts = 0;
+            let allHaveMinAttempts = true;
+
+            for (const item of items) {
+                const stat = progress.noteStats[item];
+                if (!stat) continue;
+                totalCorrect += stat.correct;
+                totalAttempts += stat.total;
+                if (stat.total < level.minAttempts) allHaveMinAttempts = false;
+            }
+
+            const accuracy = totalAttempts > 0 ? totalCorrect / totalAttempts : 0;
+
+            if (accuracy >= level.threshold && allHaveMinAttempts) {
+                progress.currentLevel++;
+                updateLevelDisplay();
+                if (quizMode !== "interval") rebuildKeyboard();
+                showLevelComplete();
+                return true;
+            }
+            return false;
+        }
+
+        function showLevelComplete() {
+            const progress = getCurrentProgress();
+            const levels = getLevelsForMode(quizMode);
+            const nextLevel = levels[progress.currentLevel];
+            document.getElementById("next-level-name").textContent = `Next: ${nextLevel.name}`;
+            document.getElementById("level-complete").style.display = "flex";
+            document.getElementById("start-btn").style.display = "none";
+            document.getElementById("replay-btn").style.display = "none";
+
+            const continueBtn = document.getElementById("continue-btn");
+            continueBtn.style.display = progress.currentLevel >= levels.length - 1 ? "none" : "inline-block";
+        }
+
+        // ============================================================
+        // Staff Rendering
         // ============================================================
         const { Factory } = Vex.Flow;
-
-        function playQuizNote(parsed) {
-            // Play the note for audio mode quiz
-            playNote(parsed.name + parsed.accidental, parsed.octave);
-        }
-
-        function replayCurrentNote() {
-            if (currentNote && quizMode === "audio") {
-                const parsed = parseNote(currentNote);
-                if (parsed) playQuizNote(parsed);
-            }
-        }
 
         function renderQuizNote(noteStr) {
             try {
                 const staffDiv = document.getElementById("staff");
                 staffDiv.innerHTML = "";
 
-                const parsed = parseNote(noteStr);
-                if (!parsed) return;
-
-                if (quizMode === "audio") {
-                    // Audio mode: show speaker icon and play the note
-                    staffDiv.innerHTML = '<div id="audio-prompt">🔊</div>';
+                if (quizMode === "interval") {
+                    // Interval mode: show speaker icon
+                    staffDiv.innerHTML = '<div id="audio-prompt">&#x1F50A; Interval</div>';
                     document.getElementById("replay-btn").style.display = "inline-block";
-                    playQuizNote(parsed);
+                    playCurrentInterval();
                     noteDisplayTime = Date.now();
                     return;
                 }
 
-                // Visual mode: hide replay button, show note on staff
+                const parsed = parseNote(noteStr);
+                if (!parsed) return;
+
+                if (quizMode === "audio") {
+                    staffDiv.innerHTML = '<div id="audio-prompt">&#x1F50A;</div>';
+                    document.getElementById("replay-btn").style.display = "inline-block";
+                    playNoteStr(noteStr);
+                    noteDisplayTime = Date.now();
+                    return;
+                }
+
+                if (quizMode === "reverse") {
+                    staffDiv.innerHTML = `<div id="note-prompt">${noteStr}</div>`;
+                    document.getElementById("replay-btn").style.display = "none";
+                    noteDisplayTime = Date.now();
+                    return;
+                }
+
+                // Visual mode: show note on staff
                 document.getElementById("replay-btn").style.display = "none";
 
                 const clef = getClefForNote(noteStr);
-                // VexFlow note format: "C#4/w" or "C4/w"
                 const vexNote = `${parsed.name}${parsed.accidental}${parsed.octave}/w`;
 
-                // Make staff responsive
                 const containerWidth = Math.min(window.innerWidth * 0.9, 400);
                 const staffWidth = Math.max(containerWidth - 40, 140);
                 const staffHeight = Math.min(150, Math.max(window.innerWidth * 0.35, 100));
@@ -683,36 +970,144 @@
                 const score = factory.EasyScore();
                 const system = factory.System({ x: 0, y: 0, width: staffWidth });
 
-                const voice = score.voice(
-                    score.notes(vexNote, { clef })
-                );
+                const voice = score.voice(score.notes(vexNote, { clef }));
                 system.addStave({ voices: [voice] }).addClef(clef);
 
                 factory.draw();
-
                 noteDisplayTime = Date.now();
             } catch (error) {
                 console.error("Error rendering note:", error);
             }
         }
 
+        function replayCurrentNote() {
+            if (quizMode === "interval" && currentInterval) {
+                playCurrentInterval();
+            } else if (currentNote && (quizMode === "audio" || quizMode === "reverse")) {
+                playNoteStr(currentNote);
+            }
+        }
+
+        // ============================================================
+        // Interval Mode Logic
+        // ============================================================
+        function generateInterval() {
+            const progress = getCurrentProgress();
+            const activeIntervals = getActiveNotes(); // returns interval names for interval mode
+            progress.roundNumber++;
+
+            // Pick interval using spaced repetition
+            const candidates = activeIntervals
+                .filter(iv => !currentInterval || iv !== currentInterval.interval)
+                .map(iv => {
+                    if (!progress.noteMemory[iv]) {
+                        progress.noteMemory[iv] = { easiness: 2.5, interval: 1, repetitions: 0, lastSeen: 0, priority: 1 };
+                    }
+                    const mem = progress.noteMemory[iv];
+                    const roundsSince = progress.roundNumber - mem.lastSeen;
+                    const isDue = roundsSince >= mem.interval;
+                    let score = mem.priority;
+                    if (isDue) score += 10;
+                    if (roundsSince > mem.interval * 2) score += 5;
+                    score += Math.random() * 0.5;
+                    return { interval: iv, score };
+                })
+                .sort((a, b) => b.score - a.score);
+
+            const chosenInterval = candidates[0].interval;
+            const semitones = INTERVALS[chosenInterval].semitones;
+
+            // Pick a random root note (C3 to C5 range, avoiding out-of-range targets)
+            const minMidi = noteToMidi("C3");
+            const maxMidi = noteToMidi("C5");
+            const rootMidi = minMidi + Math.floor(Math.random() * (maxMidi - minMidi - semitones + 1));
+            const targetMidi = rootMidi + semitones;
+
+            currentInterval = {
+                root: midiToNote(rootMidi),
+                target: midiToNote(targetMidi),
+                interval: chosenInterval,
+            };
+            currentNote = chosenInterval; // for tracking
+            firstAttempt = true;
+            return chosenInterval;
+        }
+
+        function playCurrentInterval() {
+            if (!currentInterval) return;
+            playNoteStr(currentInterval.root);
+            setTimeout(() => playNoteStr(currentInterval.target), 600);
+        }
+
+        function buildIntervalButtons() {
+            const container = document.getElementById("interval-buttons");
+            container.innerHTML = "";
+            container.style.display = "flex";
+
+            const activeIntervals = getActiveNotes();
+            for (const iv of activeIntervals) {
+                const btn = document.createElement("button");
+                btn.className = "interval-btn";
+                btn.textContent = INTERVALS[iv].name;
+                btn.dataset.interval = iv;
+                btn.addEventListener("click", () => handleIntervalClick(iv, btn));
+                btn.addEventListener("touchstart", (e) => {
+                    e.preventDefault();
+                    handleIntervalClick(iv, btn);
+                }, { passive: false });
+                container.appendChild(btn);
+            }
+        }
+
+        function handleIntervalClick(intervalName, btnElement) {
+            if (isProcessingClick || !currentInterval) return;
+
+            const responseTime = Date.now() - noteDisplayTime;
+
+            if (intervalName === currentInterval.interval) {
+                isProcessingClick = true;
+                recordAttempt(currentInterval.interval, true, responseTime);
+                btnElement.classList.add("correct");
+                showFeedback(true, INTERVALS[currentInterval.interval].name);
+                setTimeout(() => {
+                    btnElement.classList.remove("correct");
+                    generateInterval();
+                    renderQuizNote(currentNote);
+                    isProcessingClick = false;
+                }, 400);
+            } else {
+                recordAttempt(currentInterval.interval, false, responseTime);
+                btnElement.classList.add("wrong");
+                showFeedback(false, INTERVALS[currentInterval.interval].name);
+                setTimeout(() => btnElement.classList.remove("wrong"), 200);
+            }
+        }
+
+        // ============================================================
+        // Pick Next Note (for non-interval modes)
+        // ============================================================
         function pickNextNote() {
+            if (quizMode === "interval") {
+                return generateInterval();
+            }
+
+            const progress = getCurrentProgress();
             const activeNotes = getActiveNotes();
-            roundNumber++;
+            progress.roundNumber++;
 
             const candidates = activeNotes
                 .filter(note => note !== currentNote)
                 .map(note => {
-                    if (!noteMemory[note]) {
-                        noteMemory[note] = { easiness: 2.5, interval: 1, repetitions: 0, lastSeen: 0, priority: 1 };
+                    if (!progress.noteMemory[note]) {
+                        progress.noteMemory[note] = { easiness: 2.5, interval: 1, repetitions: 0, lastSeen: 0, priority: 1 };
                     }
-                    const mem = noteMemory[note];
-                    const roundsSinceLastSeen = roundNumber - mem.lastSeen;
-                    const isDue = roundsSinceLastSeen >= mem.interval;
+                    const mem = progress.noteMemory[note];
+                    const roundsSince = progress.roundNumber - mem.lastSeen;
+                    const isDue = roundsSince >= mem.interval;
 
                     let score = mem.priority;
                     if (isDue) score += 10;
-                    if (roundsSinceLastSeen > mem.interval * 2) score += 5;
+                    if (roundsSince > mem.interval * 2) score += 5;
                     score += Math.random() * 0.5;
 
                     return { note, score };
@@ -724,24 +1119,14 @@
             return currentNote;
         }
 
-        function startQuiz() {
-            loadProgress();
-            updateLevelDisplay();
-            updateStreakDisplay();
-            rebuildKeyboard();
-            renderQuizNote(pickNextNote());
-            updateStatsDisplay();
-        }
-
         // ============================================================
-        // Piano Keyboard (Dynamic range based on level)
+        // Piano Keyboard
         // ============================================================
         const NOTE_NAMES = ["C", "D", "E", "F", "G", "A", "B"];
         const BLACK_KEY_MAP = { C: "C#", D: "D#", F: "F#", G: "G#", A: "A#" };
         const HAS_BLACK_AFTER = new Set(["C", "D", "F", "G", "A"]);
 
         function getKeyboardRange() {
-            // Determine keyboard range based on active notes
             const activeNotes = getActiveNotes();
             let minOctave = 9, maxOctave = 0;
 
@@ -753,18 +1138,13 @@
                 }
             }
 
-            // Default to octave 4 if no notes found
-            if (minOctave > maxOctave) {
-                minOctave = 4;
-                maxOctave = 4;
-            }
-
+            if (minOctave > maxOctave) { minOctave = 4; maxOctave = 4; }
             return { start: minOctave, end: maxOctave };
         }
 
-        function showFeedback(isCorrect, noteStr) {
+        function showFeedback(isCorrect, itemStr) {
             const feedback = document.getElementById("feedback");
-            feedback.textContent = isCorrect ? "Correct!" : `Wrong - that was ${noteStr}`;
+            feedback.textContent = isCorrect ? "Correct!" : `Wrong - that was ${itemStr}`;
             feedback.className = isCorrect ? "correct" : "wrong";
         }
 
@@ -798,13 +1178,18 @@
             const keyboard = document.getElementById("keyboard");
             keyboard.innerHTML = "";
 
+            if (quizMode === "interval") {
+                document.getElementById("keyboard-container").style.display = "none";
+                return;
+            }
+            document.getElementById("keyboard-container").style.display = "flex";
+
             const range = getKeyboardRange();
             const activeNotes = getActiveNotes();
             const hasAccidentals = activeNotes.some(n => n.includes("#"));
             const numOctaves = range.end - range.start + 1;
 
             for (let oct = range.start; oct <= range.end; oct++) {
-                // Add octave label/wrapper for multi-octave keyboards
                 const octaveWrapper = document.createElement("div");
                 octaveWrapper.style.position = "relative";
                 octaveWrapper.style.display = "flex";
@@ -818,7 +1203,6 @@
 
                 for (const note of NOTE_NAMES) {
                     const noteStr = `${note}${oct}`;
-
                     const whiteKey = document.createElement("div");
                     whiteKey.className = "key white";
                     whiteKey.dataset.note = noteStr;
@@ -837,14 +1221,8 @@
                     whiteKey.addEventListener("mousedown", handleWhiteKeyDown);
                     whiteKey.addEventListener("mouseup", handleWhiteKeyUp);
                     whiteKey.addEventListener("mouseleave", handleWhiteKeyUp);
-                    whiteKey.addEventListener("touchstart", (e) => {
-                        e.preventDefault();
-                        handleWhiteKeyDown();
-                    }, { passive: false });
-                    whiteKey.addEventListener("touchend", (e) => {
-                        e.preventDefault();
-                        handleWhiteKeyUp();
-                    }, { passive: false });
+                    whiteKey.addEventListener("touchstart", (e) => { e.preventDefault(); handleWhiteKeyDown(); }, { passive: false });
+                    whiteKey.addEventListener("touchend", (e) => { e.preventDefault(); handleWhiteKeyUp(); }, { passive: false });
 
                     octaveWrapper.appendChild(whiteKey);
 
@@ -873,14 +1251,8 @@
                         blackKey.addEventListener("mousedown", handleBlackKeyDown);
                         blackKey.addEventListener("mouseup", handleBlackKeyUp);
                         blackKey.addEventListener("mouseleave", handleBlackKeyUp);
-                        blackKey.addEventListener("touchstart", (e) => {
-                            e.preventDefault();
-                            handleBlackKeyDown();
-                        }, { passive: false });
-                        blackKey.addEventListener("touchend", (e) => {
-                            e.preventDefault();
-                            handleBlackKeyUp();
-                        }, { passive: false });
+                        blackKey.addEventListener("touchstart", (e) => { e.preventDefault(); handleBlackKeyDown(); }, { passive: false });
+                        blackKey.addEventListener("touchend", (e) => { e.preventDefault(); handleBlackKeyUp(); }, { passive: false });
 
                         octaveWrapper.appendChild(blackKey);
                     }
@@ -888,7 +1260,6 @@
 
                 keyboard.appendChild(octaveWrapper);
 
-                // Add visual separator between octaves
                 if (oct < range.end) {
                     const separator = document.createElement("div");
                     separator.className = "octave-marker";
@@ -896,55 +1267,128 @@
                 }
             }
 
-            // Apply labels visibility state
             keyboard.classList.toggle("labels-hidden", !showLabels);
         }
 
-        startQuiz();
+        // ============================================================
+        // Menu and Screen Management
+        // ============================================================
+        function updateMenuStats() {
+            const modes = ["visual", "audio", "reverse", "interval"];
+            for (const mode of modes) {
+                const progress = modeProgress[mode];
+                const levels = getLevelsForMode(mode);
+                const level = levels[progress.currentLevel];
+
+                document.getElementById(`menu-${mode}-level`).textContent = `Level ${progress.currentLevel + 1}: ${level.name}`;
+
+                let total = 0, correct = 0;
+                Object.values(progress.noteStats).forEach(s => {
+                    total += s.total;
+                    correct += s.correct;
+                });
+                const acc = total > 0 ? Math.round((correct / total) * 100) : null;
+                document.getElementById(`menu-${mode}-accuracy`).textContent = acc !== null
+                    ? `${acc}% accuracy (${total} attempts)`
+                    : "No attempts yet";
+            }
+        }
+
+        function showMainMenu() {
+            updateMenuStats();
+            document.getElementById("main-menu").classList.remove("hidden");
+            document.getElementById("quiz-screen").classList.remove("active");
+            document.getElementById("level-complete").style.display = "none";
+            document.getElementById("interval-buttons").style.display = "none";
+        }
+
+        function showQuizScreen(mode) {
+            quizMode = mode;
+            saveProgress();
+            document.getElementById("main-menu").classList.add("hidden");
+            document.getElementById("quiz-screen").classList.add("active");
+            document.getElementById("level-complete").style.display = "none";
+
+            updateLevelDisplay();
+            updateStreakDisplay();
+            updateStatsDisplay();
+
+            if (mode === "interval") {
+                document.getElementById("keyboard-container").style.display = "none";
+                buildIntervalButtons();
+            } else {
+                document.getElementById("interval-buttons").style.display = "none";
+                rebuildKeyboard();
+            }
+
+            showWaitingState();
+        }
+
+        function showWaitingState() {
+            const staffDiv = document.getElementById("staff");
+            staffDiv.innerHTML = "";
+            document.getElementById("start-btn").style.display = "inline-block";
+            document.getElementById("replay-btn").style.display = "none";
+            document.getElementById("feedback").textContent = "";
+            document.getElementById("response-time").textContent = "";
+        }
+
+        function beginQuiz() {
+            document.getElementById("start-btn").style.display = "none";
+            document.getElementById("level-complete").style.display = "none";
+            renderQuizNote(pickNextNote());
+        }
 
         // ============================================================
-        // Controls
+        // Initialize
         // ============================================================
-        // Sync checkbox with saved state
+        loadProgress();
         document.getElementById("show-labels").checked = showLabels;
+        showMainMenu();
+
+        // ============================================================
+        // Event Handlers
+        // ============================================================
+        document.getElementById("card-visual").addEventListener("click", () => showQuizScreen("visual"));
+        document.getElementById("card-audio").addEventListener("click", async () => {
+            await Tone.start();
+            showQuizScreen("audio");
+        });
+        document.getElementById("card-reverse").addEventListener("click", () => showQuizScreen("reverse"));
+        document.getElementById("card-interval").addEventListener("click", async () => {
+            await Tone.start();
+            showQuizScreen("interval");
+        });
+
+        document.getElementById("back-to-menu").addEventListener("click", () => showMainMenu());
+
+        document.getElementById("start-btn").addEventListener("click", async () => {
+            await Tone.start();
+            beginQuiz();
+        });
+
+        document.getElementById("replay-btn").addEventListener("click", async () => {
+            await Tone.start();
+            replayCurrentNote();
+        });
+
+        document.getElementById("continue-btn").addEventListener("click", () => {
+            document.getElementById("level-complete").style.display = "none";
+            beginQuiz();
+        });
+
+        document.getElementById("menu-btn").addEventListener("click", () => {
+            document.getElementById("level-complete").style.display = "none";
+            showMainMenu();
+        });
 
         document.getElementById("show-labels").addEventListener("change", (e) => {
             showLabels = e.target.checked;
-            const keyboard = document.getElementById("keyboard");
-            keyboard.classList.toggle("labels-hidden", !showLabels);
+            document.getElementById("keyboard").classList.toggle("labels-hidden", !showLabels);
             saveProgress();
         });
 
         document.getElementById("reset-btn").addEventListener("click", resetProgress);
-
-        // Mode toggle handlers
-        function updateModeButtons() {
-            document.getElementById("mode-visual").classList.toggle("active", quizMode === "visual");
-            document.getElementById("mode-audio").classList.toggle("active", quizMode === "audio");
-        }
-
-        document.getElementById("mode-visual").addEventListener("click", () => {
-            if (quizMode !== "visual") {
-                quizMode = "visual";
-                updateModeButtons();
-                saveProgress();
-                renderQuizNote(currentNote);
-            }
-        });
-
-        document.getElementById("mode-audio").addEventListener("click", () => {
-            if (quizMode !== "audio") {
-                quizMode = "audio";
-                updateModeButtons();
-                saveProgress();
-                renderQuizNote(currentNote);
-            }
-        });
-
-        document.getElementById("replay-btn").addEventListener("click", replayCurrentNote);
-
-        // Sync mode buttons on load
-        updateModeButtons();
 
         // Register service worker for offline support
         if ('serviceWorker' in navigator) {
