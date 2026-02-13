@@ -727,6 +727,19 @@
             return "bass";
         }
 
+        function levelHasBothClefs() {
+            if (quizMode === "interval") return false;
+            const notes = getActiveNotes();
+            let hasTreble = false, hasBass = false;
+            for (const n of notes) {
+                const clef = getClefForNote(n);
+                if (clef === "treble") hasTreble = true;
+                else hasBass = true;
+                if (hasTreble && hasBass) return true;
+            }
+            return false;
+        }
+
         // ============================================================
         // Active Notes / Items
         // ============================================================
@@ -972,10 +985,13 @@
 
                 const clef = getClefForNote(noteStr);
                 const vexNote = `${parsed.name}${parsed.accidental}${parsed.octave}/w`;
+                const useGrandStaff = levelHasBothClefs();
 
                 const containerWidth = Math.min(window.innerWidth * 0.9, 400);
                 const staffWidth = Math.max(containerWidth - 40, 140);
-                const staffHeight = Math.min(150, Math.max(window.innerWidth * 0.35, 100));
+                const staffHeight = useGrandStaff
+                    ? Math.min(280, Math.max(window.innerWidth * 0.65, 200))
+                    : Math.min(150, Math.max(window.innerWidth * 0.35, 100));
 
                 const factory = new Factory({
                     renderer: { elementId: "staff", width: containerWidth, height: staffHeight },
@@ -983,8 +999,19 @@
                 const score = factory.EasyScore();
                 const system = factory.System({ x: 0, y: 0, width: staffWidth });
 
-                const voice = score.voice(score.notes(vexNote, { clef }));
-                system.addStave({ voices: [voice] }).addClef(clef);
+                if (useGrandStaff) {
+                    const trebleNotes = clef === "treble" ? vexNote : "B4/w/r";
+                    const bassNotes = clef === "bass" ? vexNote : "D3/w/r";
+                    const trebleVoice = score.voice(score.notes(trebleNotes, { clef: "treble" }));
+                    const bassVoice = score.voice(score.notes(bassNotes, { clef: "bass" }));
+                    system.addStave({ voices: [trebleVoice] }).addClef("treble");
+                    system.addStave({ voices: [bassVoice] }).addClef("bass");
+                    system.addConnector("brace");
+                    system.addConnector("singleLeft");
+                } else {
+                    const voice = score.voice(score.notes(vexNote, { clef }));
+                    system.addStave({ voices: [voice] }).addClef(clef);
+                }
 
                 factory.draw();
                 noteDisplayTime = Date.now();
