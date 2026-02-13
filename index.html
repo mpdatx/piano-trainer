@@ -511,6 +511,13 @@
                     <option value="3000">3s</option>
                 </select>
             </label>
+            <label>Sound
+                <select id="synth-picker">
+                    <option value="warm" selected>Warm</option>
+                    <option value="rich">Rich</option>
+                    <option value="bright">Bright</option>
+                </select>
+            </label>
         </div>
         <div id="keyboard-container">
             <div id="keyboard"></div>
@@ -695,10 +702,45 @@
         // ============================================================
         // Audio
         // ============================================================
-        const synth = new Tone.Synth().toDestination();
+        function createWarmSynth() {
+            return new Tone.Synth({
+                oscillator: { type: "triangle" },
+                envelope: { attack: 0.005, decay: 0.8, sustain: 0.1, release: 1.2 },
+            }).toDestination();
+        }
+
+        function createRichSynth() {
+            return new Tone.PolySynth(Tone.Synth, {
+                maxPolyphony: 4,
+                voice: Tone.Synth,
+                options: {
+                    oscillator: { type: "fmsine", modulationIndex: 1.5 },
+                    envelope: { attack: 0.002, decay: 1.0, sustain: 0.05, release: 1.5 },
+                },
+            }).toDestination();
+        }
+
+        function createBrightSynth() {
+            return new Tone.Synth({
+                oscillator: { type: "fatsawtooth", count: 3, spread: 10 },
+                envelope: { attack: 0.001, decay: 0.6, sustain: 0.05, release: 0.8 },
+            }).toDestination();
+        }
+
+        const synths = {
+            warm: createWarmSynth(),
+            rich: createRichSynth(),
+            bright: createBrightSynth(),
+        };
+
+        let currentSynthName = "warm";
+
+        function getSynth() {
+            return synths[currentSynthName];
+        }
 
         function playNote(noteName, octave) {
-            synth.triggerAttackRelease(`${noteName}${octave}`, "4n");
+            getSynth().triggerAttackRelease(`${noteName}${octave}`, "4n");
         }
 
         function playNoteStr(noteStr) {
@@ -1428,6 +1470,10 @@
             showLabels = e.target.checked;
             document.getElementById("keyboard").classList.toggle("labels-hidden", !showLabels);
             saveProgress();
+        });
+
+        document.getElementById("synth-picker").addEventListener("change", (e) => {
+            currentSynthName = e.target.value;
         });
 
         document.getElementById("reset-btn").addEventListener("click", resetProgress);
