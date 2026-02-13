@@ -482,6 +482,7 @@
             </div>
         </div>
         <button id="reset-btn" style="padding:8px 16px;background:#444;border:1px solid #666;color:#ccc;border-radius:4px;cursor:pointer;margin-top:10px;">Reset All Progress</button>
+        <div id="app-version" style="margin-top:15px;font-size:0.7rem;color:#555;"></div>
     </div>
 
     <!-- Quiz Screen -->
@@ -500,6 +501,16 @@
             <button id="replay-btn" style="display: none;">Replay</button>
             <button id="start-btn">Start</button>
             <label><input type="checkbox" id="show-labels" checked> Show key names</label>
+            <label id="delay-control" style="display:none;">Delay
+                <select id="next-delay">
+                    <option value="0">None</option>
+                    <option value="400">0.4s</option>
+                    <option value="800">0.8s</option>
+                    <option value="1200" selected>1.2s</option>
+                    <option value="2000">2s</option>
+                    <option value="3000">3s</option>
+                </select>
+            </label>
         </div>
         <div id="keyboard-container">
             <div id="keyboard"></div>
@@ -1160,7 +1171,7 @@
                 playNote(parsed.name + parsed.accidental, parsed.octave);
                 keyElement.classList.add("correct");
                 showFeedback(true, noteStr);
-                const delay = quizMode === "audio" ? 1200 : 400;
+                const delay = quizMode === "audio" ? parseInt(document.getElementById("next-delay").value) : 400;
                 setTimeout(() => {
                     keyElement.classList.remove("correct");
                     const nextNote = pickNextNote();
@@ -1313,6 +1324,7 @@
             updateLevelDisplay();
             updateStreakDisplay();
             updateStatsDisplay();
+            document.getElementById("delay-control").style.display = mode === "audio" ? "" : "none";
 
             if (mode === "interval") {
                 document.getElementById("keyboard-container").style.display = "none";
@@ -1395,6 +1407,15 @@
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('./sw.js');
         }
+
+        // Display app version
+        fetch('./sw.js')
+            .then(r => r.text())
+            .then(text => {
+                const match = text.match(/APP_VERSION\s*=\s*['"](.+?)['"]/);
+                if (match) document.getElementById('app-version').textContent = `v${match[1]}`;
+            })
+            .catch(() => {});
     </script>
 </body>
 </html>

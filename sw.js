@@ -1,4 +1,5 @@
-const CACHE_NAME = 'piano-trainer-v3';
+const APP_VERSION = '1.2.0';
+const CACHE_NAME = `piano-trainer-v${APP_VERSION}`;
 const ASSETS = [
   './',
   './index.html',
