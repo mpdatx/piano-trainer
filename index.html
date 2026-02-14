@@ -323,7 +323,15 @@
             color: #ccc;
         }
         #menu-btn:hover { background: #555; }
-        /* Interval Buttons */
+        /* Interval / Key Signature Buttons */
+        #keysig-buttons {
+            display: none;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            max-width: 500px;
+            padding: 10px 0;
+        }
         #interval-buttons {
             display: none;
             flex-wrap: wrap;
@@ -480,6 +488,12 @@
                 <div class="mode-level" id="menu-interval-level">Level 1</div>
                 <div class="mode-accuracy" id="menu-interval-accuracy">No attempts yet</div>
             </div>
+            <div class="mode-card" id="card-keysig">
+                <div class="mode-icon">&#x266D;</div>
+                <h3>Key Signatures</h3>
+                <div class="mode-level" id="menu-keysig-level">Level 1</div>
+                <div class="mode-accuracy" id="menu-keysig-accuracy">No attempts yet</div>
+            </div>
         </div>
         <button id="reset-btn" style="padding:8px 16px;background:#444;border:1px solid #666;color:#ccc;border-radius:4px;cursor:pointer;margin-top:10px;">Reset All Progress</button>
         <div id="app-version" style="margin-top:15px;font-size:0.7rem;color:#555;"></div>
@@ -523,6 +537,7 @@
             <div id="keyboard"></div>
         </div>
         <div id="interval-buttons"></div>
+        <div id="keysig-buttons"></div>
         <div id="stats">
             <h2>ACCURACY BY NOTE</h2>
             <div id="stats-grid"></div>
@@ -597,6 +612,35 @@
 
         const ALL_INTERVALS = [...new Set(INTERVAL_LEVELS.flatMap(l => l.intervals))];
 
+        // ============================================================
+        // Key Signature Training Data
+        // ============================================================
+        const KEY_SIGNATURES = {
+            "C":  { sharps: 0, flats: 0, name: "C Major", vexKey: "C" },
+            "G":  { sharps: 1, flats: 0, name: "G Major", vexKey: "G" },
+            "D":  { sharps: 2, flats: 0, name: "D Major", vexKey: "D" },
+            "A":  { sharps: 3, flats: 0, name: "A Major", vexKey: "A" },
+            "E":  { sharps: 4, flats: 0, name: "E Major", vexKey: "E" },
+            "B":  { sharps: 5, flats: 0, name: "B Major", vexKey: "B" },
+            "F#": { sharps: 6, flats: 0, name: "F# Major", vexKey: "F#" },
+            "F":  { sharps: 0, flats: 1, name: "F Major", vexKey: "F" },
+            "Bb": { sharps: 0, flats: 2, name: "Bb Major", vexKey: "Bb" },
+            "Eb": { sharps: 0, flats: 3, name: "Eb Major", vexKey: "Eb" },
+            "Ab": { sharps: 0, flats: 4, name: "Ab Major", vexKey: "Ab" },
+            "Db": { sharps: 0, flats: 5, name: "Db Major", vexKey: "Db" },
+            "Gb": { sharps: 0, flats: 6, name: "Gb Major", vexKey: "Gb" },
+        };
+
+        const KEYSIG_LEVELS = [
+            { name: "No Accidentals", keys: ["C", "G", "F"], threshold: 0.80, minAttempts: 3 },
+            { name: "One Sharp/Flat", keys: ["C", "G", "F", "D", "Bb"], threshold: 0.80, minAttempts: 3 },
+            { name: "Two Sharps/Flats", keys: ["C", "G", "D", "A", "F", "Bb", "Eb"], threshold: 0.75, minAttempts: 2 },
+            { name: "Three Sharps/Flats", keys: ["C", "G", "D", "A", "E", "F", "Bb", "Eb", "Ab"], threshold: 0.75, minAttempts: 2 },
+            { name: "All Keys", keys: ["C", "G", "D", "A", "E", "B", "F#", "F", "Bb", "Eb", "Ab", "Db", "Gb"], threshold: 0.70, minAttempts: 2 },
+        ];
+
+        const ALL_KEYSIGS = [...new Set(KEYSIG_LEVELS.flatMap(l => l.keys))];
+
         const NOTE_ORDER = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 
         function noteToMidi(noteStr) {
@@ -614,7 +658,9 @@
         }
 
         function getLevelsForMode(mode) {
-            return mode === "interval" ? INTERVAL_LEVELS : DIFFICULTY_LEVELS;
+            if (mode === "interval") return INTERVAL_LEVELS;
+            if (mode === "keysig") return KEYSIG_LEVELS;
+            return DIFFICULTY_LEVELS;
         }
 
         // ============================================================
@@ -642,6 +688,7 @@
             audio: createDefaultProgress(ALL_NOTES),
             reverse: createDefaultProgress(ALL_NOTES),
             interval: createDefaultProgress(ALL_INTERVALS),
+            keysig: createDefaultProgress(ALL_KEYSIGS),
         };
 
         function getCurrentProgress() {
@@ -662,11 +709,11 @@
 
                 if (data.modeProgress) {
                     // New format
-                    for (const mode of ["visual", "audio", "reverse", "interval"]) {
+                    for (const mode of ["visual", "audio", "reverse", "interval", "keysig"]) {
                         if (data.modeProgress[mode]) {
                             Object.assign(modeProgress[mode], data.modeProgress[mode]);
                             // Ensure all items exist in stats/memory
-                            const allItems = mode === "interval" ? ALL_INTERVALS : ALL_NOTES;
+                            const allItems = mode === "interval" ? ALL_INTERVALS : mode === "keysig" ? ALL_KEYSIGS : ALL_NOTES;
                             allItems.forEach(item => {
                                 if (!modeProgress[mode].noteStats[item]) {
                                     modeProgress[mode].noteStats[item] = { correct: 0, total: 0 };
@@ -770,7 +817,7 @@
         }
 
         function levelHasBothClefs() {
-            if (quizMode === "interval") return false;
+            if (quizMode === "interval" || quizMode === "keysig") return false;
             const notes = getActiveNotes();
             let hasTreble = false, hasBass = false;
             for (const n of notes) {
@@ -788,8 +835,10 @@
         function getActiveNotes() {
             const progress = getCurrentProgress();
             if (quizMode === "interval") {
-                const levels = INTERVAL_LEVELS;
-                return levels[progress.currentLevel].intervals;
+                return INTERVAL_LEVELS[progress.currentLevel].intervals;
+            }
+            if (quizMode === "keysig") {
+                return KEYSIG_LEVELS[progress.currentLevel].keys;
             }
             return DIFFICULTY_LEVELS[progress.currentLevel].notes;
         }
@@ -852,7 +901,7 @@
             const levels = getLevelsForMode(quizMode);
             const level = levels[progress.currentLevel];
             const levelDisplay = document.getElementById("level-display");
-            const modeLabel = quizMode === "visual" ? "Note Reading" : quizMode === "audio" ? "Ear Training" : quizMode === "reverse" ? "Note Finding" : "Intervals";
+            const modeLabel = { visual: "Note Reading", audio: "Ear Training", reverse: "Note Finding", interval: "Intervals", keysig: "Key Signatures" }[quizMode];
             levelDisplay.textContent = `${modeLabel} - Level ${progress.currentLevel + 1}: ${level.name}`;
         }
 
@@ -864,7 +913,7 @@
             const activeItems = getActiveNotes();
 
             let sortedActive;
-            if (quizMode === "interval") {
+            if (quizMode === "interval" || quizMode === "keysig") {
                 sortedActive = [...activeItems];
             } else {
                 sortedActive = [...activeItems].sort((a, b) => {
@@ -890,7 +939,7 @@
                     else div.classList.add("bad");
                 }
 
-                const displayName = quizMode === "interval" ? INTERVALS[item].name : item;
+                const displayName = quizMode === "interval" ? INTERVALS[item].name : quizMode === "keysig" ? KEY_SIGNATURES[item].name : item;
                 div.innerHTML = `
                     <div class="note-name">${displayName}</div>
                     <div class="note-accuracy">${accuracy !== null ? `${accuracy}%` : '-'}</div>
@@ -948,7 +997,7 @@
             if (progress.currentLevel >= levels.length - 1) return false;
 
             const level = levels[progress.currentLevel];
-            const items = quizMode === "interval" ? level.intervals : level.notes;
+            const items = quizMode === "interval" ? level.intervals : quizMode === "keysig" ? level.keys : level.notes;
             let totalCorrect = 0, totalAttempts = 0;
             let allHaveMinAttempts = true;
 
@@ -965,7 +1014,9 @@
             if (accuracy >= level.threshold && allHaveMinAttempts) {
                 progress.currentLevel++;
                 updateLevelDisplay();
-                if (quizMode !== "interval") rebuildKeyboard();
+                if (quizMode === "interval") buildIntervalButtons();
+                else if (quizMode === "keysig") buildKeySigButtons();
+                else rebuildKeyboard();
                 showLevelComplete();
                 return true;
             }
@@ -1000,6 +1051,25 @@
                     staffDiv.innerHTML = '<div id="audio-prompt">&#x1F50A; Interval</div>';
                     document.getElementById("replay-btn").style.display = "inline-block";
                     playCurrentInterval();
+                    noteDisplayTime = Date.now();
+                    return;
+                }
+
+                if (quizMode === "keysig") {
+                    document.getElementById("replay-btn").style.display = "none";
+                    const keySig = KEY_SIGNATURES[currentKeySig];
+                    const containerWidth = Math.min(window.innerWidth * 0.9, 400);
+                    const staffWidth = Math.max(containerWidth - 40, 140);
+                    const staffHeight = Math.min(150, Math.max(window.innerWidth * 0.35, 100));
+
+                    const factory = new Factory({
+                        renderer: { elementId: "staff", width: containerWidth, height: staffHeight },
+                    });
+                    const score = factory.EasyScore();
+                    const system = factory.System({ x: 0, y: 0, width: staffWidth });
+                    const voice = score.voice(score.notes("B4/w/r", { clef: "treble" }));
+                    system.addStave({ voices: [voice] }).addClef("treble").addKeySignature(keySig.vexKey);
+                    factory.draw();
                     noteDisplayTime = Date.now();
                     return;
                 }
@@ -1166,11 +1236,91 @@
         }
 
         // ============================================================
+        // Key Signature Mode Logic
+        // ============================================================
+        let currentKeySig = null;
+
+        function generateKeySig() {
+            const progress = getCurrentProgress();
+            const activeKeys = getActiveNotes();
+            progress.roundNumber++;
+
+            const candidates = activeKeys
+                .filter(k => k !== currentKeySig)
+                .map(k => {
+                    if (!progress.noteMemory[k]) {
+                        progress.noteMemory[k] = { easiness: 2.5, interval: 1, repetitions: 0, lastSeen: 0, priority: 1 };
+                    }
+                    const mem = progress.noteMemory[k];
+                    const roundsSince = progress.roundNumber - mem.lastSeen;
+                    const isDue = roundsSince >= mem.interval;
+                    let score = mem.priority;
+                    if (isDue) score += 10;
+                    if (roundsSince > mem.interval * 2) score += 5;
+                    score += Math.random() * 0.5;
+                    return { key: k, score };
+                })
+                .sort((a, b) => b.score - a.score);
+
+            currentKeySig = candidates[0].key;
+            currentNote = currentKeySig;
+            firstAttempt = true;
+            return currentKeySig;
+        }
+
+        function buildKeySigButtons() {
+            const container = document.getElementById("keysig-buttons");
+            container.innerHTML = "";
+            container.style.display = "flex";
+
+            const activeKeys = getActiveNotes();
+            for (const k of activeKeys) {
+                const btn = document.createElement("button");
+                btn.className = "interval-btn";
+                btn.textContent = KEY_SIGNATURES[k].name;
+                btn.dataset.key = k;
+                btn.addEventListener("click", () => handleKeySigClick(k, btn));
+                btn.addEventListener("touchstart", (e) => {
+                    e.preventDefault();
+                    handleKeySigClick(k, btn);
+                }, { passive: false });
+                container.appendChild(btn);
+            }
+        }
+
+        function handleKeySigClick(keyName, btnElement) {
+            if (isProcessingClick || !currentKeySig) return;
+
+            const responseTime = Date.now() - noteDisplayTime;
+
+            if (keyName === currentKeySig) {
+                isProcessingClick = true;
+                recordAttempt(currentKeySig, true, responseTime);
+                btnElement.classList.add("correct");
+                showFeedback(true, KEY_SIGNATURES[currentKeySig].name);
+                setTimeout(() => {
+                    btnElement.classList.remove("correct");
+                    generateKeySig();
+                    renderQuizNote(currentNote);
+                    isProcessingClick = false;
+                }, 400);
+            } else {
+                recordAttempt(currentKeySig, false, responseTime);
+                btnElement.classList.add("wrong");
+                showFeedback(false, KEY_SIGNATURES[currentKeySig].name);
+                setTimeout(() => btnElement.classList.remove("wrong"), 200);
+            }
+        }
+
+        // ============================================================
         // Pick Next Note (for non-interval modes)
         // ============================================================
         function pickNextNote() {
             if (quizMode === "interval") {
                 return generateInterval();
+            }
+            if (quizMode === "keysig") {
+                return generateKeySig();
             }
 
             const progress = getCurrentProgress();
@@ -1357,7 +1507,7 @@
         // Menu and Screen Management
         // ============================================================
         function updateMenuStats() {
-            const modes = ["visual", "audio", "reverse", "interval"];
+            const modes = ["visual", "audio", "reverse", "interval", "keysig"];
             for (const mode of modes) {
                 const progress = modeProgress[mode];
                 const levels = getLevelsForMode(mode);
@@ -1383,6 +1533,7 @@
             document.getElementById("quiz-screen").classList.remove("active");
             document.getElementById("level-complete").style.display = "none";
             document.getElementById("interval-buttons").style.display = "none";
+            document.getElementById("keysig-buttons").style.display = "none";
         }
 
         function showQuizScreen(mode) {
@@ -1397,11 +1548,16 @@
             updateStatsDisplay();
             document.getElementById("delay-control").style.display = mode === "audio" ? "" : "none";
 
+            document.getElementById("keyboard-container").style.display = "none";
+            document.getElementById("interval-buttons").style.display = "none";
+            document.getElementById("keysig-buttons").style.display = "none";
+
             if (mode === "interval") {
-                document.getElementById("keyboard-container").style.display = "none";
                 buildIntervalButtons();
+            } else if (mode === "keysig") {
+                buildKeySigButtons();
             } else {
-                document.getElementById("interval-buttons").style.display = "none";
+                document.getElementById("keyboard-container").style.display = "flex";
                 rebuildKeyboard();
             }
 
@@ -1443,6 +1599,7 @@
             await Tone.start();
             showQuizScreen("interval");
         });
+        document.getElementById("card-keysig").addEventListener("click", () => showQuizScreen("keysig"));
 
         document.getElementById("back-to-menu").addEventListener("click", () => showMainMenu());
 
@@ -1472,8 +1629,10 @@
             saveProgress();
         });
 
-        document.getElementById("synth-picker").addEventListener("change", (e) => {
+        document.getElementById("synth-picker").addEventListener("change", async (e) => {
             currentSynthName = e.target.value;
+            await Tone.start();
+            getSynth().triggerAttackRelease("C4", "4n");
         });
 
         document.getElementById("reset-btn").addEventListener("click", resetProgress);
