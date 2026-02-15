@@ -898,46 +898,489 @@
         // Music Notation Learning Data
         // ============================================================
         const NOTATION_CHAPTERS = [
+            // ── Chapter 1: The Staff & Clefs ──
             {
                 id: 1,
                 title: "The Staff & Clefs",
                 subtitle: "The foundation of written music",
-                pages: [],
+                pages: [
+                    {
+                        title: "The Musical Staff",
+                        content: `<h3>The Musical Staff</h3>
+<p>All written music lives on a <span class="highlight">staff</span> (or stave) — a set of <span class="highlight">5 horizontal lines</span> with <span class="highlight">4 spaces</span> between them.</p>
+<p>Notes placed higher on the staff sound higher in pitch; notes placed lower sound lower. Think of it like a ladder for sound.</p>
+<p>By itself the staff is just a grid — we need a <span class="highlight">clef</span> at the beginning to tell us which notes the lines and spaces represent.</p>
+<div class="staff-example" id="ch1-ex1"></div>
+<p>Above is an empty treble-clef staff. The curly symbol on the left is the clef.</p>`,
+                        render(container) {
+                            const el = container.querySelector("#ch1-ex1");
+                            if (!el) return;
+                            const factory = new Factory({ renderer: { elementId: el.id, width: 300, height: 120 } });
+                            const score = factory.EasyScore();
+                            const system = factory.System({ x: 0, y: 0, width: 260 });
+                            system.addStave({ voices: [score.voice(score.notes("B4/w/r", { clef: "treble" }))] }).addClef("treble");
+                            factory.draw();
+                        }
+                    },
+                    {
+                        title: "The Treble Clef",
+                        content: `<h3>The Treble Clef</h3>
+<p>The <span class="highlight">treble clef</span> (also called the <span class="highlight">G clef</span>) is used for higher-pitched notes — typically what your right hand plays on the piano.</p>
+<p>Its curl wraps around the second line of the staff, marking it as the note <span class="highlight">G</span>.</p>
+<p><strong>Line notes</strong> from bottom to top: <span class="highlight">E  G  B  D  F</span></p>
+<p><span class="mnemonic">Remember: "Every Good Boy Does Fine"</span></p>
+<p><strong>Space notes</strong> from bottom to top: <span class="highlight">F  A  C  E</span></p>
+<p><span class="mnemonic">They spell the word FACE!</span></p>
+<div class="staff-example" id="ch1-ex2"></div>
+<p>Here are the four line notes E, G, B, and D on the treble staff.</p>`,
+                        render(container) {
+                            const el = container.querySelector("#ch1-ex2");
+                            if (!el) return;
+                            const factory = new Factory({ renderer: { elementId: el.id, width: 300, height: 120 } });
+                            const score = factory.EasyScore();
+                            const system = factory.System({ x: 0, y: 0, width: 260 });
+                            const voice = score.voice(score.notes("E4/q, G4/q, B4/q, D5/q", { clef: "treble" }), { time: "4/4" });
+                            system.addStave({ voices: [voice] }).addClef("treble");
+                            factory.draw();
+                        }
+                    },
+                    {
+                        title: "The Bass Clef",
+                        content: `<h3>The Bass Clef</h3>
+<p>The <span class="highlight">bass clef</span> (also called the <span class="highlight">F clef</span>) is used for lower-pitched notes — typically what your left hand plays.</p>
+<p>The two dots sit on either side of the fourth line, marking it as the note <span class="highlight">F</span>.</p>
+<p><strong>Line notes</strong> from bottom to top: <span class="highlight">G  B  D  F  A</span></p>
+<p><span class="mnemonic">Remember: "Good Boys Do Fine Always"</span></p>
+<p><strong>Space notes</strong> from bottom to top: <span class="highlight">A  C  E  G</span></p>
+<p><span class="mnemonic">Remember: "All Cows Eat Grass"</span></p>
+<div class="staff-example" id="ch1-ex3"></div>
+<p>Here are the bass clef line notes G, B, D, and F.</p>`,
+                        render(container) {
+                            const el = container.querySelector("#ch1-ex3");
+                            if (!el) return;
+                            const factory = new Factory({ renderer: { elementId: el.id, width: 300, height: 120 } });
+                            const score = factory.EasyScore();
+                            const system = factory.System({ x: 0, y: 0, width: 260 });
+                            const voice = score.voice(score.notes("G2/q, B2/q, D3/q, F3/q", { clef: "bass" }), { time: "4/4" });
+                            system.addStave({ voices: [voice] }).addClef("bass");
+                            factory.draw();
+                        }
+                    },
+                    {
+                        title: "The Grand Staff & Ledger Lines",
+                        content: `<h3>The Grand Staff &amp; Ledger Lines</h3>
+<p>Piano music uses both clefs at once, joined by a bracket. This is called the <span class="highlight">grand staff</span>. The treble staff sits on top and the bass staff below.</p>
+<p><span class="highlight">Middle C</span> (C4) sits on a small <span class="highlight">ledger line</span> right between the two staves. Ledger lines are short lines that extend the staff when notes go above or below its five lines.</p>
+<div class="staff-example" id="ch1-ex4"></div>
+<p>Notice how Middle C appears on a ledger line below the treble staff and above the bass staff — it is the same note written two ways.</p>`,
+                        render(container) {
+                            const el = container.querySelector("#ch1-ex4");
+                            if (!el) return;
+                            const factory = new Factory({ renderer: { elementId: el.id, width: 300, height: 200 } });
+                            const score = factory.EasyScore();
+                            const system = factory.System({ x: 0, y: 0, width: 260 });
+                            const trebleVoice = score.voice(score.notes("C4/w", { clef: "treble" }));
+                            const bassVoice = score.voice(score.notes("C4/w", { clef: "bass" }));
+                            system.addStave({ voices: [trebleVoice] }).addClef("treble");
+                            system.addStave({ voices: [bassVoice] }).addClef("bass");
+                            system.addConnector("brace");
+                            system.addConnector("singleLeft");
+                            factory.draw();
+                        }
+                    },
+                ],
                 quizPool: [],
             },
+            // ── Chapter 2: Notes on the Staff ──
             {
                 id: 2,
                 title: "Notes on the Staff",
                 subtitle: "How pitch is represented",
-                pages: [],
+                pages: [
+                    {
+                        title: "Notes Live on Lines and Spaces",
+                        content: `<h3>Notes Live on Lines and Spaces</h3>
+<p>Every note sits either <span class="highlight">on a line</span> or <span class="highlight">in a space</span>. Moving up one position (line to space, or space to line) moves one letter name forward in the musical alphabet.</p>
+<p>The musical alphabet uses only seven letters: <span class="highlight">A B C D E F G</span>, then repeats. After G comes A again.</p>
+<p>As notes move up the staff, the pitch gets higher.</p>
+<div class="staff-example" id="ch2-ex1"></div>
+<p>Here is a C major scale — C D E F G A B C — climbing from Middle C up to the next C.</p>`,
+                        render(container) {
+                            const el = container.querySelector("#ch2-ex1");
+                            if (!el) return;
+                            const factory = new Factory({ renderer: { elementId: el.id, width: 340, height: 120 } });
+                            const score = factory.EasyScore();
+                            const system = factory.System({ x: 0, y: 0, width: 300 });
+                            const voice = score.voice(score.notes("C4/q, D4/q, E4/q, F4/q, G4/q, A4/q, B4/q, C5/q", { clef: "treble" }), { time: "8/4" });
+                            system.addStave({ voices: [voice] }).addClef("treble");
+                            factory.draw();
+                        }
+                    },
+                    {
+                        title: "Treble Clef Notes",
+                        content: `<h3>Treble Clef Notes</h3>
+<p>Let's lock in the treble clef notes you'll see most often.</p>
+<p><strong>Lines</strong> (bottom to top): <span class="highlight">E  G  B  D  F</span></p>
+<p><span class="mnemonic">"Every Good Boy Does Fine"</span></p>
+<p><strong>Spaces</strong> (bottom to top): <span class="highlight">F  A  C  E</span></p>
+<p><span class="mnemonic">They spell FACE</span></p>
+<div class="staff-example" id="ch2-ex2"></div>
+<p>Above are the four line notes shown as half notes. Notice how each one sits directly <em>on</em> a line.</p>`,
+                        render(container) {
+                            const el = container.querySelector("#ch2-ex2");
+                            if (!el) return;
+                            const factory = new Factory({ renderer: { elementId: el.id, width: 300, height: 120 } });
+                            const score = factory.EasyScore();
+                            const system = factory.System({ x: 0, y: 0, width: 260 });
+                            const voice = score.voice(score.notes("E4/h, G4/h, B4/h, D5/h", { clef: "treble" }), { time: "8/4" });
+                            system.addStave({ voices: [voice] }).addClef("treble");
+                            factory.draw();
+                        }
+                    },
+                    {
+                        title: "Bass Clef Notes",
+                        content: `<h3>Bass Clef Notes</h3>
+<p>The bass clef has its own set of line and space notes.</p>
+<p><strong>Lines</strong> (bottom to top): <span class="highlight">G  B  D  F  A</span></p>
+<p><span class="mnemonic">"Good Boys Do Fine Always"</span></p>
+<p><strong>Spaces</strong> (bottom to top): <span class="highlight">A  C  E  G</span></p>
+<p><span class="mnemonic">"All Cows Eat Grass"</span></p>
+<div class="staff-example" id="ch2-ex3"></div>
+<p>Here are the bass clef line notes. They are different from the treble clef lines — don't mix them up!</p>`,
+                        render(container) {
+                            const el = container.querySelector("#ch2-ex3");
+                            if (!el) return;
+                            const factory = new Factory({ renderer: { elementId: el.id, width: 300, height: 120 } });
+                            const score = factory.EasyScore();
+                            const system = factory.System({ x: 0, y: 0, width: 260 });
+                            const voice = score.voice(score.notes("G2/h, B2/h, D3/h, F3/h", { clef: "bass" }), { time: "8/4" });
+                            system.addStave({ voices: [voice] }).addClef("bass");
+                            factory.draw();
+                        }
+                    },
+                    {
+                        title: "Octaves and Middle C",
+                        content: `<h3>Octaves and Middle C</h3>
+<p>Since the alphabet repeats (A-G over and over), we use <span class="highlight">octave numbers</span> to tell notes apart. C4 is one octave higher than C3, and one octave lower than C5.</p>
+<p><span class="highlight">Middle C (C4)</span> is the most important landmark. On the piano, it is near the center of the keyboard. On the grand staff, it sits on a ledger line between the two staves.</p>
+<div class="staff-example" id="ch2-ex4"></div>
+<p>Middle C written in both clefs. In the treble clef it hangs just below the staff; in the bass clef it sits just above.</p>`,
+                        render(container) {
+                            const el = container.querySelector("#ch2-ex4");
+                            if (!el) return;
+                            const factory = new Factory({ renderer: { elementId: el.id, width: 300, height: 200 } });
+                            const score = factory.EasyScore();
+                            const system = factory.System({ x: 0, y: 0, width: 260 });
+                            system.addStave({ voices: [score.voice(score.notes("C4/w", { clef: "treble" }))] }).addClef("treble");
+                            system.addStave({ voices: [score.voice(score.notes("C4/w", { clef: "bass" }))] }).addClef("bass");
+                            system.addConnector("brace");
+                            system.addConnector("singleLeft");
+                            factory.draw();
+                        }
+                    },
+                ],
                 quizPool: [],
             },
+            // ── Chapter 3: Note Values ──
             {
                 id: 3,
                 title: "Note Values",
                 subtitle: "How long notes last",
-                pages: [],
+                pages: [
+                    {
+                        title: "Notes Have Duration",
+                        content: `<h3>Notes Have Duration</h3>
+<p>A note on the staff tells you two things: <span class="highlight">which pitch</span> to play (its position) and <span class="highlight">how long</span> to hold it (its shape).</p>
+<p>Here are the most common note values, measured in beats (in 4/4 time):</p>
+<p><span class="highlight">Whole note</span> — 4 beats (open oval, no stem)</p>
+<p><span class="highlight">Half note</span> — 2 beats (open oval with stem)</p>
+<p><span class="highlight">Quarter note</span> — 1 beat (filled oval with stem)</p>
+<p><span class="highlight">Eighth note</span> — 1/2 beat (filled oval, stem, flag)</p>
+<p><span class="highlight">Sixteenth note</span> — 1/4 beat (filled oval, stem, double flag)</p>
+<p>Each value is exactly <strong>half</strong> the duration of the one above it.</p>`,
+                        render: null
+                    },
+                    {
+                        title: "Whole and Half Notes",
+                        content: `<h3>Whole and Half Notes</h3>
+<p>The <span class="highlight">whole note</span> is an open (hollow) oval with no stem. It lasts <span class="highlight">4 beats</span> — a full measure in 4/4 time.</p>
+<div class="staff-example" id="ch3-ex1"></div>
+<p>The <span class="highlight">half note</span> looks similar but adds a stem. It lasts <span class="highlight">2 beats</span>, so two half notes fill one measure.</p>
+<div class="staff-example" id="ch3-ex2"></div>
+<p><span class="mnemonic">Tip: "whole" = whole measure, "half" = half a measure.</span></p>`,
+                        render(container) {
+                            let el = container.querySelector("#ch3-ex1");
+                            if (el) {
+                                const f = new Factory({ renderer: { elementId: el.id, width: 300, height: 120 } });
+                                const s = f.EasyScore();
+                                f.System({ x: 0, y: 0, width: 260 }).addStave({ voices: [s.voice(s.notes("C4/w"))] }).addClef("treble");
+                                f.draw();
+                            }
+                            el = container.querySelector("#ch3-ex2");
+                            if (el) {
+                                const f = new Factory({ renderer: { elementId: el.id, width: 300, height: 120 } });
+                                const s = f.EasyScore();
+                                f.System({ x: 0, y: 0, width: 260 }).addStave({ voices: [s.voice(s.notes("C4/h, E4/h"), { time: "4/4" })] }).addClef("treble");
+                                f.draw();
+                            }
+                        }
+                    },
+                    {
+                        title: "Quarter and Eighth Notes",
+                        content: `<h3>Quarter and Eighth Notes</h3>
+<p>The <span class="highlight">quarter note</span> has a filled (solid) oval and a stem. It gets <span class="highlight">1 beat</span>. Four quarter notes fill a 4/4 measure.</p>
+<div class="staff-example" id="ch3-ex3"></div>
+<p>The <span class="highlight">eighth note</span> adds a flag (or beam when grouped) to the stem. It gets <span class="highlight">half a beat</span>, so two eighths equal one quarter.</p>
+<div class="staff-example" id="ch3-ex4"></div>
+<p><span class="mnemonic">Look for the flag! More flags = shorter note.</span></p>`,
+                        render(container) {
+                            let el = container.querySelector("#ch3-ex3");
+                            if (el) {
+                                const f = new Factory({ renderer: { elementId: el.id, width: 300, height: 120 } });
+                                const s = f.EasyScore();
+                                f.System({ x: 0, y: 0, width: 260 }).addStave({ voices: [s.voice(s.notes("C4/q, D4/q, E4/q, F4/q"))] }).addClef("treble");
+                                f.draw();
+                            }
+                            el = container.querySelector("#ch3-ex4");
+                            if (el) {
+                                const f = new Factory({ renderer: { elementId: el.id, width: 300, height: 120 } });
+                                const s = f.EasyScore();
+                                f.System({ x: 0, y: 0, width: 260 }).addStave({ voices: [s.voice(s.notes("C4/8, D4/8, E4/8, F4/8, G4/8, A4/8, B4/8, C5/8"), { time: "4/4" })] }).addClef("treble");
+                                f.draw();
+                            }
+                        }
+                    },
+                    {
+                        title: "The Duration Tree",
+                        content: `<h3>The Duration Tree</h3>
+<p>Note values form a neat hierarchy — each one is <span class="highlight">half the length</span> of the one above:</p>
+<p>1 whole = 2 halves = 4 quarters = 8 eighths = 16 sixteenths</p>
+<p><strong>Dotted notes:</strong> A <span class="highlight">dot</span> after a note adds half its value. A dotted half note = 2 + 1 = <span class="highlight">3 beats</span>. A dotted quarter = 1 + 0.5 = 1.5 beats.</p>
+<p><strong>Ties:</strong> A curved line connecting two notes of the same pitch <span class="highlight">adds their durations together</span>. A half note tied to a quarter note = 3 beats (same result as a dotted half).</p>
+<p><span class="mnemonic">Dots add half, ties add everything.</span></p>`,
+                        render: null
+                    },
+                ],
                 quizPool: [],
             },
+            // ── Chapter 4: Rests ──
             {
                 id: 4,
                 title: "Rests",
                 subtitle: "The sound of silence",
-                pages: [],
+                pages: [
+                    {
+                        title: "Silence Has Notation Too",
+                        content: `<h3>Silence Has Notation Too</h3>
+<p>Music isn't just about sound — the silences between notes are just as important. <span class="highlight">Rests</span> tell you when <em>not</em> to play.</p>
+<p>Every note value has a matching rest of equal duration:</p>
+<p><span class="highlight">Whole rest</span> — 4 beats of silence</p>
+<p><span class="highlight">Half rest</span> — 2 beats of silence</p>
+<p><span class="highlight">Quarter rest</span> — 1 beat of silence</p>
+<p><span class="highlight">Eighth rest</span> — 1/2 beat of silence</p>
+<p><span class="highlight">Sixteenth rest</span> — 1/4 beat of silence</p>
+<p>Rests follow the same duration tree as notes — each is half the value of the one above.</p>`,
+                        render: null
+                    },
+                    {
+                        title: "Whole and Half Rests",
+                        content: `<h3>Whole and Half Rests</h3>
+<p>These two look similar — both are small rectangles — but their position tells them apart:</p>
+<p>The <span class="highlight">whole rest</span> hangs <em>down</em> from the fourth line (like a hole in the ground).</p>
+<p>The <span class="highlight">half rest</span> sits <em>up</em> on the third line (like a hat on a head).</p>
+<p><span class="mnemonic">Remember: the Whole rest hangs like it fell in a Hole. The Half rest sits up like a Hat.</span></p>
+<div class="staff-example" id="ch4-ex1"></div>
+<p>Above: two half rests filling one measure. Each represents 2 beats of silence.</p>`,
+                        render(container) {
+                            const el = container.querySelector("#ch4-ex1");
+                            if (el) {
+                                const f = new Factory({ renderer: { elementId: el.id, width: 300, height: 120 } });
+                                const s = f.EasyScore();
+                                f.System({ x: 0, y: 0, width: 260 }).addStave({ voices: [s.voice(s.notes("B4/h/r, B4/h/r"), { time: "4/4" })] }).addClef("treble");
+                                f.draw();
+                            }
+                        }
+                    },
+                    {
+                        title: "Quarter, Eighth, and Sixteenth Rests",
+                        content: `<h3>Quarter, Eighth, and Sixteenth Rests</h3>
+<p>The <span class="highlight">quarter rest</span> looks like a zigzag or lightning bolt. It gets 1 beat of silence.</p>
+<p>The <span class="highlight">eighth rest</span> resembles the number 7 with a dot. It gets half a beat.</p>
+<p>The <span class="highlight">sixteenth rest</span> has two flags and gets a quarter of a beat.</p>
+<div class="staff-example" id="ch4-ex2"></div>
+<p>Above: a mix of quarter notes and quarter rests. Play, rest, play, rest — like a musical conversation.</p>
+<p><span class="mnemonic">More flags on a rest = shorter silence, just like notes.</span></p>`,
+                        render(container) {
+                            const el = container.querySelector("#ch4-ex2");
+                            if (el) {
+                                const f = new Factory({ renderer: { elementId: el.id, width: 300, height: 120 } });
+                                const s = f.EasyScore();
+                                f.System({ x: 0, y: 0, width: 260 }).addStave({ voices: [s.voice(s.notes("C4/q, B4/q/r, E4/q, B4/q/r"))] }).addClef("treble");
+                                f.draw();
+                            }
+                        }
+                    },
+                ],
                 quizPool: [],
             },
+            // ── Chapter 5: Time Signatures ──
             {
                 id: 5,
                 title: "Time Signatures",
                 subtitle: "Organizing beats into measures",
-                pages: [],
+                pages: [
+                    {
+                        title: "What Is a Time Signature?",
+                        content: `<h3>What Is a Time Signature?</h3>
+<p>At the start of every piece you'll see two numbers stacked on the staff. This is the <span class="highlight">time signature</span>.</p>
+<p>The <span class="highlight">top number</span> tells you how many beats are in each measure.</p>
+<p>The <span class="highlight">bottom number</span> tells you which note value gets one beat (4 = quarter note, 8 = eighth note).</p>
+<p>Vertical lines called <span class="highlight">bar lines</span> divide the staff into measures. Each measure must contain exactly the number of beats the time signature specifies.</p>
+<div class="staff-example" id="ch5-ex1"></div>
+<p>Above: 4/4 time — four quarter-note beats per measure. This is the most common time signature.</p>`,
+                        render(container) {
+                            const el = container.querySelector("#ch5-ex1");
+                            if (el) {
+                                const f = new Factory({ renderer: { elementId: el.id, width: 300, height: 120 } });
+                                const s = f.EasyScore();
+                                f.System({ x: 0, y: 0, width: 260 }).addStave({ voices: [s.voice(s.notes("C4/q, D4/q, E4/q, F4/q"))] }).addClef("treble").addTimeSignature("4/4");
+                                f.draw();
+                            }
+                        }
+                    },
+                    {
+                        title: "Common Time Signatures",
+                        content: `<h3>Common Time Signatures</h3>
+<p><span class="highlight">4/4</span> — Four quarter-note beats. Called "common time." Used in most pop, rock, and classical music.</p>
+<p><span class="highlight">3/4</span> — Three quarter-note beats. The feel of a <span class="highlight">waltz</span>: ONE-two-three, ONE-two-three.</p>
+<p><span class="highlight">2/4</span> — Two quarter-note beats. Often used in marches: LEFT-right, LEFT-right.</p>
+<div class="staff-example" id="ch5-ex2"></div>
+<p>Above: 4/4 — four quarter notes per measure.</p>
+<div class="staff-example" id="ch5-ex3"></div>
+<p>Above: 3/4 — three quarter notes per measure (waltz feel).</p>`,
+                        render(container) {
+                            let el = container.querySelector("#ch5-ex2");
+                            if (el) {
+                                const f = new Factory({ renderer: { elementId: el.id, width: 300, height: 120 } });
+                                const s = f.EasyScore();
+                                f.System({ x: 0, y: 0, width: 260 }).addStave({ voices: [s.voice(s.notes("C4/q, E4/q, G4/q, C5/q"))] }).addClef("treble").addTimeSignature("4/4");
+                                f.draw();
+                            }
+                            el = container.querySelector("#ch5-ex3");
+                            if (el) {
+                                const f = new Factory({ renderer: { elementId: el.id, width: 300, height: 120 } });
+                                const s = f.EasyScore();
+                                f.System({ x: 0, y: 0, width: 260 }).addStave({ voices: [s.voice(s.notes("C4/q, E4/q, G4/q"), { time: "3/4" })] }).addClef("treble").addTimeSignature("3/4");
+                                f.draw();
+                            }
+                        }
+                    },
+                    {
+                        title: "Compound Time: 6/8",
+                        content: `<h3>Compound Time: 6/8</h3>
+<p><span class="highlight">6/8 time</span> has six eighth-note beats per measure, but they are felt as <span class="highlight">two groups of three</span>.</p>
+<p>This gives the music a swinging, lilting feel — think of "Row, Row, Row Your Boat" or an Irish jig.</p>
+<p>How is 6/8 different from 3/4? Both have six eighth notes per measure, but 3/4 groups them as <strong>three groups of two</strong>, while 6/8 groups them as <strong>two groups of three</strong>. The emphasis pattern is different.</p>
+<div class="staff-example" id="ch5-ex4"></div>
+<p>Above: 6/8 time — six eighth notes grouped in two sets of three.</p>`,
+                        render(container) {
+                            const el = container.querySelector("#ch5-ex4");
+                            if (el) {
+                                const f = new Factory({ renderer: { elementId: el.id, width: 340, height: 120 } });
+                                const s = f.EasyScore();
+                                f.System({ x: 0, y: 0, width: 300 }).addStave({ voices: [s.voice(s.notes("C4/8, D4/8, E4/8, F4/8, G4/8, A4/8"), { time: "6/8" })] }).addClef("treble").addTimeSignature("6/8");
+                                f.draw();
+                            }
+                        }
+                    },
+                ],
                 quizPool: [],
             },
+            // ── Chapter 6: Key Signatures & Accidentals ──
             {
                 id: 6,
                 title: "Key Signatures & Accidentals",
                 subtitle: "Sharps, flats, and naturals",
-                pages: [],
+                pages: [
+                    {
+                        title: "Accidentals: Sharps, Flats, and Naturals",
+                        content: `<h3>Accidentals: Sharps, Flats, and Naturals</h3>
+<p>Not every note is a plain A, B, C, etc. Small symbols called <span class="highlight">accidentals</span> modify a note's pitch by a half step:</p>
+<p><span class="highlight">Sharp (#)</span> — raises the note by one half step.</p>
+<p><span class="highlight">Flat (b)</span> — lowers the note by one half step.</p>
+<p><span class="highlight">Natural</span> — cancels a previous sharp or flat, returning to the unmodified pitch.</p>
+<p>On the piano, a half step is the distance from any key to the very next key (including black keys).</p>
+<div class="staff-example" id="ch6-ex1"></div>
+<p>Above: C, C-sharp, D, D-flat. Notice C# and Db are the same piano key — different names for the same sound.</p>`,
+                        render(container) {
+                            const el = container.querySelector("#ch6-ex1");
+                            if (el) {
+                                const f = new Factory({ renderer: { elementId: el.id, width: 300, height: 120 } });
+                                const s = f.EasyScore();
+                                f.System({ x: 0, y: 0, width: 260 }).addStave({ voices: [s.voice(s.notes("C4/q, C#4/q, D4/q, Db4/q"))] }).addClef("treble");
+                                f.draw();
+                            }
+                        }
+                    },
+                    {
+                        title: "What Is a Key Signature?",
+                        content: `<h3>What Is a Key Signature?</h3>
+<p>If a piece uses certain sharps or flats throughout, writing them on every note would be tedious. Instead, we place them once at the beginning of each line — this is the <span class="highlight">key signature</span>.</p>
+<p>A key signature tells you: "Every time you see this note, play it sharp (or flat) unless a natural sign says otherwise."</p>
+<p>For example, <span class="highlight">G Major</span> has one sharp — F#. Instead of marking every F with a sharp, the key signature places one sharp on the F line.</p>
+<div class="staff-example" id="ch6-ex2"></div>
+<p>Above: G major key signature (one sharp: F#), followed by a simple melody.</p>`,
+                        render(container) {
+                            const el = container.querySelector("#ch6-ex2");
+                            if (el) {
+                                const f = new Factory({ renderer: { elementId: el.id, width: 300, height: 120 } });
+                                const s = f.EasyScore();
+                                f.System({ x: 0, y: 0, width: 260 }).addStave({ voices: [s.voice(s.notes("G4/q, A4/q, B4/q, G4/q"))] }).addClef("treble").addKeySignature("G");
+                                f.draw();
+                            }
+                        }
+                    },
+                    {
+                        title: "The Order of Sharps and Flats",
+                        content: `<h3>The Order of Sharps and Flats</h3>
+<p>Sharps and flats always appear in a fixed order:</p>
+<p><span class="highlight">Sharps:</span> F C G D A E B</p>
+<p><span class="mnemonic">"Father Charles Goes Down And Ends Battle"</span></p>
+<p><span class="highlight">Flats:</span> B E A D G C F (the reverse!)</p>
+<p><span class="mnemonic">"Battle Ends And Down Goes Charles' Father"</span></p>
+<p>If a key has 2 sharps, they will always be F# and C#. If it has 3 flats, they are always Bb, Eb, and Ab.</p>
+<div class="staff-example" id="ch6-ex3"></div>
+<p>Above: D major — two sharps (F# and C#).</p>`,
+                        render(container) {
+                            const el = container.querySelector("#ch6-ex3");
+                            if (el) {
+                                const f = new Factory({ renderer: { elementId: el.id, width: 300, height: 120 } });
+                                const s = f.EasyScore();
+                                f.System({ x: 0, y: 0, width: 260 }).addStave({ voices: [s.voice(s.notes("D4/h, A4/h"), { time: "4/4" })] }).addClef("treble").addKeySignature("D");
+                                f.draw();
+                            }
+                        }
+                    },
+                    {
+                        title: "Identifying Key Signatures",
+                        content: `<h3>Identifying Key Signatures</h3>
+<p>Quick tricks to name a major key from its signature:</p>
+<p><strong>Sharp keys:</strong> Look at the <span class="highlight">last sharp</span> and go up one half step — that's your key. Example: last sharp is C# → key is D major.</p>
+<p><strong>Flat keys:</strong> Look at the <span class="highlight">second-to-last flat</span> — that's your key. Example: flats are Bb, Eb, Ab → second-to-last is Eb → key is Eb major.</p>
+<p><strong>Special cases:</strong> C major has no sharps or flats. F major has just one flat (Bb) — the "second-to-last" trick doesn't apply, so just memorize it.</p>
+<div class="staff-example" id="ch6-ex4"></div>
+<p>Above: Eb major — three flats (Bb, Eb, Ab). The second-to-last flat is Eb, confirming the key.</p>`,
+                        render(container) {
+                            const el = container.querySelector("#ch6-ex4");
+                            if (el) {
+                                const f = new Factory({ renderer: { elementId: el.id, width: 300, height: 120 } });
+                                const s = f.EasyScore();
+                                f.System({ x: 0, y: 0, width: 260 }).addStave({ voices: [s.voice(s.notes("Eb4/h, Bb4/h"), { time: "4/4" })] }).addClef("treble").addKeySignature("Eb");
+                                f.draw();
+                            }
+                        }
+                    },
+                ],
                 quizPool: [],
             },
         ];
