@@ -46,7 +46,6 @@
         }
         #keyboard-container {
             display: flex;
-            justify-content: center;
             overflow-x: auto;
             overflow-y: hidden;
             width: 100%;
@@ -71,7 +70,8 @@
             position: relative;
             cursor: pointer;
             user-select: none;
-            touch-action: manipulation;
+            touch-action: pan-x pan-y;
+            margin: 0 auto;
             --key-width: 50px;
             --key-height: 180px;
         }
