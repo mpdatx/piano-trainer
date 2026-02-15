@@ -329,6 +329,12 @@
             color: #ccc;
         }
         #stay-btn:hover { background: #555; }
+        #reset-stay-btn {
+            background: #553322;
+            border: 1px solid #774433;
+            color: #daa;
+        }
+        #reset-stay-btn:hover { background: #664433; }
         #level-picker {
             background: #333;
             color: #ccc;
@@ -461,6 +467,29 @@
             font-size: clamp(0.8rem, 2.8vw, 0.9rem);
             color: #aaa;
         }
+        #level-progress {
+            margin-top: 6px;
+        }
+        #level-progress-bar {
+            width: 200px;
+            max-width: 60vw;
+            height: 6px;
+            background: #333;
+            border-radius: 3px;
+            margin: 0 auto 4px;
+            overflow: hidden;
+        }
+        #level-progress-fill {
+            height: 100%;
+            background: #22aa55;
+            border-radius: 3px;
+            transition: width 0.3s;
+            width: 0%;
+        }
+        #level-progress-text {
+            font-size: clamp(0.65rem, 2.2vw, 0.75rem);
+            color: #777;
+        }
         #streak-display {
             font-size: clamp(0.75rem, 2.5vw, 0.85rem);
             color: #888;
@@ -533,6 +562,10 @@
         </div>
         <div id="level-info">
             <div id="level-display"> <select id="level-picker"></select> <a href="#" id="unlock-all-btn"></a></div>
+            <div id="level-progress">
+                <div id="level-progress-bar"><div id="level-progress-fill"></div></div>
+                <div id="level-progress-text"></div>
+            </div>
             <div id="streak-display"></div>
         </div>
         <div id="feedback"></div>
@@ -571,6 +604,7 @@
             <div class="level-btns">
                 <button id="continue-btn">Continue to Next Level</button>
                 <button id="stay-btn">Stay on this Level</button>
+                <button id="reset-stay-btn">Reset &amp; Stay</button>
                 <button id="menu-btn">Back to Menu</button>
             </div>
         </div>
@@ -909,6 +943,46 @@
             const modeLabel = { visual: "Note Reading", audio: "Ear Training", reverse: "Note Finding", interval: "Intervals", keysig: "Key Signatures" }[quizMode];
             levelDisplay.childNodes[0].textContent = `${modeLabel} - Level ${progress.currentLevel + 1}: ${level.name} `;
             populateLevelPicker();
+            updateLevelProgress();
+        }
+
+        function getLevelItems(level) {
+            return quizMode === "interval" ? level.intervals : quizMode === "keysig" ? level.keys : level.notes;
+        }
+
+        function updateLevelProgress() {
+            const progress = getCurrentProgress();
+            const levels = getLevelsForMode(quizMode);
+            const level = levels[progress.currentLevel];
+            const items = getLevelItems(level);
+
+            let totalCorrect = 0, totalAttempts = 0;
+            let itemsReady = 0;
+            for (const item of items) {
+                const stat = progress.noteStats[item];
+                if (!stat) continue;
+                totalCorrect += stat.correct;
+                totalAttempts += stat.total;
+                if (stat.total >= level.minAttempts) itemsReady++;
+            }
+
+            const accuracy = totalAttempts > 0 ? totalCorrect / totalAttempts : 0;
+            const accuracyPct = Math.round(accuracy * 100);
+            const thresholdPct = Math.round(level.threshold * 100);
+            const allReady = itemsReady === items.length;
+
+            // Progress is based on how close accuracy is to threshold, weighted by attempts completion
+            const attemptProgress = itemsReady / items.length;
+            const accuracyProgress = Math.min(1, accuracy / level.threshold);
+            const overallProgress = Math.min(1, attemptProgress * 0.4 + accuracyProgress * 0.6);
+
+            const fill = document.getElementById("level-progress-fill");
+            fill.style.width = `${Math.round(overallProgress * 100)}%`;
+            fill.style.background = accuracy >= level.threshold && allReady ? "#22aa55" :
+                accuracy >= level.threshold ? "#cc8800" : "#4488cc";
+
+            const text = document.getElementById("level-progress-text");
+            text.textContent = `${accuracyPct}% accuracy (need ${thresholdPct}%) · ${itemsReady}/${items.length} notes practiced (need ${level.minAttempts} each)`;
         }
 
         function populateLevelPicker() {
@@ -1007,6 +1081,7 @@
 
             firstAttempt = false;
             updateStatsDisplay();
+            updateLevelProgress();
             checkLevelUp();
             saveProgress();
         }
@@ -1020,7 +1095,7 @@
             if (progress.currentLevel >= levels.length - 1) return false;
 
             const level = levels[progress.currentLevel];
-            const items = quizMode === "interval" ? level.intervals : quizMode === "keysig" ? level.keys : level.notes;
+            const items = getLevelItems(level);
             let totalCorrect = 0, totalAttempts = 0;
             let allHaveMinAttempts = true;
 
@@ -1046,6 +1121,20 @@
             return false;
         }
 
+        function resetLevelStats(levelIndex) {
+            const progress = getCurrentProgress();
+            const levels = getLevelsForMode(quizMode);
+            const level = levels[levelIndex];
+            const items = getLevelItems(level);
+            for (const item of items) {
+                progress.noteStats[item] = { correct: 0, total: 0 };
+                if (progress.noteMemory[item]) {
+                    progress.noteMemory[item] = { easiness: 2.5, interval: 1, repetitions: 0, lastSeen: 0, priority: 1 };
+                }
+            }
+            saveProgress();
+        }
+
         function showLevelComplete() {
             const progress = getCurrentProgress();
             const levels = getLevelsForMode(quizMode);
@@ -1060,6 +1149,7 @@
 
             document.getElementById("continue-btn").style.display = isLastLevel ? "none" : "inline-block";
             document.getElementById("stay-btn").style.display = "inline-block";
+            document.getElementById("reset-stay-btn").style.display = "inline-block";
         }
 
         // ============================================================
@@ -1686,6 +1776,20 @@
             saveProgress();
             document.getElementById("level-complete").style.display = "none";
             updateLevelDisplay();
+            if (quizMode === "interval") buildIntervalButtons();
+            else if (quizMode === "keysig") buildKeySigButtons();
+            else rebuildKeyboard();
+            beginQuiz();
+        });
+
+        document.getElementById("reset-stay-btn").addEventListener("click", () => {
+            const progress = getCurrentProgress();
+            const targetLevel = Math.max(0, progress.currentLevel - 1);
+            progress.currentLevel = targetLevel;
+            resetLevelStats(targetLevel);
+            document.getElementById("level-complete").style.display = "none";
+            updateLevelDisplay();
+            updateStatsDisplay();
             if (quizMode === "interval") buildIntervalButtons();
             else if (quizMode === "keysig") buildKeySigButtons();
             else rebuildKeyboard();
