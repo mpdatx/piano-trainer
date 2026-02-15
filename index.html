@@ -525,13 +525,6 @@
                     <option value="3000">3s</option>
                 </select>
             </label>
-            <label>Sound
-                <select id="synth-picker">
-                    <option value="warm" selected>Warm</option>
-                    <option value="rich">Rich</option>
-                    <option value="bright">Bright</option>
-                </select>
-            </label>
         </div>
         <div id="keyboard-container">
             <div id="keyboard"></div>
@@ -749,45 +742,29 @@
         // ============================================================
         // Audio
         // ============================================================
-        function createWarmSynth() {
-            return new Tone.Synth({
-                oscillator: { type: "triangle" },
-                envelope: { attack: 0.005, decay: 0.8, sustain: 0.1, release: 1.2 },
-            }).toDestination();
-        }
+        const SAMPLE_BASE_URL = "https://tonejs.github.io/audio/salamander/";
+        const piano = new Tone.Sampler({
+            urls: {
+                A0: "A0.mp3", C1: "C1.mp3", "D#1": "Ds1.mp3", "F#1": "Fs1.mp3",
+                A1: "A1.mp3", C2: "C2.mp3", "D#2": "Ds2.mp3", "F#2": "Fs2.mp3",
+                A2: "A2.mp3", C3: "C3.mp3", "D#3": "Ds3.mp3", "F#3": "Fs3.mp3",
+                A3: "A3.mp3", C4: "C4.mp3", "D#4": "Ds4.mp3", "F#4": "Fs4.mp3",
+                A4: "A4.mp3", C5: "C5.mp3", "D#5": "Ds5.mp3", "F#5": "Fs5.mp3",
+                A5: "A5.mp3", C6: "C6.mp3", "D#6": "Ds6.mp3", "F#6": "Fs6.mp3",
+                A6: "A6.mp3", C7: "C7.mp3", "D#7": "Ds7.mp3",
+                C8: "C8.mp3",
+            },
+            release: 1,
+            baseUrl: SAMPLE_BASE_URL,
+        }).toDestination();
 
-        function createRichSynth() {
-            return new Tone.PolySynth(Tone.Synth, {
-                maxPolyphony: 4,
-                voice: Tone.Synth,
-                options: {
-                    oscillator: { type: "fmsine", modulationIndex: 1.5 },
-                    envelope: { attack: 0.002, decay: 1.0, sustain: 0.05, release: 1.5 },
-                },
-            }).toDestination();
-        }
-
-        function createBrightSynth() {
-            return new Tone.Synth({
-                oscillator: { type: "fatsawtooth", count: 3, spread: 10 },
-                envelope: { attack: 0.001, decay: 0.6, sustain: 0.05, release: 0.8 },
-            }).toDestination();
-        }
-
-        const synths = {
-            warm: createWarmSynth(),
-            rich: createRichSynth(),
-            bright: createBrightSynth(),
-        };
-
-        let currentSynthName = "warm";
-
-        function getSynth() {
-            return synths[currentSynthName];
-        }
+        let pianoLoaded = false;
+        piano.onsampleload = () => {};
+        Tone.loaded().then(() => { pianoLoaded = true; });
 
         function playNote(noteName, octave) {
-            getSynth().triggerAttackRelease(`${noteName}${octave}`, "4n");
+            if (!pianoLoaded) return;
+            piano.triggerAttackRelease(`${noteName}${octave}`, "4n");
         }
 
         function playNoteStr(noteStr) {
@@ -1627,12 +1604,6 @@
             showLabels = e.target.checked;
             document.getElementById("keyboard").classList.toggle("labels-hidden", !showLabels);
             saveProgress();
-        });
-
-        document.getElementById("synth-picker").addEventListener("change", async (e) => {
-            currentSynthName = e.target.value;
-            await Tone.start();
-            getSynth().triggerAttackRelease("C4", "4n");
         });
 
         document.getElementById("reset-btn").addEventListener("click", resetProgress);
