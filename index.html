@@ -110,17 +110,16 @@
         .key.black.active {
             background: linear-gradient(to bottom, #446, #335);
         }
-        @media (max-width: 768px) {
-            #keyboard {
-                --key-width: 55px;
-                --key-height: 180px;
+        @media (max-height: 700px) and (max-width: 480px) {
+            #staff-container {
+                padding: 8px;
+                margin-bottom: 10px;
             }
-        }
-        @media (max-width: 480px) {
-            #keyboard {
-                --key-width: 50px;
-                --key-height: 160px;
-            }
+            .back-btn { margin-bottom: 8px; }
+            #level-info { margin-bottom: 8px; }
+            #feedback { min-height: 1.5rem; margin-bottom: 5px; }
+            #controls { margin-bottom: 10px; gap: 8px; }
+            #keyboard-container { padding: 5px 0; }
         }
         .key-label {
             position: absolute;
@@ -303,6 +302,7 @@
             display: flex;
             gap: 15px;
             justify-content: center;
+            flex-wrap: wrap;
         }
         .level-btns button {
             padding: 12px 24px;
@@ -323,6 +323,32 @@
             color: #ccc;
         }
         #menu-btn:hover { background: #555; }
+        #stay-btn {
+            background: #444;
+            border: 1px solid #666;
+            color: #ccc;
+        }
+        #stay-btn:hover { background: #555; }
+        #level-picker {
+            background: #333;
+            color: #ccc;
+            border: 1px solid #555;
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-size: clamp(0.75rem, 2.5vw, 0.85rem);
+            margin-left: 8px;
+            cursor: pointer;
+        }
+        #level-picker option:disabled {
+            color: #666;
+        }
+        #unlock-all-btn {
+            font-size: clamp(0.65rem, 2vw, 0.75rem);
+            color: #666;
+            text-decoration: none;
+            margin-left: 4px;
+        }
+        #unlock-all-btn:hover { color: #aaa; }
         /* Interval / Key Signature Buttons */
         #keysig-buttons {
             display: none;
@@ -506,7 +532,7 @@
             <div id="staff"></div>
         </div>
         <div id="level-info">
-            <div id="level-display"></div>
+            <div id="level-display"> <select id="level-picker"></select> <a href="#" id="unlock-all-btn"></a></div>
             <div id="streak-display"></div>
         </div>
         <div id="feedback"></div>
@@ -544,6 +570,7 @@
             <div class="next-level-name" id="next-level-name"></div>
             <div class="level-btns">
                 <button id="continue-btn">Continue to Next Level</button>
+                <button id="stay-btn">Stay on this Level</button>
                 <button id="menu-btn">Back to Menu</button>
             </div>
         </div>
@@ -556,6 +583,7 @@
 
         let showLabels = true;
         let quizMode = "visual"; // "visual", "audio", "reverse", "interval"
+        let allLevelsUnlocked = false;
 
         // ============================================================
         // Progressive Difficulty Levels
@@ -563,15 +591,15 @@
         const DIFFICULTY_LEVELS = [
             { name: "C Position", notes: ["C4", "E4", "G4"], threshold: 0.80, minAttempts: 3 },
             { name: "C Position+", notes: ["C4", "D4", "E4", "F4", "G4"], threshold: 0.80, minAttempts: 3 },
-            { name: "Full Treble Octave", notes: ["C4", "D4", "E4", "F4", "G4", "A4", "B4"], threshold: 0.75, minAttempts: 3 },
+            { name: "Full Treble Octave", notes: ["C4", "D4", "E4", "F4", "G4", "A4", "B4"], threshold: 0.80, minAttempts: 3 },
             { name: "Bass C Position", notes: ["C3", "E3", "G3"], threshold: 0.80, minAttempts: 3 },
             { name: "Bass C Position+", notes: ["C3", "D3", "E3", "F3", "G3"], threshold: 0.80, minAttempts: 3 },
-            { name: "Both Clefs Basic", notes: ["C3", "E3", "G3", "C4", "E4", "G4"], threshold: 0.75, minAttempts: 3 },
-            { name: "Both Clefs Expanded", notes: ["C3", "D3", "E3", "F3", "G3", "C4", "D4", "E4", "F4", "G4"], threshold: 0.75, minAttempts: 2 },
-            { name: "Full Range", notes: ["G2", "A2", "B2", "C3", "D3", "E3", "F3", "G3", "C4", "D4", "E4", "F4", "G4", "A4", "B4"], threshold: 0.70, minAttempts: 2 },
-            { name: "High Treble", notes: ["G2", "A2", "B2", "C3", "D3", "E3", "F3", "G3", "C4", "D4", "E4", "F4", "G4", "A4", "B4", "C5", "D5", "E5"], threshold: 0.70, minAttempts: 2 },
-            { name: "Ledger Lines", notes: ["G2", "A2", "B2", "C3", "D3", "E3", "F3", "G3", "A3", "B3", "C4", "D4", "E4", "F4", "G4", "A4", "B4", "C5", "D5", "E5"], threshold: 0.70, minAttempts: 2 },
-            { name: "Accidentals", notes: ["C4", "C#4", "D4", "D#4", "E4", "F4", "F#4", "G4", "G#4", "A4", "A#4", "B4"], threshold: 0.70, minAttempts: 2 },
+            { name: "Both Clefs Basic", notes: ["C3", "E3", "G3", "C4", "E4", "G4"], threshold: 0.80, minAttempts: 4 },
+            { name: "Both Clefs Expanded", notes: ["C3", "D3", "E3", "F3", "G3", "C4", "D4", "E4", "F4", "G4"], threshold: 0.80, minAttempts: 4 },
+            { name: "Full Range", notes: ["G2", "A2", "B2", "C3", "D3", "E3", "F3", "G3", "C4", "D4", "E4", "F4", "G4", "A4", "B4"], threshold: 0.80, minAttempts: 3 },
+            { name: "High Treble", notes: ["G2", "A2", "B2", "C3", "D3", "E3", "F3", "G3", "C4", "D4", "E4", "F4", "G4", "A4", "B4", "C5", "D5", "E5"], threshold: 0.75, minAttempts: 3 },
+            { name: "Ledger Lines", notes: ["G2", "A2", "B2", "C3", "D3", "E3", "F3", "G3", "A3", "B3", "C4", "D4", "E4", "F4", "G4", "A4", "B4", "C5", "D5", "E5"], threshold: 0.75, minAttempts: 3 },
+            { name: "Accidentals", notes: ["C4", "C#4", "D4", "D#4", "E4", "F4", "F#4", "G4", "G#4", "A4", "A#4", "B4"], threshold: 0.75, minAttempts: 3 },
         ];
 
         const ALL_NOTES = [...new Set(DIFFICULTY_LEVELS.flatMap(l => l.notes))];
@@ -879,7 +907,25 @@
             const level = levels[progress.currentLevel];
             const levelDisplay = document.getElementById("level-display");
             const modeLabel = { visual: "Note Reading", audio: "Ear Training", reverse: "Note Finding", interval: "Intervals", keysig: "Key Signatures" }[quizMode];
-            levelDisplay.textContent = `${modeLabel} - Level ${progress.currentLevel + 1}: ${level.name}`;
+            levelDisplay.childNodes[0].textContent = `${modeLabel} - Level ${progress.currentLevel + 1}: ${level.name} `;
+            populateLevelPicker();
+        }
+
+        function populateLevelPicker() {
+            const progress = getCurrentProgress();
+            const levels = getLevelsForMode(quizMode);
+            const picker = document.getElementById("level-picker");
+            picker.innerHTML = "";
+            for (let i = 0; i < levels.length; i++) {
+                const opt = document.createElement("option");
+                opt.value = i;
+                opt.textContent = `Lv ${i + 1}: ${levels[i].name}`;
+                opt.disabled = !allLevelsUnlocked && i > progress.currentLevel;
+                picker.appendChild(opt);
+            }
+            picker.value = progress.currentLevel;
+            const unlockBtn = document.getElementById("unlock-all-btn");
+            unlockBtn.textContent = allLevelsUnlocked ? "[lock]" : "[unlock all]";
         }
 
         function updateStatsDisplay() {
@@ -1003,14 +1049,17 @@
         function showLevelComplete() {
             const progress = getCurrentProgress();
             const levels = getLevelsForMode(quizMode);
+            const isLastLevel = progress.currentLevel >= levels.length - 1;
             const nextLevel = levels[progress.currentLevel];
-            document.getElementById("next-level-name").textContent = `Next: ${nextLevel.name}`;
+            document.getElementById("next-level-name").textContent = isLastLevel
+                ? "You've completed all levels!"
+                : `Next: ${nextLevel.name}`;
             document.getElementById("level-complete").style.display = "flex";
             document.getElementById("start-btn").style.display = "none";
             document.getElementById("replay-btn").style.display = "none";
 
-            const continueBtn = document.getElementById("continue-btn");
-            continueBtn.style.display = progress.currentLevel >= levels.length - 1 ? "none" : "inline-block";
+            document.getElementById("continue-btn").style.display = isLastLevel ? "none" : "inline-block";
+            document.getElementById("stay-btn").style.display = "inline-block";
         }
 
         // ============================================================
@@ -1079,7 +1128,7 @@
                 const containerWidth = Math.min(window.innerWidth * 0.9, 400);
                 const staffWidth = Math.max(containerWidth - 40, 140);
                 const staffHeight = useGrandStaff
-                    ? Math.min(280, Math.max(window.innerWidth * 0.65, 200))
+                    ? Math.min(250, Math.max(window.innerHeight * 0.28, 180))
                     : Math.min(150, Math.max(window.innerWidth * 0.35, 100));
 
                 const factory = new Factory({
@@ -1399,6 +1448,14 @@
             const hasAccidentals = activeNotes.some(n => n.includes("#"));
             const numOctaves = range.end - range.start + 1;
 
+            const totalWhiteKeys = numOctaves * 7;
+            const availableWidth = window.innerWidth - 20;
+            const fittedKeyWidth = Math.floor(availableWidth / totalWhiteKeys);
+            const keyWidth = Math.min(50, Math.max(40, fittedKeyWidth));
+            keyboard.style.setProperty("--key-width", `${keyWidth}px`);
+            const keyHeight = Math.min(160, Math.max(120, keyWidth * 3));
+            keyboard.style.setProperty("--key-height", `${keyHeight}px`);
+
             for (let oct = range.start; oct <= range.end; oct++) {
                 const octaveWrapper = document.createElement("div");
                 octaveWrapper.style.position = "relative";
@@ -1478,6 +1535,9 @@
             }
 
             keyboard.classList.toggle("labels-hidden", !showLabels);
+
+            const container = document.getElementById("keyboard-container");
+            container.scrollLeft = (keyboard.scrollWidth - container.clientWidth) / 2;
         }
 
         // ============================================================
@@ -1595,9 +1655,39 @@
             beginQuiz();
         });
 
+        document.getElementById("stay-btn").addEventListener("click", () => {
+            const progress = getCurrentProgress();
+            progress.currentLevel = Math.max(0, progress.currentLevel - 1);
+            saveProgress();
+            document.getElementById("level-complete").style.display = "none";
+            updateLevelDisplay();
+            if (quizMode === "interval") buildIntervalButtons();
+            else if (quizMode === "keysig") buildKeySigButtons();
+            else rebuildKeyboard();
+            beginQuiz();
+        });
+
         document.getElementById("menu-btn").addEventListener("click", () => {
             document.getElementById("level-complete").style.display = "none";
             showMainMenu();
+        });
+
+        document.getElementById("level-picker").addEventListener("change", (e) => {
+            const progress = getCurrentProgress();
+            progress.currentLevel = parseInt(e.target.value, 10);
+            saveProgress();
+            updateLevelDisplay();
+            if (quizMode === "interval") buildIntervalButtons();
+            else if (quizMode === "keysig") buildKeySigButtons();
+            else rebuildKeyboard();
+            showWaitingState();
+            updateStatsDisplay();
+        });
+
+        document.getElementById("unlock-all-btn").addEventListener("click", (e) => {
+            e.preventDefault();
+            allLevelsUnlocked = !allLevelsUnlocked;
+            populateLevelPicker();
         });
 
         document.getElementById("show-labels").addEventListener("change", (e) => {
