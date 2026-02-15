@@ -702,6 +702,99 @@
 
         const ALL_KEYSIGS = [...new Set(KEYSIG_LEVELS.flatMap(l => l.keys))];
 
+        // ============================================================
+        // Music Notation Learning Data
+        // ============================================================
+        const NOTATION_CHAPTERS = [
+            {
+                id: 1,
+                title: "The Staff & Clefs",
+                subtitle: "The foundation of written music",
+                pages: [],
+                quizPool: [],
+            },
+            {
+                id: 2,
+                title: "Notes on the Staff",
+                subtitle: "How pitch is represented",
+                pages: [],
+                quizPool: [],
+            },
+            {
+                id: 3,
+                title: "Note Values",
+                subtitle: "How long notes last",
+                pages: [],
+                quizPool: [],
+            },
+            {
+                id: 4,
+                title: "Rests",
+                subtitle: "The sound of silence",
+                pages: [],
+                quizPool: [],
+            },
+            {
+                id: 5,
+                title: "Time Signatures",
+                subtitle: "Organizing beats into measures",
+                pages: [],
+                quizPool: [],
+            },
+            {
+                id: 6,
+                title: "Key Signatures & Accidentals",
+                subtitle: "Sharps, flats, and naturals",
+                pages: [],
+                quizPool: [],
+            },
+        ];
+
+        function getNotationProgress() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    if (data.notationProgress) return data.notationProgress;
+                } catch (e) {}
+            }
+            return createDefaultNotationProgress();
+        }
+
+        function createDefaultNotationProgress() {
+            const chapters = {};
+            for (const ch of NOTATION_CHAPTERS) {
+                chapters[ch.id] = {
+                    lessonComplete: false,
+                    lessonPage: 0,
+                    quizPassed: false,
+                    quizStats: {},
+                    quizMemory: {},
+                    roundNumber: 0,
+                    currentStreak: 0,
+                    longestStreak: 0,
+                };
+            }
+            return { chapters };
+        }
+
+        function getNotationCurrentChapter(progress) {
+            for (const ch of NOTATION_CHAPTERS) {
+                if (!progress.chapters[ch.id] || !progress.chapters[ch.id].quizPassed) return ch.id;
+            }
+            return NOTATION_CHAPTERS.length;
+        }
+
+        function saveNotationProgress(progress) {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            let data = {};
+            if (saved) {
+                try { data = JSON.parse(saved); } catch (e) {}
+            }
+            data.notationProgress = progress;
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        }
+
         const NOTE_ORDER = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 
         function noteToMidi(noteStr) {
