@@ -1433,6 +1433,33 @@
             }
         }
 
+        const TOUCH_SCROLL_THRESHOLD = 10;
+        function addTouchHandlers(el, onDown, onUp) {
+            let startX, startY, scrolled;
+            el.addEventListener("touchstart", (e) => {
+                const t = e.touches[0];
+                startX = t.clientX;
+                startY = t.clientY;
+                scrolled = false;
+            }, { passive: true });
+            el.addEventListener("touchmove", (e) => {
+                if (scrolled) return;
+                const t = e.touches[0];
+                if (Math.abs(t.clientX - startX) > TOUCH_SCROLL_THRESHOLD ||
+                    Math.abs(t.clientY - startY) > TOUCH_SCROLL_THRESHOLD) {
+                    scrolled = true;
+                    onUp();
+                }
+            }, { passive: true });
+            el.addEventListener("touchend", (e) => {
+                if (!scrolled) {
+                    e.preventDefault();
+                    onDown();
+                    setTimeout(onUp, 150);
+                }
+            }, { passive: false });
+        }
+
         function rebuildKeyboard() {
             const keyboard = document.getElementById("keyboard");
             keyboard.innerHTML = "";
@@ -1488,8 +1515,7 @@
                     whiteKey.addEventListener("mousedown", handleWhiteKeyDown);
                     whiteKey.addEventListener("mouseup", handleWhiteKeyUp);
                     whiteKey.addEventListener("mouseleave", handleWhiteKeyUp);
-                    whiteKey.addEventListener("touchstart", (e) => { e.preventDefault(); handleWhiteKeyDown(); }, { passive: false });
-                    whiteKey.addEventListener("touchend", (e) => { e.preventDefault(); handleWhiteKeyUp(); }, { passive: false });
+                    addTouchHandlers(whiteKey, handleWhiteKeyDown, handleWhiteKeyUp);
 
                     octaveWrapper.appendChild(whiteKey);
 
@@ -1518,8 +1544,7 @@
                         blackKey.addEventListener("mousedown", handleBlackKeyDown);
                         blackKey.addEventListener("mouseup", handleBlackKeyUp);
                         blackKey.addEventListener("mouseleave", handleBlackKeyUp);
-                        blackKey.addEventListener("touchstart", (e) => { e.preventDefault(); handleBlackKeyDown(); }, { passive: false });
-                        blackKey.addEventListener("touchend", (e) => { e.preventDefault(); handleBlackKeyUp(); }, { passive: false });
+                        addTouchHandlers(blackKey, handleBlackKeyDown, handleBlackKeyUp);
 
                         octaveWrapper.appendChild(blackKey);
                     }
