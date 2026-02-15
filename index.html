@@ -549,6 +549,12 @@
                 <div class="mode-level" id="menu-keysig-level">Level 1</div>
                 <div class="mode-accuracy" id="menu-keysig-accuracy">No attempts yet</div>
             </div>
+            <div class="mode-card" id="card-notation">
+                <div class="mode-icon">&#x1F3BC;</div>
+                <h3>Music Notation</h3>
+                <div class="mode-level" id="menu-notation-level">Chapter 1 of 6</div>
+                <div class="mode-accuracy" id="menu-notation-accuracy">Not started</div>
+            </div>
         </div>
         <button id="reset-btn" style="padding:8px 16px;background:#444;border:1px solid #666;color:#ccc;border-radius:4px;cursor:pointer;margin-top:10px;">Reset All Progress</button>
         <div id="app-version" style="margin-top:15px;font-size:0.7rem;color:#555;"></div>
@@ -1677,6 +1683,14 @@
                     ? `${acc}% accuracy (${total} attempts)`
                     : "No attempts yet";
             }
+
+            const notProg = getNotationProgress();
+            const chapNum = getNotationCurrentChapter(notProg);
+            document.getElementById("menu-notation-level").textContent = `Chapter ${chapNum} of ${NOTATION_CHAPTERS.length}`;
+            const completedCount = Object.values(notProg.chapters).filter(c => c.quizPassed).length;
+            document.getElementById("menu-notation-accuracy").textContent = completedCount > 0
+                ? `${completedCount}/${NOTATION_CHAPTERS.length} chapters complete`
+                : "Not started";
         }
 
         function showMainMenu() {
@@ -1686,6 +1700,9 @@
             document.getElementById("level-complete").style.display = "none";
             document.getElementById("interval-buttons").style.display = "none";
             document.getElementById("keysig-buttons").style.display = "none";
+            document.getElementById("notation-chapters").classList.remove("active");
+            document.getElementById("notation-lesson").classList.remove("active");
+            document.getElementById("notation-quiz").classList.remove("active");
         }
 
         function showQuizScreen(mode) {
@@ -1752,6 +1769,7 @@
             showQuizScreen("interval");
         });
         document.getElementById("card-keysig").addEventListener("click", () => showQuizScreen("keysig"));
+        document.getElementById("card-notation").addEventListener("click", () => showNotationChapterList());
 
         document.getElementById("back-to-menu").addEventListener("click", () => showMainMenu());
 
