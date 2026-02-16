@@ -2689,6 +2689,47 @@
             }
         }
 
+        function showNotationLesson(chapterId, pageIndex) {
+            currentChapterId = chapterId;
+            const chapter = NOTATION_CHAPTERS.find(c => c.id === chapterId);
+            if (!chapter) return;
+
+            currentLessonPage = Math.min(pageIndex, chapter.pages.length - 1);
+
+            document.getElementById("notation-chapters").classList.remove("active");
+            document.getElementById("notation-quiz").classList.remove("active");
+            document.getElementById("notation-lesson").classList.add("active");
+
+            document.getElementById("lesson-title").textContent = chapter.title;
+            renderLessonPage(chapter);
+        }
+
+        function renderLessonPage(chapter) {
+            const page = chapter.pages[currentLessonPage];
+            const content = document.getElementById("lesson-content");
+            content.innerHTML = `<h3>${page.title}</h3>${page.content}`;
+
+            if (page.render) {
+                requestAnimationFrame(() => page.render(content));
+            }
+
+            document.getElementById("lesson-page-indicator").textContent =
+                `Page ${currentLessonPage + 1} of ${chapter.pages.length}`;
+
+            const prevBtn = document.getElementById("lesson-prev");
+            const nextBtn = document.getElementById("lesson-next");
+            prevBtn.style.display = currentLessonPage > 0 ? "inline-block" : "none";
+
+            const isLastPage = currentLessonPage >= chapter.pages.length - 1;
+            nextBtn.textContent = isLastPage ? "Start Quiz" : "Next";
+            nextBtn.className = isLastPage ? "primary" : "";
+
+            if (!notationProgress.chapters[chapter.id].lessonComplete) {
+                notationProgress.chapters[chapter.id].lessonPage = currentLessonPage;
+                saveNotationProgress(notationProgress);
+            }
+        }
+
         // ============================================================
         // Initialize
         // ============================================================
@@ -2714,6 +2755,28 @@
 
         document.getElementById("back-to-menu").addEventListener("click", () => showMainMenu());
         document.getElementById("notation-back-menu").addEventListener("click", () => showMainMenu());
+
+        document.getElementById("lesson-prev").addEventListener("click", () => {
+            if (currentLessonPage > 0) {
+                currentLessonPage--;
+                const chapter = NOTATION_CHAPTERS.find(c => c.id === currentChapterId);
+                renderLessonPage(chapter);
+            }
+        });
+
+        document.getElementById("lesson-next").addEventListener("click", () => {
+            const chapter = NOTATION_CHAPTERS.find(c => c.id === currentChapterId);
+            if (currentLessonPage >= chapter.pages.length - 1) {
+                notationProgress.chapters[chapter.id].lessonComplete = true;
+                saveNotationProgress(notationProgress);
+                showNotationQuiz(chapter.id);
+            } else {
+                currentLessonPage++;
+                renderLessonPage(chapter);
+            }
+        });
+
+        document.getElementById("lesson-back-chapters").addEventListener("click", () => showNotationChapterList());
 
         document.getElementById("start-btn").addEventListener("click", async () => {
             await Tone.start();
