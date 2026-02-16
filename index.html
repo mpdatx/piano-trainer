@@ -1328,12 +1328,21 @@
 <p>The <span class="highlight">eighth rest</span> resembles the number 7 with a dot. It gets half a beat.</p>
 <p>The <span class="highlight">sixteenth rest</span> has two flags and gets a quarter of a beat.</p>
 <div class="staff-example" id="ch4-ex2"></div>
-<p>Above: a mix of quarter notes and quarter rests. Play, rest, play, rest — like a musical conversation.</p>
+<p>Above: a quarter rest, an eighth rest, and a sixteenth rest side by side. Notice how each shorter rest has more flags.</p>
+<div class="staff-example" id="ch4-ex2b"></div>
+<p>Above: a mix of quarter notes and quarter rests in action — play, rest, play, rest.</p>
 <p><span class="mnemonic">More flags on a rest = shorter silence, just like notes.</span></p>`,
                         render(container) {
                             const el = container.querySelector("#ch4-ex2");
                             if (el) {
                                 const f = new Factory({ renderer: { elementId: el.id, width: 300, height: 120 } });
+                                const s = f.EasyScore();
+                                f.System({ x: 0, y: 0, width: 260 }).addStave({ voices: [s.voice(s.notes("B4/q/r, B4/8/r, B4/16/r, B4/16/r, B4/h/r"))] }).addClef("treble");
+                                f.draw();
+                            }
+                            const el2 = container.querySelector("#ch4-ex2b");
+                            if (el2) {
+                                const f = new Factory({ renderer: { elementId: el2.id, width: 300, height: 120 } });
                                 const s = f.EasyScore();
                                 f.System({ x: 0, y: 0, width: 260 }).addStave({ voices: [s.voice(s.notes("C4/q, B4/q/r, E4/q, B4/q/r"))] }).addClef("treble");
                                 f.draw();
