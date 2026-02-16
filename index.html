@@ -2927,7 +2927,7 @@
             const pool = chapter.quizPool;
 
             let totalCorrect = 0, totalAttempts = 0, itemsReady = 0;
-            const minAttempts = 2;
+            const minAttempts = 1;
             const threshold = 0.80;
 
             for (const q of pool) {
@@ -2950,7 +2950,7 @@
                 accuracy >= threshold ? "#cc8800" : "#4488cc";
 
             document.getElementById("nq-progress-text").textContent =
-                `${accuracyPct}% accuracy (need 80%) \u00b7 ${itemsReady}/${pool.length} questions practiced (need ${minAttempts} each)`;
+                `${accuracyPct}% accuracy (need 80%) \u00b7 ${itemsReady}/${pool.length} questions seen`;
         }
 
         function updateNQStreak() {
@@ -2991,7 +2991,7 @@
         function checkNQChapterComplete() {
             const chapter = NOTATION_CHAPTERS.find(c => c.id === currentChapterId);
             const chProg = notationProgress.chapters[currentChapterId];
-            const minAttempts = 2;
+            const minAttempts = 1;
             const threshold = 0.80;
 
             let totalCorrect = 0, totalAttempts = 0;
