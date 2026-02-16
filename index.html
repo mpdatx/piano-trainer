@@ -989,7 +989,28 @@
                         }
                     },
                 ],
-                quizPool: [],
+                quizPool: [
+                    { id: "1-1", prompt: "How many lines does a musical staff have?", render: null, options: ["4", "5", "6", "3"], correctIndex: 1 },
+                    { id: "1-2", prompt: "How many spaces are between the lines of a staff?", render: null, options: ["3", "5", "4", "6"], correctIndex: 2 },
+                    { id: "1-3", prompt: "Which clef is shown?", render(el) {
+                        const f = new Factory({ renderer: { elementId: el.id, width: 200, height: 120 } });
+                        const s = f.EasyScore();
+                        f.System({ x: 0, y: 0, width: 160 }).addStave({ voices: [s.voice(s.notes("B4/w/r"))] }).addClef("treble");
+                        f.draw();
+                    }, options: ["Treble clef", "Bass clef", "Alto clef", "Tenor clef"], correctIndex: 0 },
+                    { id: "1-4", prompt: "Which clef is shown?", render(el) {
+                        const f = new Factory({ renderer: { elementId: el.id, width: 200, height: 120 } });
+                        const s = f.EasyScore();
+                        f.System({ x: 0, y: 0, width: 160 }).addStave({ voices: [s.voice(s.notes("D3/w/r", { clef: "bass" }))] }).addClef("bass");
+                        f.draw();
+                    }, options: ["Alto clef", "Treble clef", "Bass clef", "Tenor clef"], correctIndex: 2 },
+                    { id: "1-5", prompt: "The treble clef is also known as the:", render: null, options: ["F clef", "G clef", "C clef", "D clef"], correctIndex: 1 },
+                    { id: "1-6", prompt: "The bass clef is also known as the:", render: null, options: ["G clef", "C clef", "D clef", "F clef"], correctIndex: 3 },
+                    { id: "1-7", prompt: "What is a ledger line?", render: null, options: ["A short line extending the staff", "A vertical bar line", "A line connecting two staves", "A line showing tempo"], correctIndex: 0 },
+                    { id: "1-8", prompt: "The grand staff combines:", render: null, options: ["Two treble clefs", "Treble and bass clefs", "Two bass clefs", "Treble and alto clefs"], correctIndex: 1 },
+                    { id: "1-9", prompt: "Where does Middle C sit on the grand staff?", render: null, options: ["Top of treble staff", "On a ledger line between the staves", "Bottom of bass staff", "Third line of treble staff"], correctIndex: 1 },
+                    { id: "1-10", prompt: "Higher position on the staff means:", render: null, options: ["Lower pitch", "Louder sound", "Higher pitch", "Faster tempo"], correctIndex: 2 },
+                ],
             },
             // ── Chapter 2: Notes on the Staff ──
             {
@@ -1079,7 +1100,43 @@
                         }
                     },
                 ],
-                quizPool: [],
+                quizPool: [
+                    { id: "2-1", prompt: "What note is this?", render(el) {
+                        const f = new Factory({ renderer: { elementId: el.id, width: 200, height: 120 } });
+                        const s = f.EasyScore();
+                        f.System({ x: 0, y: 0, width: 160 }).addStave({ voices: [s.voice(s.notes("E4/w"))] }).addClef("treble");
+                        f.draw();
+                    }, options: ["E", "F", "D", "G"], correctIndex: 0 },
+                    { id: "2-2", prompt: "What note is this?", render(el) {
+                        const f = new Factory({ renderer: { elementId: el.id, width: 200, height: 120 } });
+                        const s = f.EasyScore();
+                        f.System({ x: 0, y: 0, width: 160 }).addStave({ voices: [s.voice(s.notes("A4/w"))] }).addClef("treble");
+                        f.draw();
+                    }, options: ["G", "B", "A", "C"], correctIndex: 2 },
+                    { id: "2-3", prompt: "What note is this?", render(el) {
+                        const f = new Factory({ renderer: { elementId: el.id, width: 200, height: 120 } });
+                        const s = f.EasyScore();
+                        f.System({ x: 0, y: 0, width: 160 }).addStave({ voices: [s.voice(s.notes("F4/w"))] }).addClef("treble");
+                        f.draw();
+                    }, options: ["E", "G", "D", "F"], correctIndex: 3 },
+                    { id: "2-4", prompt: "What note is this?", render(el) {
+                        const f = new Factory({ renderer: { elementId: el.id, width: 200, height: 120 } });
+                        const s = f.EasyScore();
+                        f.System({ x: 0, y: 0, width: 160 }).addStave({ voices: [s.voice(s.notes("B2/w", { clef: "bass" }))] }).addClef("bass");
+                        f.draw();
+                    }, options: ["A", "C", "B", "D"], correctIndex: 2 },
+                    { id: "2-5", prompt: "What note is this?", render(el) {
+                        const f = new Factory({ renderer: { elementId: el.id, width: 200, height: 120 } });
+                        const s = f.EasyScore();
+                        f.System({ x: 0, y: 0, width: 160 }).addStave({ voices: [s.voice(s.notes("D3/w", { clef: "bass" }))] }).addClef("bass");
+                        f.draw();
+                    }, options: ["C", "E", "D", "F"], correctIndex: 2 },
+                    { id: "2-6", prompt: "Treble clef line notes from bottom: E, G, B, D, ___", render: null, options: ["A", "F", "C", "E"], correctIndex: 1 },
+                    { id: "2-7", prompt: "Treble clef space notes spell:", render: null, options: ["FADE", "FACE", "CAGE", "CAFE"], correctIndex: 1 },
+                    { id: "2-8", prompt: "Bass clef line notes from bottom: G, B, D, F, ___", render: null, options: ["A", "G", "E", "C"], correctIndex: 0 },
+                    { id: "2-9", prompt: "Bass clef space notes from bottom: A, C, E, ___", render: null, options: ["F", "B", "G", "D"], correctIndex: 2 },
+                    { id: "2-10", prompt: "Middle C is also known as:", render: null, options: ["C3", "C5", "C4", "C2"], correctIndex: 2 },
+                ],
             },
             // ── Chapter 3: Note Values ──
             {
@@ -1161,7 +1218,33 @@
                         render: null
                     },
                 ],
-                quizPool: [],
+                quizPool: [
+                    { id: "3-1", prompt: "What type of note is this?", render(el) {
+                        const f = new Factory({ renderer: { elementId: el.id, width: 200, height: 120 } });
+                        const s = f.EasyScore();
+                        f.System({ x: 0, y: 0, width: 160 }).addStave({ voices: [s.voice(s.notes("C4/w"))] }).addClef("treble");
+                        f.draw();
+                    }, options: ["Whole note", "Half note", "Quarter note", "Eighth note"], correctIndex: 0 },
+                    { id: "3-2", prompt: "What type of note is this?", render(el) {
+                        const f = new Factory({ renderer: { elementId: el.id, width: 200, height: 120 } });
+                        const s = f.EasyScore();
+                        f.System({ x: 0, y: 0, width: 160 }).addStave({ voices: [s.voice(s.notes("C4/h, B4/h/r"), { time: "4/4" })] }).addClef("treble");
+                        f.draw();
+                    }, options: ["Quarter note", "Whole note", "Half note", "Eighth note"], correctIndex: 2 },
+                    { id: "3-3", prompt: "What type of note is this?", render(el) {
+                        const f = new Factory({ renderer: { elementId: el.id, width: 200, height: 120 } });
+                        const s = f.EasyScore();
+                        f.System({ x: 0, y: 0, width: 160 }).addStave({ voices: [s.voice(s.notes("C4/q, B4/q/r, B4/q/r, B4/q/r"))] }).addClef("treble");
+                        f.draw();
+                    }, options: ["Half note", "Eighth note", "Quarter note", "Sixteenth note"], correctIndex: 2 },
+                    { id: "3-4", prompt: "How many beats does a whole note get in 4/4 time?", render: null, options: ["1", "2", "3", "4"], correctIndex: 3 },
+                    { id: "3-5", prompt: "How many beats does a half note get?", render: null, options: ["4", "1", "2", "1/2"], correctIndex: 2 },
+                    { id: "3-6", prompt: "How many beats does a quarter note get?", render: null, options: ["2", "1", "1/2", "4"], correctIndex: 1 },
+                    { id: "3-7", prompt: "How many quarter notes equal one whole note?", render: null, options: ["2", "8", "3", "4"], correctIndex: 3 },
+                    { id: "3-8", prompt: "How many eighth notes equal one quarter note?", render: null, options: ["4", "2", "1", "8"], correctIndex: 1 },
+                    { id: "3-9", prompt: "A dotted half note gets how many beats?", render: null, options: ["2", "3", "4", "2.5"], correctIndex: 1 },
+                    { id: "3-10", prompt: "What does a tie do?", render: null, options: ["Raises pitch by half step", "Combines duration of two notes", "Separates measures", "Indicates silence"], correctIndex: 1 },
+                ],
             },
             // ── Chapter 4: Rests ──
             {
@@ -1221,7 +1304,23 @@
                         }
                     },
                 ],
-                quizPool: [],
+                quizPool: [
+                    { id: "4-1", prompt: "What type of rest is shown? (It hangs from a line)", render(el) {
+                        const f = new Factory({ renderer: { elementId: el.id, width: 200, height: 120 } });
+                        const s = f.EasyScore();
+                        f.System({ x: 0, y: 0, width: 160 }).addStave({ voices: [s.voice(s.notes("B4/w/r"))] }).addClef("treble");
+                        f.draw();
+                    }, options: ["Half rest", "Whole rest", "Quarter rest", "Eighth rest"], correctIndex: 1 },
+                    { id: "4-2", prompt: "How many beats of silence does a whole rest get in 4/4?", render: null, options: ["1", "2", "3", "4"], correctIndex: 3 },
+                    { id: "4-3", prompt: "How many beats does a half rest get?", render: null, options: ["1", "4", "2", "1/2"], correctIndex: 2 },
+                    { id: "4-4", prompt: "How many beats does a quarter rest get?", render: null, options: ["2", "4", "1/2", "1"], correctIndex: 3 },
+                    { id: "4-5", prompt: "The whole rest hangs DOWN, the half rest sits UP. True or false?", render: null, options: ["True", "False"], correctIndex: 0 },
+                    { id: "4-6", prompt: "How many beats does an eighth rest get?", render: null, options: ["1", "1/4", "2", "1/2"], correctIndex: 3 },
+                    { id: "4-7", prompt: "A rest tells you to:", render: null, options: ["Play louder", "Be silent", "Play faster", "Repeat a note"], correctIndex: 1 },
+                    { id: "4-8", prompt: "Which rest looks like a zigzag or lightning bolt?", render: null, options: ["Whole rest", "Half rest", "Quarter rest", "Eighth rest"], correctIndex: 2 },
+                    { id: "4-9", prompt: "How many eighth rests equal one quarter rest?", render: null, options: ["4", "1", "2", "8"], correctIndex: 2 },
+                    { id: "4-10", prompt: "Every note value has a corresponding:", render: null, options: ["Clef", "Rest of equal duration", "Key signature", "Time signature"], correctIndex: 1 },
+                ],
             },
             // ── Chapter 5: Time Signatures ──
             {
@@ -1294,7 +1393,33 @@
                         }
                     },
                 ],
-                quizPool: [],
+                quizPool: [
+                    { id: "5-1", prompt: "What time signature is shown?", render(el) {
+                        const f = new Factory({ renderer: { elementId: el.id, width: 200, height: 120 } });
+                        const s = f.EasyScore();
+                        f.System({ x: 0, y: 0, width: 160 }).addStave({ voices: [s.voice(s.notes("B4/w/r"))] }).addClef("treble").addTimeSignature("4/4");
+                        f.draw();
+                    }, options: ["3/4", "4/4", "2/4", "6/8"], correctIndex: 1 },
+                    { id: "5-2", prompt: "What time signature is shown?", render(el) {
+                        const f = new Factory({ renderer: { elementId: el.id, width: 200, height: 120 } });
+                        const s = f.EasyScore();
+                        f.System({ x: 0, y: 0, width: 160 }).addStave({ voices: [s.voice(s.notes("B4/h/r, B4/q/r"), { time: "3/4" })] }).addClef("treble").addTimeSignature("3/4");
+                        f.draw();
+                    }, options: ["4/4", "6/8", "2/4", "3/4"], correctIndex: 3 },
+                    { id: "5-3", prompt: "What time signature is shown?", render(el) {
+                        const f = new Factory({ renderer: { elementId: el.id, width: 200, height: 120 } });
+                        const s = f.EasyScore();
+                        f.System({ x: 0, y: 0, width: 160 }).addStave({ voices: [s.voice(s.notes("B4/h/r"), { time: "2/4" })] }).addClef("treble").addTimeSignature("2/4");
+                        f.draw();
+                    }, options: ["3/4", "4/4", "2/4", "6/8"], correctIndex: 2 },
+                    { id: "5-4", prompt: "In 4/4 time, how many beats are in each measure?", render: null, options: ["2", "3", "4", "6"], correctIndex: 2 },
+                    { id: "5-5", prompt: "In 3/4 time, how many beats are in each measure?", render: null, options: ["2", "3", "4", "6"], correctIndex: 1 },
+                    { id: "5-6", prompt: "The top number in a time signature tells you:", render: null, options: ["Tempo", "Key", "Beats per measure", "Note value"], correctIndex: 2 },
+                    { id: "5-7", prompt: "The bottom number 4 means which note gets one beat?", render: null, options: ["Whole note", "Half note", "Quarter note", "Eighth note"], correctIndex: 2 },
+                    { id: "5-8", prompt: "3/4 time is commonly associated with:", render: null, options: ["March", "Waltz", "Rock music", "Jazz"], correctIndex: 1 },
+                    { id: "5-9", prompt: "In 6/8 time, beats are typically grouped as:", render: null, options: ["6 groups of 1", "3 groups of 2", "2 groups of 3", "1 group of 6"], correctIndex: 2 },
+                    { id: "5-10", prompt: "A measure is the space between two:", render: null, options: ["Clefs", "Rests", "Bar lines", "Key signatures"], correctIndex: 2 },
+                ],
             },
             // ── Chapter 6: Key Signatures & Accidentals ──
             {
@@ -1381,7 +1506,33 @@
                         }
                     },
                 ],
-                quizPool: [],
+                quizPool: [
+                    { id: "6-1", prompt: "What does a sharp (#) do to a note?", render: null, options: ["Lowers by half step", "Raises by half step", "Doubles duration", "Cancels a flat"], correctIndex: 1 },
+                    { id: "6-2", prompt: "What does a flat (b) do to a note?", render: null, options: ["Raises by half step", "Cancels a sharp", "Lowers by half step", "Halves duration"], correctIndex: 2 },
+                    { id: "6-3", prompt: "What does a natural sign do?", render: null, options: ["Raises by half step", "Lowers by half step", "Cancels a sharp or flat", "Doubles the note"], correctIndex: 2 },
+                    { id: "6-4", prompt: "What key signature is shown?", render(el) {
+                        const f = new Factory({ renderer: { elementId: el.id, width: 200, height: 120 } });
+                        const s = f.EasyScore();
+                        f.System({ x: 0, y: 0, width: 160 }).addStave({ voices: [s.voice(s.notes("B4/w/r"))] }).addClef("treble").addKeySignature("G");
+                        f.draw();
+                    }, options: ["C Major", "D Major", "G Major", "F Major"], correctIndex: 2 },
+                    { id: "6-5", prompt: "What key signature is shown?", render(el) {
+                        const f = new Factory({ renderer: { elementId: el.id, width: 200, height: 120 } });
+                        const s = f.EasyScore();
+                        f.System({ x: 0, y: 0, width: 160 }).addStave({ voices: [s.voice(s.notes("B4/w/r"))] }).addClef("treble").addKeySignature("F");
+                        f.draw();
+                    }, options: ["G Major", "C Major", "Bb Major", "F Major"], correctIndex: 3 },
+                    { id: "6-6", prompt: "The order of sharps begins with:", render: null, options: ["C#", "G#", "F#", "B#"], correctIndex: 2 },
+                    { id: "6-7", prompt: "The order of flats begins with:", render: null, options: ["Eb", "Ab", "Bb", "Db"], correctIndex: 2 },
+                    { id: "6-8", prompt: "C Major has how many sharps or flats?", render: null, options: ["1 sharp", "1 flat", "None", "2 sharps"], correctIndex: 2 },
+                    { id: "6-9", prompt: "For sharp keys, the key name is one half step above:", render: null, options: ["The first sharp", "The last sharp", "Middle C", "The clef"], correctIndex: 1 },
+                    { id: "6-10", prompt: "What key signature is shown?", render(el) {
+                        const f = new Factory({ renderer: { elementId: el.id, width: 200, height: 120 } });
+                        const s = f.EasyScore();
+                        f.System({ x: 0, y: 0, width: 160 }).addStave({ voices: [s.voice(s.notes("B4/w/r"))] }).addClef("treble").addKeySignature("D");
+                        f.draw();
+                    }, options: ["A Major", "G Major", "D Major", "E Major"], correctIndex: 2 },
+                ],
             },
         ];
 
