@@ -1532,6 +1532,510 @@
                     }, options: ["A Major", "G Major", "D Major", "E Major"], correctIndex: 2 },
                 ],
             },
+            // ── Chapter 7: Half Steps & Whole Steps ──
+            {
+                id: 7,
+                title: "Half Steps & Whole Steps",
+                subtitle: "The building blocks of music",
+                pages: [
+                    {
+                        title: "What Is a Half Step?",
+                        content: `<h3>What Is a Half Step?</h3>
+<p>A <span class="highlight">half step</span> is the smallest distance between two notes in Western music. On the piano, it's from one key to the <em>very next key</em> — white or black.</p>
+<p>Most white keys have a black key between them, making the distance from one white key to the next a whole step. But <span class="highlight">E→F</span> and <span class="highlight">B→C</span> are natural half steps — there's no black key between them.</p>
+<p><span class="mnemonic">Remember: E-F and B-C are the "no-gap" pairs.</span></p>
+<div class="staff-example" id="ch7-ex1"></div>
+<p>Above: C to C# (white to black key) — a half step.</p>
+<div class="staff-example" id="ch7-ex2"></div>
+<p>Above: E to F (two white keys, no black key between) — also a half step.</p>`,
+                        render(container) {
+                            const el1 = container.querySelector("#ch7-ex1");
+                            if (el1) {
+                                const f = new Factory({ renderer: { elementId: el1.id, width: 300, height: 120 } });
+                                const s = f.EasyScore();
+                                f.System({ x: 0, y: 0, width: 260 }).addStave({ voices: [s.voice(s.notes("C4/h, C#4/h"))] }).addClef("treble");
+                                f.draw();
+                            }
+                            const el2 = container.querySelector("#ch7-ex2");
+                            if (el2) {
+                                const f = new Factory({ renderer: { elementId: el2.id, width: 300, height: 120 } });
+                                const s = f.EasyScore();
+                                f.System({ x: 0, y: 0, width: 260 }).addStave({ voices: [s.voice(s.notes("E4/h, F4/h"))] }).addClef("treble");
+                                f.draw();
+                            }
+                        }
+                    },
+                    {
+                        title: "What Is a Whole Step?",
+                        content: `<h3>What Is a Whole Step?</h3>
+<p>A <span class="highlight">whole step</span> equals <span class="highlight">two half steps</span>. On the keyboard, a whole step always skips exactly one key.</p>
+<p>C→D is a whole step (skips C#). D→E is a whole step (skips D#).</p>
+<p>Think of it this way: if you can fit one key in between, it's a whole step.</p>
+<div class="staff-example" id="ch7-ex3"></div>
+<p>Above: C to D, then D to E — both whole steps.</p>`,
+                        render(container) {
+                            const el = container.querySelector("#ch7-ex3");
+                            if (el) {
+                                const f = new Factory({ renderer: { elementId: el.id, width: 300, height: 120 } });
+                                const s = f.EasyScore();
+                                f.System({ x: 0, y: 0, width: 260 }).addStave({ voices: [s.voice(s.notes("C4/h, D4/h"))] }).addClef("treble");
+                                f.draw();
+                            }
+                        }
+                    },
+                    {
+                        title: "The Piano Keyboard Pattern",
+                        content: `<h3>The Piano Keyboard Pattern</h3>
+<p>The pattern of whole and half steps creates the distinctive layout of the piano keyboard. Between white keys:</p>
+<p style="text-align:center; font-size:1.1em; letter-spacing:2px; margin:12px 0;">
+<strong>C</strong> <span style="color:#2196F3">W</span> <strong>D</strong> <span style="color:#2196F3">W</span> <strong>E</strong> <span style="color:#e53935">H</span> <strong>F</strong> <span style="color:#2196F3">W</span> <strong>G</strong> <span style="color:#2196F3">W</span> <strong>A</strong> <span style="color:#2196F3">W</span> <strong>B</strong> <span style="color:#e53935">H</span> <strong>C</strong>
+</p>
+<p><span style="color:#2196F3"><strong>W</strong></span> = Whole step (black key between) &nbsp; <span style="color:#e53935"><strong>H</strong></span> = Half step (no black key)</p>
+<p>This <span class="highlight">W-W-H-W-W-W-H</span> pattern repeats every octave — it's the foundation of the major scale (Chapter 8).</p>
+<p><span class="mnemonic">The half steps always land between E-F and B-C.</span></p>`
+                    },
+                    {
+                        title: "Counting Half Steps",
+                        content: `<h3>Counting Half Steps</h3>
+<p>To count half steps between two notes, count every key (black and white) from the starting note to the target — don't count the starting note itself.</p>
+<p><span class="highlight">C to E</span> = 4 half steps (C→C#→D→D#→E)</p>
+<p><span class="highlight">C to G</span> = 7 half steps (C→C#→D→D#→E→F→F#→G)</p>
+<p>This skill is essential: intervals, scales, and chords are all defined by specific half-step distances.</p>`
+                    },
+                ],
+                quizPool: [
+                    { id: "7-1", prompt: "What is a half step?", render: null, options: ["The smallest distance between two notes", "A skip of two keys", "The distance between C and E", "The distance between octaves"], correctIndex: 0 },
+                    { id: "7-2", prompt: "How many half steps from E to F?", render: null, options: ["1", "2", "3", "0"], correctIndex: 0 },
+                    { id: "7-3", prompt: "How many half steps from B to C?", render: null, options: ["2", "3", "0", "1"], correctIndex: 3 },
+                    { id: "7-4", prompt: "What is a whole step?", render: null, options: ["Three half steps", "One half step", "Two half steps", "Four half steps"], correctIndex: 2 },
+                    { id: "7-5", prompt: "How many half steps from C to D?", render: null, options: ["1", "2", "3", "4"], correctIndex: 1 },
+                    { id: "7-6", prompt: "Which pair of white keys has NO black key between them?", render: null, options: ["C and D", "D and E", "E and F", "G and A"], correctIndex: 2 },
+                    { id: "7-7", prompt: "How many half steps from C to E?", render: null, options: ["2", "3", "4", "5"], correctIndex: 2 },
+                    { id: "7-8", prompt: "How many half steps from C to G?", render: null, options: ["5", "6", "7", "8"], correctIndex: 2 },
+                    { id: "7-9", prompt: "A whole step on the piano always skips ___ key(s):", render: null, options: ["0", "1", "2", "3"], correctIndex: 1 },
+                    { id: "7-10", prompt: "Which of these is a half step?", render: null, options: ["C to D", "D to F", "F to F#", "G to B"], correctIndex: 2 },
+                ],
+            },
+            // ── Chapter 8: The Major Scale ──
+            {
+                id: 8,
+                title: "The Major Scale",
+                subtitle: "The most important pattern in music",
+                pages: [
+                    {
+                        title: "What Is a Scale?",
+                        content: `<h3>What Is a Scale?</h3>
+<p>A <span class="highlight">scale</span> is a set of notes arranged in order by pitch. Think of it as the "palette" of notes a piece of music draws from.</p>
+<p>The <span class="highlight">major scale</span> is the most common — it sounds bright and happy. You've already heard it: Do-Re-Mi-Fa-Sol-La-Ti-Do.</p>
+<div class="staff-example" id="ch8-ex1"></div>
+<p>Above: The C major scale — all white keys from C to C.</p>`,
+                        render(container) {
+                            const el = container.querySelector("#ch8-ex1");
+                            if (el) {
+                                const f = new Factory({ renderer: { elementId: el.id, width: 340, height: 120 } });
+                                const s = f.EasyScore();
+                                f.System({ x: 0, y: 0, width: 300 }).addStave({ voices: [s.voice(s.notes("C4/q, D4/q, E4/q, F4/q, G4/q, A4/q, B4/q, C5/q"), { time: "8/4" })] }).addClef("treble");
+                                f.draw();
+                            }
+                        }
+                    },
+                    {
+                        title: "The Major Scale Formula",
+                        content: `<h3>The Major Scale Formula</h3>
+<p>Every major scale follows the same pattern of whole and half steps:</p>
+<p style="text-align:center; font-size:1.2em; margin:12px 0;"><span class="highlight">W - W - H - W - W - W - H</span></p>
+<p>In C major this is easy to see — all white keys:</p>
+<p style="text-align:center;">C <span style="color:#2196F3">W</span> D <span style="color:#2196F3">W</span> E <span style="color:#e53935">H</span> F <span style="color:#2196F3">W</span> G <span style="color:#2196F3">W</span> A <span style="color:#2196F3">W</span> B <span style="color:#e53935">H</span> C</p>
+<p>The half steps always fall between degrees <span class="highlight">3-4</span> and <span class="highlight">7-8</span>.</p>
+<div class="staff-example" id="ch8-ex2"></div>
+<p>C major scale for reference — notice how it uses no sharps or flats.</p>`,
+                        render(container) {
+                            const el = container.querySelector("#ch8-ex2");
+                            if (el) {
+                                const f = new Factory({ renderer: { elementId: el.id, width: 340, height: 120 } });
+                                const s = f.EasyScore();
+                                f.System({ x: 0, y: 0, width: 300 }).addStave({ voices: [s.voice(s.notes("C4/q, D4/q, E4/q, F4/q, G4/q, A4/q, B4/q, C5/q"), { time: "8/4" })] }).addClef("treble");
+                                f.draw();
+                            }
+                        }
+                    },
+                    {
+                        title: "Building Major Scales",
+                        content: `<h3>Building Major Scales</h3>
+<p>Start on <em>any</em> note and apply <span class="highlight">W-W-H-W-W-W-H</span> — you'll get a major scale.</p>
+<p><strong>G major:</strong> G-A-B-C-D-E-F#-G (one sharp)</p>
+<p><strong>F major:</strong> F-G-A-Bb-C-D-E-F (one flat)</p>
+<p>This is exactly <em>why</em> key signatures exist — they tell you which sharps or flats a scale needs.</p>
+<div class="staff-example" id="ch8-ex3"></div>
+<p>Above: G major scale. The key signature shows one sharp (F#).</p>`,
+                        render(container) {
+                            const el = container.querySelector("#ch8-ex3");
+                            if (el) {
+                                const f = new Factory({ renderer: { elementId: el.id, width: 340, height: 120 } });
+                                const s = f.EasyScore();
+                                f.System({ x: 0, y: 0, width: 300 }).addStave({ voices: [s.voice(s.notes("G4/q, A4/q, B4/q, C5/q, D5/q, E5/q, F#5/q, G5/q"), { time: "8/4" })] }).addClef("treble").addKeySignature("G");
+                                f.draw();
+                            }
+                        }
+                    },
+                    {
+                        title: "Scale Degrees",
+                        content: `<h3>Scale Degrees</h3>
+<p>Each note in a scale has a number and a name:</p>
+<p><span class="highlight">1 = Tonic</span> (home base)<br>
+2 = Supertonic<br>
+3 = Mediant<br>
+<span class="highlight">4 = Subdominant</span><br>
+<span class="highlight">5 = Dominant</span> (strongest pull to tonic)<br>
+6 = Submediant<br>
+7 = Leading Tone (wants to resolve up to tonic)</p>
+<p>The three most important: <span class="highlight">1 (Tonic)</span>, <span class="highlight">4 (Subdominant)</span>, and <span class="highlight">5 (Dominant)</span>. These form the backbone of harmony.</p>`
+                    },
+                    {
+                        title: "Why Scales Matter",
+                        content: `<h3>Why Scales Matter</h3>
+<p>Scales are the <span class="highlight">foundation</span> of nearly everything in music:</p>
+<p><strong>Melodies</strong> — most melodies use notes from a single scale. Knowing the scale helps you predict what comes next.</p>
+<p><strong>Chords</strong> — chords are built from scale notes (you'll learn this in Chapter 10).</p>
+<p><strong>Sight reading</strong> — when you know a key, you know which notes to expect, making reading much faster.</p>
+<p><strong>Improvisation</strong> — scales give you the "safe" notes to play over a chord progression.</p>`
+                    },
+                ],
+                quizPool: [
+                    { id: "8-1", prompt: "The major scale formula (in whole and half steps) is:", render: null, options: ["W-H-W-W-H-W-W", "W-W-H-W-W-W-H", "H-W-W-H-W-W-W", "W-W-W-H-W-W-H"], correctIndex: 1 },
+                    { id: "8-2", prompt: "How many notes are in a major scale (including the octave)?", render: null, options: ["6", "7", "8", "12"], correctIndex: 2 },
+                    { id: "8-3", prompt: "In a major scale, the half steps fall between degrees:", render: null, options: ["1-2 and 5-6", "2-3 and 6-7", "3-4 and 7-8", "4-5 and 1-2"], correctIndex: 2 },
+                    { id: "8-4", prompt: "C major uses:", render: null, options: ["One sharp", "One flat", "No sharps or flats", "Two sharps"], correctIndex: 2 },
+                    { id: "8-5", prompt: "What note is the 5th degree of C major?", render: null, options: ["E", "F", "G", "A"], correctIndex: 2 },
+                    { id: "8-6", prompt: "G major has one sharp. Which note is sharp?", render: null, options: ["C#", "G#", "F#", "D#"], correctIndex: 2 },
+                    { id: "8-7", prompt: "F major has one flat. Which note is flat?", render: null, options: ["Eb", "Ab", "Db", "Bb"], correctIndex: 3 },
+                    { id: "8-8", prompt: "The 1st degree of a scale is called the:", render: null, options: ["Dominant", "Mediant", "Leading tone", "Tonic"], correctIndex: 3 },
+                    { id: "8-9", prompt: "The 5th degree of a scale is called the:", render: null, options: ["Tonic", "Dominant", "Subdominant", "Mediant"], correctIndex: 1 },
+                    { id: "8-10", prompt: "What major scale is shown?", render(el) {
+                        const f = new Factory({ renderer: { elementId: el.id, width: 340, height: 120 } });
+                        const s = f.EasyScore();
+                        f.System({ x: 0, y: 0, width: 300 }).addStave({ voices: [s.voice(s.notes("D4/q, E4/q, F#4/q, G4/q, A4/q, B4/q, C#5/q, D5/q"), { time: "8/4" })] }).addClef("treble").addKeySignature("D");
+                        f.draw();
+                    }, options: ["C Major", "D Major", "G Major", "A Major"], correctIndex: 1 },
+                ],
+            },
+            // ── Chapter 9: The Minor Scale ──
+            {
+                id: 9,
+                title: "The Minor Scale",
+                subtitle: "The other side of the coin",
+                pages: [
+                    {
+                        title: "Major vs. Minor",
+                        content: `<h3>Major vs. Minor</h3>
+<p><span class="highlight">Major</span> scales sound bright and happy. <span class="highlight">Minor</span> scales sound darker, sadder, or more dramatic.</p>
+<p>The natural minor formula: <span class="highlight">W-H-W-W-H-W-W</span></p>
+<p>Here's the amazing thing: C major (C D E F G A B C) and A minor (A B C D E F G A) use the <em>exact same white keys</em> — just starting on different notes!</p>
+<div class="staff-example" id="ch9-ex1"></div>
+<p>Above: A natural minor scale — all white keys from A to A.</p>`,
+                        render(container) {
+                            const el = container.querySelector("#ch9-ex1");
+                            if (el) {
+                                const f = new Factory({ renderer: { elementId: el.id, width: 340, height: 120 } });
+                                const s = f.EasyScore();
+                                f.System({ x: 0, y: 0, width: 300 }).addStave({ voices: [s.voice(s.notes("A3/q, B3/q, C4/q, D4/q, E4/q, F4/q, G4/q, A4/q", { clef: "bass" }), { time: "8/4" })] }).addClef("bass");
+                                f.draw();
+                            }
+                        }
+                    },
+                    {
+                        title: "Relative Major and Minor",
+                        content: `<h3>Relative Major and Minor</h3>
+<p>Every major key has a <span class="highlight">relative minor</span> that shares the exact same key signature.</p>
+<p>To find the relative minor, start on the <span class="highlight">6th degree</span> of the major scale (or count down 3 half steps from the major key).</p>
+<p><strong>Common pairs:</strong></p>
+<p>C major → <span class="highlight">A minor</span><br>
+G major → <span class="highlight">E minor</span><br>
+F major → <span class="highlight">D minor</span></p>
+<div class="staff-example" id="ch9-ex2"></div>
+<p>Above: C major scale — A minor uses the same notes, starting on A.</p>`,
+                        render(container) {
+                            const el = container.querySelector("#ch9-ex2");
+                            if (el) {
+                                const f = new Factory({ renderer: { elementId: el.id, width: 340, height: 120 } });
+                                const s = f.EasyScore();
+                                f.System({ x: 0, y: 0, width: 300 }).addStave({ voices: [s.voice(s.notes("C4/q, D4/q, E4/q, F4/q, G4/q, A4/q, B4/q, C5/q"), { time: "8/4" })] }).addClef("treble");
+                                f.draw();
+                            }
+                        }
+                    },
+                    {
+                        title: "Harmonic and Melodic Minor",
+                        content: `<h3>Harmonic and Melodic Minor</h3>
+<p>The natural minor has two important variations:</p>
+<p><span class="highlight">Harmonic minor</span>: raise the 7th degree by a half step. This creates a <em>leading tone</em> that pulls strongly back to the tonic, and gives the scale a distinctive, almost exotic sound.</p>
+<p>A harmonic minor: A B C D E F <span class="highlight">G#</span> A</p>
+<p><span class="highlight">Melodic minor</span>: raise <em>both</em> the 6th and 7th going up; revert to natural minor going down.</p>
+<p>For now, just know these variations exist — you'll mostly encounter natural minor.</p>
+<div class="staff-example" id="ch9-ex3"></div>
+<p>Above: A harmonic minor — notice the G# creating a larger gap before A.</p>`,
+                        render(container) {
+                            const el = container.querySelector("#ch9-ex3");
+                            if (el) {
+                                const f = new Factory({ renderer: { elementId: el.id, width: 340, height: 120 } });
+                                const s = f.EasyScore();
+                                f.System({ x: 0, y: 0, width: 300 }).addStave({ voices: [s.voice(s.notes("A3/q, B3/q, C4/q, D4/q, E4/q, F4/q, G#4/q, A4/q"), { time: "8/4" })] }).addClef("treble");
+                                f.draw();
+                            }
+                        }
+                    },
+                    {
+                        title: "Finding Minor Keys",
+                        content: `<h3>Finding Minor Keys</h3>
+<p>A key signature alone doesn't tell you if a piece is major or minor — you have to listen and look at the music.</p>
+<p><strong>Clues that a piece is in a minor key:</strong></p>
+<p>The melody starts or ends on the minor tonic. The "home" note feels darker. Look for raised 7th degrees (accidentals not in the key signature).</p>
+<p><strong>Common major/minor pairs:</strong></p>
+<p>C/Am &bull; G/Em &bull; D/Bm &bull; F/Dm &bull; Bb/Gm &bull; Eb/Cm</p>
+<p><span class="mnemonic">Same key signature, different home note.</span></p>`
+                    },
+                ],
+                quizPool: [
+                    { id: "9-1", prompt: "The natural minor scale formula is:", render: null, options: ["W-W-H-W-W-W-H", "W-H-W-W-H-W-W", "H-W-W-H-W-W-W", "W-W-H-W-W-H-W"], correctIndex: 1 },
+                    { id: "9-2", prompt: "Minor scales generally sound:", render: null, options: ["Bright and happy", "Dark or sad", "Fast and energetic", "Loud and bold"], correctIndex: 1 },
+                    { id: "9-3", prompt: "What is the relative minor of C major?", render: null, options: ["D minor", "E minor", "A minor", "G minor"], correctIndex: 2 },
+                    { id: "9-4", prompt: "What is the relative minor of G major?", render: null, options: ["B minor", "D minor", "E minor", "A minor"], correctIndex: 2 },
+                    { id: "9-5", prompt: "The relative minor starts on which degree of the major scale?", render: null, options: ["3rd", "4th", "5th", "6th"], correctIndex: 3 },
+                    { id: "9-6", prompt: "A minor and C major share the same:", render: null, options: ["Tempo", "Key signature", "Time signature", "Clef"], correctIndex: 1 },
+                    { id: "9-7", prompt: "In harmonic minor, which degree is raised?", render: null, options: ["3rd", "5th", "6th", "7th"], correctIndex: 3 },
+                    { id: "9-8", prompt: "What note is raised in A harmonic minor?", render: null, options: ["F", "E", "G", "D"], correctIndex: 2 },
+                    { id: "9-9", prompt: "How many half steps down from a major key to its relative minor?", render: null, options: ["1", "2", "3", "4"], correctIndex: 2 },
+                    { id: "9-10", prompt: "What is the relative major of D minor?", render: null, options: ["C major", "D major", "F major", "G major"], correctIndex: 2 },
+                ],
+            },
+            // ── Chapter 10: Chords — Major & Minor Triads ──
+            {
+                id: 10,
+                title: "Chords — Major & Minor Triads",
+                subtitle: "Playing notes together",
+                pages: [
+                    {
+                        title: "What Is a Chord?",
+                        content: `<h3>What Is a Chord?</h3>
+<p>A <span class="highlight">chord</span> is three or more notes played at the same time. The simplest chord is a <span class="highlight">triad</span> — three notes stacked in intervals of a third.</p>
+<p>Chords provide <span class="highlight">harmony</span>, the vertical dimension of music that supports the melody.</p>
+<div class="staff-example" id="ch10-ex1"></div>
+<p>Above: A C major chord (C-E-G) — three notes stacked on the staff.</p>`,
+                        render(container) {
+                            const el = container.querySelector("#ch10-ex1");
+                            if (el) {
+                                const f = new Factory({ renderer: { elementId: el.id, width: 200, height: 120 } });
+                                const s = f.EasyScore();
+                                f.System({ x: 0, y: 0, width: 160 }).addStave({ voices: [s.voice(s.notes("(C4 E4 G4)/w"))] }).addClef("treble");
+                                f.draw();
+                            }
+                        }
+                    },
+                    {
+                        title: "Building Major Triads",
+                        content: `<h3>Building Major Triads</h3>
+<p>A <span class="highlight">major triad</span> is built: Root + <span class="highlight">4 half steps</span> + <span class="highlight">3 half steps</span>.</p>
+<p><strong>C major:</strong> C-E-G &nbsp; <strong>G major:</strong> G-B-D &nbsp; <strong>F major:</strong> F-A-C</p>
+<p>Major triads sound bright and stable — they're the "happy" chords.</p>
+<div class="staff-example" id="ch10-ex2"></div>
+<p>Above: C major (C-E-G) and G major (G-B-D) triads.</p>
+<div class="staff-example" id="ch10-ex3"></div>
+<p>Above: F major triad (F-A-C).</p>`,
+                        render(container) {
+                            const el1 = container.querySelector("#ch10-ex2");
+                            if (el1) {
+                                const f = new Factory({ renderer: { elementId: el1.id, width: 300, height: 120 } });
+                                const s = f.EasyScore();
+                                f.System({ x: 0, y: 0, width: 260 }).addStave({ voices: [s.voice(s.notes("(C4 E4 G4)/h, (G3 B3 D4)/h"))] }).addClef("treble");
+                                f.draw();
+                            }
+                            const el2 = container.querySelector("#ch10-ex3");
+                            if (el2) {
+                                const f = new Factory({ renderer: { elementId: el2.id, width: 200, height: 120 } });
+                                const s = f.EasyScore();
+                                f.System({ x: 0, y: 0, width: 160 }).addStave({ voices: [s.voice(s.notes("(F3 A3 C4)/w"))] }).addClef("treble");
+                                f.draw();
+                            }
+                        }
+                    },
+                    {
+                        title: "Building Minor Triads",
+                        content: `<h3>Building Minor Triads</h3>
+<p>A <span class="highlight">minor triad</span> reverses the intervals: Root + <span class="highlight">3 half steps</span> + <span class="highlight">4 half steps</span>.</p>
+<p>Compare: <strong>C major</strong> = C-E-G vs <strong>C minor</strong> = C-Eb-G</p>
+<p>The only difference is the <span class="highlight">3rd</span> — it's lowered by one half step. This small change transforms the mood from bright to dark.</p>
+<div class="staff-example" id="ch10-ex4"></div>
+<p>Above: C major (C-E-G) then C minor (C-Eb-G) — hear how the feel changes with just one note.</p>`,
+                        render(container) {
+                            const el = container.querySelector("#ch10-ex4");
+                            if (el) {
+                                const f = new Factory({ renderer: { elementId: el.id, width: 300, height: 120 } });
+                                const s = f.EasyScore();
+                                f.System({ x: 0, y: 0, width: 260 }).addStave({ voices: [s.voice(s.notes("(C4 E4 G4)/h, (C4 Eb4 G4)/h"))] }).addClef("treble");
+                                f.draw();
+                            }
+                        }
+                    },
+                    {
+                        title: "Common Triads to Know",
+                        content: `<h3>Common Triads to Know</h3>
+<p><strong>Major triads:</strong></p>
+<p>C (C-E-G) &bull; D (D-F#-A) &bull; E (E-G#-B) &bull; F (F-A-C) &bull; G (G-B-D) &bull; A (A-C#-E) &bull; Bb (Bb-D-F)</p>
+<p><strong>Minor triads:</strong></p>
+<p>Am (A-C-E) &bull; Dm (D-F-A) &bull; Em (E-G-B) &bull; Gm (G-Bb-D)</p>
+<p><span class="mnemonic">Minor chords are labeled with a lowercase "m" after the root: Am, Dm, Em.</span></p>
+<p>Major chords use just the letter name. "C" means C major; "Cm" means C minor.</p>`
+                    },
+                    {
+                        title: "Inversions",
+                        content: `<h3>Inversions</h3>
+<p>A chord's notes can be rearranged into different <span class="highlight">inversions</span>:</p>
+<p><strong>Root position:</strong> C-E-G (root on bottom)<br>
+<strong>1st inversion:</strong> E-G-C (3rd on bottom)<br>
+<strong>2nd inversion:</strong> G-C-E (5th on bottom)</p>
+<p>Same chord, different voicing. Inversions create smoother transitions between chords.</p>
+<div class="staff-example" id="ch10-ex5"></div>
+<p>Above: C major in root position and 1st inversion.</p>
+<div class="staff-example" id="ch10-ex6"></div>
+<p>Above: C major in 2nd inversion (G on bottom).</p>`,
+                        render(container) {
+                            const el1 = container.querySelector("#ch10-ex5");
+                            if (el1) {
+                                const f = new Factory({ renderer: { elementId: el1.id, width: 300, height: 120 } });
+                                const s = f.EasyScore();
+                                f.System({ x: 0, y: 0, width: 260 }).addStave({ voices: [s.voice(s.notes("(C4 E4 G4)/h, (E4 G4 C5)/h"))] }).addClef("treble");
+                                f.draw();
+                            }
+                            const el2 = container.querySelector("#ch10-ex6");
+                            if (el2) {
+                                const f = new Factory({ renderer: { elementId: el2.id, width: 200, height: 120 } });
+                                const s = f.EasyScore();
+                                f.System({ x: 0, y: 0, width: 160 }).addStave({ voices: [s.voice(s.notes("(G3 C4 E4)/w"))] }).addClef("treble");
+                                f.draw();
+                            }
+                        }
+                    },
+                ],
+                quizPool: [
+                    { id: "10-1", prompt: "A triad is made up of how many notes?", render: null, options: ["2", "3", "4", "5"], correctIndex: 1 },
+                    { id: "10-2", prompt: "A major triad is built with:", render: null, options: ["Root + 3 half steps + 4 half steps", "Root + 4 half steps + 3 half steps", "Root + 2 half steps + 2 half steps", "Root + 5 half steps + 2 half steps"], correctIndex: 1 },
+                    { id: "10-3", prompt: "What notes make up a C major triad?", render: null, options: ["C-D-E", "C-Eb-G", "C-E-G", "C-F-A"], correctIndex: 2 },
+                    { id: "10-4", prompt: "What notes make up a G major triad?", render: null, options: ["G-A-B", "G-Bb-D", "G-B-D", "G-C-E"], correctIndex: 2 },
+                    { id: "10-5", prompt: "A minor triad is built with:", render: null, options: ["Root + 4 half steps + 3 half steps", "Root + 3 half steps + 3 half steps", "Root + 3 half steps + 4 half steps", "Root + 4 half steps + 4 half steps"], correctIndex: 2 },
+                    { id: "10-6", prompt: "What notes make up an A minor triad?", render: null, options: ["A-C-E", "A-C#-E", "A-D-F", "A-Cb-E"], correctIndex: 0 },
+                    { id: "10-7", prompt: "The difference between C major and C minor is:", render: null, options: ["The root", "The 3rd", "The 5th", "The octave"], correctIndex: 1 },
+                    { id: "10-8", prompt: "What chord is this?", render(el) {
+                        const f = new Factory({ renderer: { elementId: el.id, width: 200, height: 120 } });
+                        const s = f.EasyScore();
+                        f.System({ x: 0, y: 0, width: 160 }).addStave({ voices: [s.voice(s.notes("(C4 E4 G4)/w"))] }).addClef("treble");
+                        f.draw();
+                    }, options: ["C minor", "F major", "C major", "G major"], correctIndex: 2 },
+                    { id: "10-9", prompt: "In first inversion, which note is on the bottom?", render: null, options: ["The root", "The 3rd", "The 5th", "The 7th"], correctIndex: 1 },
+                    { id: "10-10", prompt: "What chord is this?", render(el) {
+                        const f = new Factory({ renderer: { elementId: el.id, width: 200, height: 120 } });
+                        const s = f.EasyScore();
+                        f.System({ x: 0, y: 0, width: 160 }).addStave({ voices: [s.voice(s.notes("(A3 C4 E4)/w"))] }).addClef("treble");
+                        f.draw();
+                    }, options: ["C major", "A major", "E minor", "A minor"], correctIndex: 3 },
+                ],
+            },
+            // ── Chapter 11: Chord Progressions ──
+            {
+                id: 11,
+                title: "Chord Progressions",
+                subtitle: "How chords work together",
+                pages: [
+                    {
+                        title: "Chords in a Key",
+                        content: `<h3>Chords in a Key</h3>
+<p>When you build a triad on each note of a major scale, you get seven chords — some major, some minor, one diminished:</p>
+<p style="text-align:center; margin:12px 0;">
+<strong>I</strong> &bull; <strong>ii</strong> &bull; <strong>iii</strong> &bull; <strong>IV</strong> &bull; <strong>V</strong> &bull; <strong>vi</strong> &bull; <strong>vii&deg;</strong>
+</p>
+<p>In C major: <span class="highlight">C(I)</span> &bull; Dm(ii) &bull; Em(iii) &bull; <span class="highlight">F(IV)</span> &bull; <span class="highlight">G(V)</span> &bull; Am(vi) &bull; Bdim(vii&deg;)</p>
+<p><span class="mnemonic">Uppercase = major, lowercase = minor. This pattern is the same in every major key.</span></p>`
+                    },
+                    {
+                        title: "The I, IV, and V Chords",
+                        content: `<h3>The I, IV, and V Chords</h3>
+<p>The three most important chords in any key:</p>
+<p><span class="highlight">I (Tonic)</span> — home, stability<br>
+<span class="highlight">IV (Subdominant)</span> — departure, movement<br>
+<span class="highlight">V (Dominant)</span> — tension, wants to resolve back to I</p>
+<p>In C major: C, F, G. In G major: G, C, D.</p>
+<p>Thousands of songs use <em>only</em> these three chords!</p>
+<div class="staff-example" id="ch11-ex1"></div>
+<p>Above: I and IV chords in C major (C and F).</p>
+<div class="staff-example" id="ch11-ex2"></div>
+<p>Above: V chord in C major (G).</p>`,
+                        render(container) {
+                            const el1 = container.querySelector("#ch11-ex1");
+                            if (el1) {
+                                const f = new Factory({ renderer: { elementId: el1.id, width: 300, height: 120 } });
+                                const s = f.EasyScore();
+                                f.System({ x: 0, y: 0, width: 260 }).addStave({ voices: [s.voice(s.notes("(C4 E4 G4)/h, (F3 A3 C4)/h"))] }).addClef("treble");
+                                f.draw();
+                            }
+                            const el2 = container.querySelector("#ch11-ex2");
+                            if (el2) {
+                                const f = new Factory({ renderer: { elementId: el2.id, width: 200, height: 120 } });
+                                const s = f.EasyScore();
+                                f.System({ x: 0, y: 0, width: 160 }).addStave({ voices: [s.voice(s.notes("(G3 B3 D4)/w"))] }).addClef("treble");
+                                f.draw();
+                            }
+                        }
+                    },
+                    {
+                        title: "The I-V-vi-IV Progression",
+                        content: `<h3>The I-V-vi-IV Progression</h3>
+<p>The most common chord progression in pop music:</p>
+<p style="text-align:center; font-size:1.2em; margin:12px 0;"><span class="highlight">I → V → vi → IV</span></p>
+<p>In C major: <strong>C → G → Am → F</strong></p>
+<p>You've heard this in "Let It Be," "No Woman No Cry," "Someone Like You," and hundreds more.</p>
+<div class="staff-example" id="ch11-ex3"></div>
+<p>Above: The I-V-vi-IV progression in C major.</p>`,
+                        render(container) {
+                            const el = container.querySelector("#ch11-ex3");
+                            if (el) {
+                                const f = new Factory({ renderer: { elementId: el.id, width: 300, height: 120 } });
+                                const s = f.EasyScore();
+                                f.System({ x: 0, y: 0, width: 260 }).addStave({ voices: [s.voice(s.notes("(C4 E4 G4)/q, (G3 B3 D4)/q, (A3 C4 E4)/q, (F3 A3 C4)/q"))] }).addClef("treble");
+                                f.draw();
+                            }
+                        }
+                    },
+                    {
+                        title: "Other Common Progressions",
+                        content: `<h3>Other Common Progressions</h3>
+<p><span class="highlight">I-IV-V-I</span> — Classic resolution. The foundation of blues, rock, and folk. Ends with a strong return home.</p>
+<p><span class="highlight">I-vi-IV-V</span> — The "50s progression." Doo-wop, early rock and roll.</p>
+<p><span class="highlight">ii-V-I</span> — The jazz turnaround. The most important progression in jazz harmony.</p>
+<p><span class="highlight">12-bar blues</span> — A 12-measure pattern using I, IV, and V that defines blues, early rock, and jazz.</p>
+<p>Once you can hear these patterns, you'll start recognizing them everywhere.</p>`
+                    },
+                    {
+                        title: "Reading Chord Symbols",
+                        content: `<h3>Reading Chord Symbols</h3>
+<p>On lead sheets and charts, chords are written above the melody line using shorthand:</p>
+<p><span class="highlight">C</span> = C major &nbsp; <span class="highlight">Cm</span> = C minor &nbsp; <span class="highlight">C7</span> = C dominant 7th</p>
+<p><span class="highlight">G/B</span> = G major with B in the bass (a "slash chord")</p>
+<p>Now you know how to <em>build</em> each of these from the formulas you've learned. When you see "Dm" on a chart, you know it means D-F-A.</p>
+<p><span class="mnemonic">Letter alone = major. Letter + "m" = minor. That's the most important distinction.</span></p>`
+                    },
+                ],
+                quizPool: [
+                    { id: "11-1", prompt: "In C major, what is the IV chord?", render: null, options: ["G major", "A minor", "F major", "D minor"], correctIndex: 2 },
+                    { id: "11-2", prompt: "In C major, what is the V chord?", render: null, options: ["F major", "G major", "A minor", "E minor"], correctIndex: 1 },
+                    { id: "11-3", prompt: "In G major, what is the I chord?", render: null, options: ["C major", "D major", "G major", "A major"], correctIndex: 2 },
+                    { id: "11-4", prompt: "Roman numeral 'vi' indicates a:", render: null, options: ["Major chord", "Minor chord", "Diminished chord", "Augmented chord"], correctIndex: 1 },
+                    { id: "11-5", prompt: "The most common pop progression is:", render: null, options: ["I-IV-V-I", "ii-V-I", "I-V-vi-IV", "I-vi-ii-V"], correctIndex: 2 },
+                    { id: "11-6", prompt: "In C major, the I-V-vi-IV progression is:", render: null, options: ["C-F-Am-G", "C-G-Am-F", "C-G-Em-F", "C-F-G-Am"], correctIndex: 1 },
+                    { id: "11-7", prompt: "The V chord naturally wants to resolve to the:", render: null, options: ["IV chord", "vi chord", "I chord", "ii chord"], correctIndex: 2 },
+                    { id: "11-8", prompt: "In C major, which chord is built on the 2nd degree?", render: null, options: ["C major", "D minor", "E minor", "F major"], correctIndex: 1 },
+                    { id: "11-9", prompt: "What does 'Cm' mean as a chord symbol?", render: null, options: ["C major", "C minor", "C diminished", "C with a melody"], correctIndex: 1 },
+                    { id: "11-10", prompt: "In G major, the I-IV-V chords are:", render: null, options: ["G-C-D", "G-B-D", "G-D-A", "G-F-C"], correctIndex: 0 },
+                ],
+            },
         ];
 
         function getNotationProgress() {
