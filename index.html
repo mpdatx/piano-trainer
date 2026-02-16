@@ -1636,7 +1636,13 @@
         }
 
         function saveProgress() {
-            const data = { modeProgress, showLabels };
+            const saved = localStorage.getItem(STORAGE_KEY);
+            let data = {};
+            if (saved) {
+                try { data = JSON.parse(saved); } catch (e) {}
+            }
+            data.modeProgress = modeProgress;
+            data.showLabels = showLabels;
             localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
         }
 
@@ -2574,6 +2580,7 @@
 
         function showMainMenu() {
             updateMenuStats();
+            isNotationQuizActive = false;
             document.getElementById("main-menu").classList.remove("hidden");
             document.getElementById("quiz-screen").classList.remove("active");
             document.getElementById("level-complete").style.display = "none";
@@ -2708,7 +2715,7 @@
         function renderLessonPage(chapter) {
             const page = chapter.pages[currentLessonPage];
             const content = document.getElementById("lesson-content");
-            content.innerHTML = `<h3>${page.title}</h3>${page.content}`;
+            content.innerHTML = page.content;
 
             if (page.render) {
                 requestAnimationFrame(() => page.render(content));
