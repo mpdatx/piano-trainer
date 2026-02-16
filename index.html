@@ -356,7 +356,7 @@
         }
         #unlock-all-btn:hover { color: #aaa; }
         /* Interval / Key Signature Buttons */
-        #keysig-buttons {
+        #keysig-buttons, #circle-buttons {
             display: none;
             flex-wrap: wrap;
             gap: 8px;
@@ -3041,7 +3041,7 @@ F major → <span class="highlight">D minor</span></p>
             const levels = getLevelsForMode(quizMode);
             const level = levels[progress.currentLevel];
             const levelDisplay = document.getElementById("level-display");
-            const modeLabel = { visual: "Note Reading", audio: "Ear Training", reverse: "Note Finding", interval: "Intervals", keysig: "Key Signatures" }[quizMode];
+            const modeLabel = { visual: "Note Reading", audio: "Ear Training", reverse: "Note Finding", interval: "Intervals", keysig: "Key Signatures", circle: "Circle of Fifths" }[quizMode];
             levelDisplay.childNodes[0].textContent = `${modeLabel} - Level ${progress.currentLevel + 1}: ${level.name} `;
             populateLevelPicker();
             updateLevelProgress();
@@ -3215,7 +3215,7 @@ F major → <span class="highlight">D minor</span></p>
                 updateLevelDisplay();
                 if (quizMode === "interval") buildIntervalButtons();
                 else if (quizMode === "keysig") buildKeySigButtons();
-                else rebuildKeyboard();
+                else if (quizMode !== "circle") rebuildKeyboard();
                 showLevelComplete();
                 return true;
             }
