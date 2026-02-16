@@ -2585,6 +2585,7 @@
         }
 
         function showQuizScreen(mode) {
+            isNotationQuizActive = false;
             quizMode = mode;
             saveProgress();
             document.getElementById("main-menu").classList.add("hidden");
@@ -3082,14 +3083,23 @@
 
         document.getElementById("continue-btn").addEventListener("click", () => {
             document.getElementById("level-complete").style.display = "none";
+            if (isNotationQuizActive) {
+                const nextChapter = NOTATION_CHAPTERS.find(c => c.id === currentChapterId + 1);
+                if (nextChapter) startChapter(nextChapter.id);
+                return;
+            }
             beginQuiz();
         });
 
         document.getElementById("stay-btn").addEventListener("click", () => {
+            document.getElementById("level-complete").style.display = "none";
+            if (isNotationQuizActive) {
+                showNotationQuiz(currentChapterId);
+                return;
+            }
             const progress = getCurrentProgress();
             progress.currentLevel = Math.max(0, progress.currentLevel - 1);
             saveProgress();
-            document.getElementById("level-complete").style.display = "none";
             updateLevelDisplay();
             if (quizMode === "interval") buildIntervalButtons();
             else if (quizMode === "keysig") buildKeySigButtons();
@@ -3098,11 +3108,28 @@
         });
 
         document.getElementById("reset-stay-btn").addEventListener("click", () => {
+            document.getElementById("level-complete").style.display = "none";
+            if (isNotationQuizActive) {
+                const cp = notationProgress.chapters[currentChapterId];
+                cp.quizPassed = false;
+                cp.quizStats = {};
+                cp.quizMemory = {};
+                cp.currentStreak = 0;
+                cp.longestStreak = 0;
+                cp.roundNumber = 0;
+                const chapter = NOTATION_CHAPTERS.find(c => c.id === currentChapterId);
+                for (const q of chapter.quizPool) {
+                    cp.quizStats[q.id] = { correct: 0, total: 0 };
+                    cp.quizMemory[q.id] = { easiness: 2.5, interval: 1, repetitions: 0, lastSeen: 0, priority: 1 };
+                }
+                saveNotationProgress(notationProgress);
+                showNotationQuiz(currentChapterId);
+                return;
+            }
             const progress = getCurrentProgress();
             const targetLevel = Math.max(0, progress.currentLevel - 1);
             progress.currentLevel = targetLevel;
             resetLevelStats(targetLevel);
-            document.getElementById("level-complete").style.display = "none";
             updateLevelDisplay();
             updateStatsDisplay();
             if (quizMode === "interval") buildIntervalButtons();
