@@ -697,7 +697,7 @@
             <div class="mode-card" id="card-notation">
                 <div class="mode-icon">&#x1F3BC;</div>
                 <h3>Music Notation</h3>
-                <div class="mode-level" id="menu-notation-level">Chapter 1 of 11</div>
+                <div class="mode-level" id="menu-notation-level">Chapter 1 of 14</div>
                 <div class="mode-accuracy" id="menu-notation-accuracy">Not started</div>
             </div>
         </div>
@@ -2057,7 +2057,7 @@ F major → <span class="highlight">D minor</span></p>
                             const f = new Factory({ renderer: { elementId: el.id, width: 300, height: 140 } });
                             const s = f.EasyScore();
                             const voice = s.voice(s.notes("C4/q, E4/q, G4/q, C5/q"));
-                            const stave = f.System({ x: 0, y: 0, width: 260 }).addStave({ voices: [voice] }).addClef("treble");
+                            f.System({ x: 0, y: 0, width: 260 }).addStave({ voices: [voice] }).addClef("treble");
                             f.draw();
                             // Add "p" text below the staff manually
                             const ctx = f.getContext();
