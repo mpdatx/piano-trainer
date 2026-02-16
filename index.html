@@ -697,7 +697,7 @@
             <div class="mode-card" id="card-notation">
                 <div class="mode-icon">&#x1F3BC;</div>
                 <h3>Music Notation</h3>
-                <div class="mode-level" id="menu-notation-level">Chapter 1 of 6</div>
+                <div class="mode-level" id="menu-notation-level">Chapter 1 of 11</div>
                 <div class="mode-accuracy" id="menu-notation-accuracy">Not started</div>
             </div>
         </div>
@@ -1779,7 +1779,7 @@ F major → <span class="highlight">D minor</span></p>
                             if (el) {
                                 const f = new Factory({ renderer: { elementId: el.id, width: 340, height: 120 } });
                                 const s = f.EasyScore();
-                                f.System({ x: 0, y: 0, width: 300 }).addStave({ voices: [s.voice(s.notes("A3/q, B3/q, C4/q, D4/q, E4/q, F4/q, G#4/q, A4/q"), { time: "8/4" })] }).addClef("treble");
+                                f.System({ x: 0, y: 0, width: 300 }).addStave({ voices: [s.voice(s.notes("A3/q, B3/q, C4/q, D4/q, E4/q, F4/q, G#4/q, A4/q", { clef: "bass" }), { time: "8/4" })] }).addClef("bass");
                                 f.draw();
                             }
                         }
