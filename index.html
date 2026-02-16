@@ -694,6 +694,12 @@
                 <div class="mode-level" id="menu-keysig-level">Level 1</div>
                 <div class="mode-accuracy" id="menu-keysig-accuracy">No attempts yet</div>
             </div>
+            <div class="mode-card" id="card-circle">
+                <div class="mode-icon">&#x1F504;</div>
+                <h3>Circle of Fifths</h3>
+                <div class="mode-level" id="menu-circle-level">Level 1</div>
+                <div class="mode-accuracy" id="menu-circle-accuracy">No attempts yet</div>
+            </div>
             <div class="mode-card" id="card-notation">
                 <div class="mode-icon">&#x1F3BC;</div>
                 <h3>Music Notation</h3>
@@ -741,6 +747,7 @@
         </div>
         <div id="interval-buttons"></div>
         <div id="keysig-buttons"></div>
+        <div class="button-grid" id="circle-buttons" style="display:none"></div>
         <div id="stats">
             <h2>ACCURACY BY NOTE</h2>
             <div id="stats-grid"></div>
@@ -893,6 +900,38 @@
         ];
 
         const ALL_KEYSIGS = [...new Set(KEYSIG_LEVELS.flatMap(l => l.keys))];
+
+        // ── Circle of Fifths Trainer Data ──
+        const COF_DATA = {
+            "C":  { sharps: 0, flats: 0, fifthUp: "G",  fourthUp: "F",  relMinor: "Am",  I: "C",  IV: "F",  V: "G" },
+            "G":  { sharps: 1, flats: 0, fifthUp: "D",  fourthUp: "C",  relMinor: "Em",  I: "G",  IV: "C",  V: "D" },
+            "D":  { sharps: 2, flats: 0, fifthUp: "A",  fourthUp: "G",  relMinor: "Bm",  I: "D",  IV: "G",  V: "A" },
+            "A":  { sharps: 3, flats: 0, fifthUp: "E",  fourthUp: "D",  relMinor: "F#m", I: "A",  IV: "D",  V: "E" },
+            "E":  { sharps: 4, flats: 0, fifthUp: "B",  fourthUp: "A",  relMinor: "C#m", I: "E",  IV: "A",  V: "B" },
+            "B":  { sharps: 5, flats: 0, fifthUp: "F#", fourthUp: "E",  relMinor: "G#m", I: "B",  IV: "E",  V: "F#" },
+            "F#": { sharps: 6, flats: 0, fifthUp: "Db", fourthUp: "B",  relMinor: "D#m", I: "F#", IV: "B",  V: "C#" },
+            "Db": { sharps: 0, flats: 5, fifthUp: "Ab", fourthUp: "Gb", relMinor: "Bbm", I: "Db", IV: "Gb", V: "Ab" },
+            "Ab": { sharps: 0, flats: 4, fifthUp: "Eb", fourthUp: "Db", relMinor: "Fm",  I: "Ab", IV: "Db", V: "Eb" },
+            "Eb": { sharps: 0, flats: 3, fifthUp: "Bb", fourthUp: "Ab", relMinor: "Cm",  I: "Eb", IV: "Ab", V: "Bb" },
+            "Bb": { sharps: 0, flats: 2, fifthUp: "F",  fourthUp: "Eb", relMinor: "Gm",  I: "Bb", IV: "Eb", V: "F" },
+            "F":  { sharps: 0, flats: 1, fifthUp: "C",  fourthUp: "Bb", relMinor: "Dm",  I: "F",  IV: "Bb", V: "C" },
+        };
+
+        const COF_KEYS = Object.keys(COF_DATA);
+
+        const COF_LEVELS = [
+            { name: "Fifths Up",       items: COF_KEYS.map(k => `fifth_up_${k}`),    threshold: 0.80, minAttempts: 3 },
+            { name: "Fourths Up",      items: COF_KEYS.map(k => `fourth_up_${k}`),   threshold: 0.80, minAttempts: 3 },
+            { name: "Sharps & Flats",  items: COF_KEYS.map(k => `sig_${k}`),         threshold: 0.80, minAttempts: 3 },
+            { name: "Relative Minors", items: COF_KEYS.flatMap(k => [`rel_minor_${k}`, `rel_major_${k}`]), threshold: 0.80, minAttempts: 3 },
+            { name: "I-IV-V Chords",   items: ["C","G","D","A","F","Bb","Eb"].flatMap(k => [`chord_I_${k}`, `chord_IV_${k}`, `chord_V_${k}`]), threshold: 0.80, minAttempts: 3 },
+            { name: "Full Circle",     items: null, threshold: 0.80, minAttempts: 2 },
+        ];
+
+        // For level 6 (Full Circle), combine all items from levels 0-4
+        COF_LEVELS[5].items = COF_LEVELS.slice(0, 5).flatMap(l => l.items);
+
+        const ALL_COF_ITEMS = [...new Set(COF_LEVELS.flatMap(l => l.items))];
 
         // ============================================================
         // Music Notation Learning Data
@@ -2766,6 +2805,7 @@ F major → <span class="highlight">D minor</span></p>
         function getLevelsForMode(mode) {
             if (mode === "interval") return INTERVAL_LEVELS;
             if (mode === "keysig") return KEYSIG_LEVELS;
+            if (mode === "circle") return COF_LEVELS;
             return DIFFICULTY_LEVELS;
         }
 
@@ -2795,6 +2835,7 @@ F major → <span class="highlight">D minor</span></p>
             reverse: createDefaultProgress(ALL_NOTES),
             interval: createDefaultProgress(ALL_INTERVALS),
             keysig: createDefaultProgress(ALL_KEYSIGS),
+            circle: createDefaultProgress(ALL_COF_ITEMS),
         };
 
         function getCurrentProgress() {
@@ -2821,11 +2862,11 @@ F major → <span class="highlight">D minor</span></p>
 
                 if (data.modeProgress) {
                     // New format
-                    for (const mode of ["visual", "audio", "reverse", "interval", "keysig"]) {
+                    for (const mode of ["visual", "audio", "reverse", "interval", "keysig", "circle"]) {
                         if (data.modeProgress[mode]) {
                             Object.assign(modeProgress[mode], data.modeProgress[mode]);
                             // Ensure all items exist in stats/memory
-                            const allItems = mode === "interval" ? ALL_INTERVALS : mode === "keysig" ? ALL_KEYSIGS : ALL_NOTES;
+                            const allItems = mode === "interval" ? ALL_INTERVALS : mode === "keysig" ? ALL_KEYSIGS : mode === "circle" ? ALL_COF_ITEMS : ALL_NOTES;
                             allItems.forEach(item => {
                                 if (!modeProgress[mode].noteStats[item]) {
                                     modeProgress[mode].noteStats[item] = { correct: 0, total: 0 };
@@ -2936,6 +2977,9 @@ F major → <span class="highlight">D minor</span></p>
             if (quizMode === "keysig") {
                 return KEYSIG_LEVELS[progress.currentLevel].keys;
             }
+            if (quizMode === "circle") {
+                return COF_LEVELS[progress.currentLevel].items;
+            }
             return DIFFICULTY_LEVELS[progress.currentLevel].notes;
         }
 
@@ -3004,7 +3048,7 @@ F major → <span class="highlight">D minor</span></p>
         }
 
         function getLevelItems(level) {
-            return quizMode === "interval" ? level.intervals : quizMode === "keysig" ? level.keys : level.notes;
+            return quizMode === "interval" ? level.intervals : quizMode === "keysig" ? level.keys : quizMode === "circle" ? level.items : level.notes;
         }
 
         function updateLevelProgress() {
@@ -3247,6 +3291,13 @@ F major → <span class="highlight">D minor</span></p>
                     return;
                 }
 
+                if (quizMode === "circle") {
+                    document.getElementById("replay-btn").style.display = "none";
+                    staffDiv.innerHTML = `<div id="note-prompt">${currentCofPrompt}</div>`;
+                    noteDisplayTime = Date.now();
+                    return;
+                }
+
                 const parsed = parseNote(noteStr);
                 if (!parsed) return;
 
@@ -3412,6 +3463,9 @@ F major → <span class="highlight">D minor</span></p>
         // Key Signature Mode Logic
         // ============================================================
         let currentKeySig = null;
+        let currentCofItem = null;
+        let currentCofAnswer = null;
+        let currentCofPrompt = "";
 
         function generateKeySig() {
             const progress = getCurrentProgress();
@@ -3486,6 +3540,147 @@ F major → <span class="highlight">D minor</span></p>
         }
 
         // ============================================================
+        // Circle of Fifths Mode Logic
+        // ============================================================
+        function generateCofQuestion() {
+            const progress = getCurrentProgress();
+            const activeItems = getActiveNotes();
+            progress.roundNumber++;
+
+            // Spaced repetition selection (same algorithm as other modes)
+            const candidates = activeItems
+                .filter(item => item !== currentCofItem)
+                .map(item => {
+                    if (!progress.noteMemory[item]) {
+                        progress.noteMemory[item] = { easiness: 2.5, interval: 1, repetitions: 0, lastSeen: 0, priority: 1 };
+                    }
+                    const mem = progress.noteMemory[item];
+                    const roundsSince = progress.roundNumber - mem.lastSeen;
+                    const isDue = roundsSince >= mem.interval;
+                    let score = mem.priority;
+                    if (isDue) score += 10;
+                    if (roundsSince > mem.interval * 2) score += 5;
+                    score += Math.random() * 0.5;
+                    return { item, score };
+                })
+                .sort((a, b) => b.score - a.score);
+
+            currentCofItem = candidates[0].item;
+            firstAttempt = true;
+
+            // Parse the item key to determine question type and target key
+            const parts = currentCofItem.split("_");
+            const type = parts.slice(0, -1).join("_"); // e.g. "fifth_up", "rel_minor", "chord_IV"
+            const key = parts[parts.length - 1]; // e.g. "C", "G", "Bb"
+            const data = COF_DATA[key];
+
+            let prompt, answer, distractorPool;
+
+            if (type === "fifth_up") {
+                prompt = `What key is a 5th above ${key}?`;
+                answer = data.fifthUp;
+                distractorPool = COF_KEYS.filter(k => k !== answer);
+            } else if (type === "fourth_up") {
+                prompt = `What key is a 4th above ${key}?`;
+                answer = data.fourthUp;
+                distractorPool = COF_KEYS.filter(k => k !== answer);
+            } else if (type === "sig") {
+                if (data.sharps > 0) {
+                    prompt = `How many sharps in ${key} major?`;
+                    answer = String(data.sharps);
+                    distractorPool = ["0","1","2","3","4","5","6"].filter(n => n !== answer);
+                } else if (data.flats > 0) {
+                    prompt = `How many flats in ${key} major?`;
+                    answer = String(data.flats);
+                    distractorPool = ["0","1","2","3","4","5","6"].filter(n => n !== answer);
+                } else {
+                    prompt = `How many sharps or flats in ${key} major?`;
+                    answer = "0";
+                    distractorPool = ["1","2","3","4","5","6"];
+                }
+            } else if (type === "rel_minor") {
+                prompt = `What is the relative minor of ${key} major?`;
+                answer = data.relMinor;
+                distractorPool = COF_KEYS.map(k => COF_DATA[k].relMinor).filter(m => m !== answer);
+            } else if (type === "rel_major") {
+                // Reverse: given a minor key, find its relative major
+                const minorName = data.relMinor;
+                prompt = `What is the relative major of ${minorName}?`;
+                answer = key;
+                distractorPool = COF_KEYS.filter(k => k !== answer);
+            } else if (type === "chord_I") {
+                prompt = `In ${key} major, what is the I chord?`;
+                answer = key;
+                distractorPool = COF_KEYS.filter(k => k !== answer);
+            } else if (type === "chord_IV") {
+                prompt = `In ${key} major, what is the IV chord?`;
+                answer = data.IV;
+                distractorPool = COF_KEYS.filter(k => k !== answer);
+            } else if (type === "chord_V") {
+                prompt = `In ${key} major, what is the V chord?`;
+                answer = data.V;
+                distractorPool = COF_KEYS.filter(k => k !== answer);
+            }
+
+            currentCofAnswer = answer;
+            currentCofPrompt = prompt;
+
+            // Build answer buttons with 1 correct + 3 distractors
+            const distractors = [];
+            const shuffled = distractorPool.sort(() => Math.random() - 0.5);
+            for (let i = 0; i < 3 && i < shuffled.length; i++) {
+                distractors.push(shuffled[i]);
+            }
+            const options = [answer, ...distractors].sort(() => Math.random() - 0.5);
+            buildCofAnswerButtons(options);
+
+            currentNote = currentCofItem; // for renderQuizNote compatibility
+            return currentCofItem;
+        }
+
+        function buildCofAnswerButtons(options) {
+            const container = document.getElementById("circle-buttons");
+            container.innerHTML = "";
+            container.style.display = "flex";
+
+            for (const opt of options) {
+                const btn = document.createElement("button");
+                btn.className = "interval-btn";
+                btn.textContent = opt;
+                btn.addEventListener("click", () => handleCofClick(opt, btn));
+                btn.addEventListener("touchstart", (e) => {
+                    e.preventDefault();
+                    handleCofClick(opt, btn);
+                }, { passive: false });
+                container.appendChild(btn);
+            }
+        }
+
+        function handleCofClick(selected, btnElement) {
+            if (isProcessingClick || !currentCofAnswer) return;
+
+            const responseTime = Date.now() - noteDisplayTime;
+
+            if (selected === currentCofAnswer) {
+                isProcessingClick = true;
+                recordAttempt(currentCofItem, true, responseTime);
+                btnElement.classList.add("correct");
+                showFeedback(true, currentCofAnswer);
+                setTimeout(() => {
+                    btnElement.classList.remove("correct");
+                    generateCofQuestion();
+                    renderQuizNote(currentNote);
+                    isProcessingClick = false;
+                }, 400);
+            } else {
+                recordAttempt(currentCofItem, false, responseTime);
+                btnElement.classList.add("wrong");
+                showFeedback(false, currentCofAnswer);
+                setTimeout(() => btnElement.classList.remove("wrong"), 200);
+            }
+        }
+
+        // ============================================================
         // Pick Next Note (for non-interval modes)
         // ============================================================
         function pickNextNote() {
@@ -3494,6 +3689,9 @@ F major → <span class="highlight">D minor</span></p>
             }
             if (quizMode === "keysig") {
                 return generateKeySig();
+            }
+            if (quizMode === "circle") {
+                return generateCofQuestion();
             }
 
             const progress = getCurrentProgress();
@@ -3716,7 +3914,7 @@ F major → <span class="highlight">D minor</span></p>
         // Menu and Screen Management
         // ============================================================
         function updateMenuStats() {
-            const modes = ["visual", "audio", "reverse", "interval", "keysig"];
+            const modes = ["visual", "audio", "reverse", "interval", "keysig", "circle"];
             for (const mode of modes) {
                 const progress = modeProgress[mode];
                 const levels = getLevelsForMode(mode);
@@ -3752,6 +3950,7 @@ F major → <span class="highlight">D minor</span></p>
             document.getElementById("level-complete").style.display = "none";
             document.getElementById("interval-buttons").style.display = "none";
             document.getElementById("keysig-buttons").style.display = "none";
+            document.getElementById("circle-buttons").style.display = "none";
             document.getElementById("notation-chapters").classList.remove("active");
             document.getElementById("notation-lesson").classList.remove("active");
             document.getElementById("notation-quiz").classList.remove("active");
@@ -3773,11 +3972,15 @@ F major → <span class="highlight">D minor</span></p>
             document.getElementById("keyboard-container").style.display = "none";
             document.getElementById("interval-buttons").style.display = "none";
             document.getElementById("keysig-buttons").style.display = "none";
+            document.getElementById("circle-buttons").style.display = "none";
 
             if (mode === "interval") {
                 buildIntervalButtons();
             } else if (mode === "keysig") {
                 buildKeySigButtons();
+            } else if (mode === "circle") {
+                // Buttons are built per-question, just show container
+                document.getElementById("circle-buttons").style.display = "flex";
             } else {
                 document.getElementById("keyboard-container").style.display = "flex";
                 rebuildKeyboard();
@@ -4216,6 +4419,7 @@ F major → <span class="highlight">D minor</span></p>
             showQuizScreen("interval");
         });
         document.getElementById("card-keysig").addEventListener("click", () => showQuizScreen("keysig"));
+        document.getElementById("card-circle").addEventListener("click", () => showQuizScreen("circle"));
         document.getElementById("card-notation").addEventListener("click", () => showNotationChapterList());
 
         document.getElementById("back-to-menu").addEventListener("click", () => showMainMenu());
