@@ -1083,14 +1083,14 @@
 <p><strong>Spaces</strong> (bottom to top): <span class="highlight">F  A  C  E</span></p>
 <p><span class="mnemonic">They spell FACE</span></p>
 <div class="staff-example" id="ch2-ex2"></div>
-<p>Above are the four line notes shown as half notes. Notice how each one sits directly <em>on</em> a line.</p>`,
+<p>Above are the five line notes. Notice how each one sits directly <em>on</em> a line.</p>`,
                         render(container) {
                             const el = container.querySelector("#ch2-ex2");
                             if (!el) return;
-                            const factory = new Factory({ renderer: { elementId: el.id, width: 300, height: 120 } });
+                            const factory = new Factory({ renderer: { elementId: el.id, width: 340, height: 120 } });
                             const score = factory.EasyScore();
-                            const system = factory.System({ x: 0, y: 0, width: 260 });
-                            const voice = score.voice(score.notes("E4/h, G4/h, B4/h, D5/h", { clef: "treble" }), { time: "8/4" });
+                            const system = factory.System({ x: 0, y: 0, width: 300 });
+                            const voice = score.voice(score.notes("E4/h, G4/h, B4/h, D5/h, F5/h", { clef: "treble" }), { time: "10/4" });
                             system.addStave({ voices: [voice] }).addClef("treble");
                             factory.draw();
                         }
@@ -1104,14 +1104,14 @@
 <p><strong>Spaces</strong> (bottom to top): <span class="highlight">A  C  E  G</span></p>
 <p><span class="mnemonic">"All Cows Eat Grass"</span></p>
 <div class="staff-example" id="ch2-ex3"></div>
-<p>Here are the bass clef line notes. They are different from the treble clef lines — don't mix them up!</p>`,
+<p>Here are the five bass clef line notes. They are different from the treble clef lines — don't mix them up!</p>`,
                         render(container) {
                             const el = container.querySelector("#ch2-ex3");
                             if (!el) return;
-                            const factory = new Factory({ renderer: { elementId: el.id, width: 300, height: 120 } });
+                            const factory = new Factory({ renderer: { elementId: el.id, width: 340, height: 120 } });
                             const score = factory.EasyScore();
-                            const system = factory.System({ x: 0, y: 0, width: 260 });
-                            const voice = score.voice(score.notes("G2/h, B2/h, D3/h, F3/h", { clef: "bass" }), { time: "8/4" });
+                            const system = factory.System({ x: 0, y: 0, width: 300 });
+                            const voice = score.voice(score.notes("G2/h, B2/h, D3/h, F3/h, A3/h", { clef: "bass" }), { time: "10/4" });
                             system.addStave({ voices: [voice] }).addClef("bass");
                             factory.draw();
                         }
