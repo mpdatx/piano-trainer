@@ -2628,6 +2628,68 @@
         }
 
         // ============================================================
+        // Notation Learning Mode
+        // ============================================================
+        let notationProgress = null;
+        let currentChapterId = null;
+        let currentLessonPage = 0;
+        let currentQuizQuestion = null;
+        let nqFirstAttempt = true;
+        let nqDisplayTime = null;
+        let isNotationQuizActive = false;
+
+        function showNotationChapterList() {
+            notationProgress = getNotationProgress();
+            document.getElementById("main-menu").classList.add("hidden");
+            document.getElementById("quiz-screen").classList.remove("active");
+            document.getElementById("notation-lesson").classList.remove("active");
+            document.getElementById("notation-quiz").classList.remove("active");
+            document.getElementById("notation-chapters").classList.add("active");
+            isNotationQuizActive = false;
+            buildChapterList();
+        }
+
+        function buildChapterList() {
+            const list = document.getElementById("chapter-list");
+            list.innerHTML = "";
+            const currentCh = getNotationCurrentChapter(notationProgress);
+
+            for (const ch of NOTATION_CHAPTERS) {
+                const chProg = notationProgress.chapters[ch.id];
+                const isCompleted = chProg && chProg.quizPassed;
+                const isCurrent = ch.id === currentCh;
+                const isLocked = !allLevelsUnlocked && ch.id > currentCh;
+
+                const item = document.createElement("div");
+                item.className = "chapter-item" + (isCompleted ? " completed" : "") + (isCurrent ? " current" : "") + (isLocked ? " locked" : "");
+
+                item.innerHTML = `
+                    <div class="chapter-num">${isCompleted ? "\u2713" : ch.id}</div>
+                    <div class="chapter-info">
+                        <h3>${ch.title}</h3>
+                        <p>${ch.subtitle}${chProg && chProg.lessonComplete ? " · Lesson complete" : ""}${isCompleted ? " · Quiz passed" : ""}</p>
+                    </div>
+                `;
+
+                if (!isLocked) {
+                    item.addEventListener("click", () => startChapter(ch.id));
+                }
+
+                list.appendChild(item);
+            }
+        }
+
+        function startChapter(chapterId) {
+            currentChapterId = chapterId;
+            const chProg = notationProgress.chapters[chapterId];
+            if (chProg && chProg.lessonComplete) {
+                showNotationLesson(chapterId, 0);
+            } else {
+                showNotationLesson(chapterId, chProg ? chProg.lessonPage : 0);
+            }
+        }
+
+        // ============================================================
         // Initialize
         // ============================================================
         loadProgress();
@@ -2651,6 +2713,7 @@
         document.getElementById("card-notation").addEventListener("click", () => showNotationChapterList());
 
         document.getElementById("back-to-menu").addEventListener("click", () => showMainMenu());
+        document.getElementById("notation-back-menu").addEventListener("click", () => showMainMenu());
 
         document.getElementById("start-btn").addEventListener("click", async () => {
             await Tone.start();
