@@ -1,5 +1,5 @@
 import state from '../data/state.js';
-import { getLevelsForMode, getActiveNotes } from './progress.js';
+import { getActiveNotes } from './progress.js';
 
 const NOTE_ORDER = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 
