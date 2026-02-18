@@ -662,6 +662,13 @@
             width: 100%;
             flex-direction: column;
             align-items: center;
+            position: relative;
+        }
+        #freeplay-screen > .back-btn {
+            position: absolute;
+            top: -35px;
+            left: 0;
+            margin-bottom: 0;
         }
         #freeplay-screen.active { display: flex; }
         #freeplay-staff-container {
@@ -712,32 +719,30 @@
             flex-basis: 100%;
             justify-content: center;
         }
-        #freeplay-keyboard-row {
+        #freeplay-octave-row {
             display: flex;
             align-items: center;
-            width: 100%;
-            gap: 6px;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 6px;
         }
         .octave-arrow {
             background: #333;
             border: 1px solid #555;
             color: #ccc;
-            font-size: clamp(1.2rem, 4vw, 1.5rem);
-            padding: 12px 10px;
+            font-size: clamp(0.9rem, 3vw, 1.1rem);
+            padding: 6px 14px;
             border-radius: 6px;
             cursor: pointer;
             touch-action: manipulation;
-            flex-shrink: 0;
         }
         .octave-arrow:hover { background: #444; }
         .octave-arrow:active { background: #555; }
         .octave-arrow:disabled { opacity: 0.3; cursor: default; }
         .octave-arrow:disabled:hover { background: #333; }
         #freeplay-octave-label {
-            text-align: center;
             font-size: clamp(0.75rem, 2.5vw, 0.85rem);
             color: #888;
-            margin-top: 6px;
         }
         #freeplay-controls {
             margin-top: 10px;
@@ -870,14 +875,14 @@
         <div id="freeplay-staff-container">
             <div id="freeplay-staff"></div>
         </div>
-        <div id="freeplay-keyboard-row">
+        <div id="freeplay-octave-row">
             <button class="octave-arrow" id="freeplay-octave-down">&larr;</button>
-            <div id="freeplay-keyboard-container">
-                <div id="freeplay-keyboard"></div>
-            </div>
+            <div id="freeplay-octave-label"></div>
             <button class="octave-arrow" id="freeplay-octave-up">&rarr;</button>
         </div>
-        <div id="freeplay-octave-label"></div>
+        <div id="freeplay-keyboard-container">
+            <div id="freeplay-keyboard"></div>
+        </div>
         <div id="freeplay-controls">
             <label><input type="checkbox" id="freeplay-note-times"> Note durations</label>
         </div>
