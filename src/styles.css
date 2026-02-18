@@ -684,6 +684,18 @@
             --key-width: 50px;
             --key-height: 180px;
         }
+        #freeplay-keyboard.freeplay-narrow {
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 4px 0;
+        }
+        #freeplay-keyboard.freeplay-narrow .octave-marker {
+            display: none;
+        }
+        #freeplay-keyboard.freeplay-narrow .octave-group {
+            flex-basis: 100%;
+            justify-content: center;
+        }
         #freeplay-keyboard-row {
             display: flex;
             align-items: center;

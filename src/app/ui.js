@@ -480,15 +480,6 @@ function buildFreePlayKeyboard() {
         notes.push({ name, octave, noteStr: `${name}${octave}`, isWhite: WHITE_INDICES.has(chrIdx) });
     }
 
-    // Sizing based on white key count (always 14 for 2 octaves)
-    const whiteCount = notes.filter(n => n.isWhite).length;
-    const availableWidth = window.innerWidth - 20;
-    const fittedKeyWidth = Math.floor(availableWidth / whiteCount);
-    const keyWidth = Math.min(50, Math.max(40, fittedKeyWidth));
-    keyboard.style.setProperty("--key-width", `${keyWidth}px`);
-    const keyHeight = Math.min(160, Math.max(120, keyWidth * 3));
-    keyboard.style.setProperty("--key-height", `${keyHeight}px`);
-
     // Group by octave
     const groups = [];
     let cur = null;
@@ -500,9 +491,22 @@ function buildFreePlayKeyboard() {
         cur.notes.push(note);
     }
 
+    // Sizing — on narrow screens, size keys to fit the widest group (one row)
+    const whiteCount = notes.filter(n => n.isWhite).length;
+    const availableWidth = window.innerWidth - 20;
+    const narrow = availableWidth < whiteCount * 40;
+    const maxGroupWhites = Math.max(...groups.map(g => g.notes.filter(n => n.isWhite).length));
+    const sizingWhites = narrow ? maxGroupWhites : whiteCount;
+    const keyWidth = Math.min(60, Math.max(30, availableWidth / sizingWhites - 2));
+    keyboard.style.setProperty("--key-width", `${keyWidth}px`);
+    const keyHeight = Math.min(160, Math.max(120, keyWidth * 3));
+    keyboard.style.setProperty("--key-height", `${keyHeight}px`);
+    keyboard.classList.toggle("freeplay-narrow", narrow);
+
     for (let g = 0; g < groups.length; g++) {
         const group = groups[g];
         const wrapper = document.createElement("div");
+        wrapper.className = "octave-group";
         wrapper.style.position = "relative";
         wrapper.style.display = "flex";
 

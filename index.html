@@ -700,6 +700,18 @@
             --key-width: 50px;
             --key-height: 180px;
         }
+        #freeplay-keyboard.freeplay-narrow {
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 4px 0;
+        }
+        #freeplay-keyboard.freeplay-narrow .octave-marker {
+            display: none;
+        }
+        #freeplay-keyboard.freeplay-narrow .octave-group {
+            flex-basis: 100%;
+            justify-content: center;
+        }
         #freeplay-keyboard-row {
             display: flex;
             align-items: center;
@@ -3802,13 +3814,6 @@ F major \u2192 <span class="highlight">D minor</span></p>
       const name = CHROMATIC[chrIdx];
       notes.push({ name, octave, noteStr: `${name}${octave}`, isWhite: WHITE_INDICES.has(chrIdx) });
     }
-    const whiteCount = notes.filter((n) => n.isWhite).length;
-    const availableWidth = window.innerWidth - 20;
-    const fittedKeyWidth = Math.floor(availableWidth / whiteCount);
-    const keyWidth = Math.min(50, Math.max(40, fittedKeyWidth));
-    keyboard.style.setProperty("--key-width", `${keyWidth}px`);
-    const keyHeight = Math.min(160, Math.max(120, keyWidth * 3));
-    keyboard.style.setProperty("--key-height", `${keyHeight}px`);
     const groups = [];
     let cur = null;
     for (const note of notes) {
@@ -3818,9 +3823,20 @@ F major \u2192 <span class="highlight">D minor</span></p>
       }
       cur.notes.push(note);
     }
+    const whiteCount = notes.filter((n) => n.isWhite).length;
+    const availableWidth = window.innerWidth - 20;
+    const narrow = availableWidth < whiteCount * 40;
+    const maxGroupWhites = Math.max(...groups.map((g) => g.notes.filter((n) => n.isWhite).length));
+    const sizingWhites = narrow ? maxGroupWhites : whiteCount;
+    const keyWidth = Math.min(60, Math.max(30, availableWidth / sizingWhites - 2));
+    keyboard.style.setProperty("--key-width", `${keyWidth}px`);
+    const keyHeight = Math.min(160, Math.max(120, keyWidth * 3));
+    keyboard.style.setProperty("--key-height", `${keyHeight}px`);
+    keyboard.classList.toggle("freeplay-narrow", narrow);
     for (let g = 0; g < groups.length; g++) {
       const group = groups[g];
       const wrapper = document.createElement("div");
+      wrapper.className = "octave-group";
       wrapper.style.position = "relative";
       wrapper.style.display = "flex";
       if (groups.length > 1) {
