@@ -686,6 +686,7 @@
         }
         #freeplay-keyboard-container {
             display: flex;
+            flex-direction: column;
             overflow-x: auto;
             overflow-y: hidden;
             width: 100%;
@@ -693,6 +694,7 @@
             padding: 10px 0;
             -webkit-overflow-scrolling: touch;
             scrollbar-width: thin;
+            position: relative;
         }
         #freeplay-keyboard-container::-webkit-scrollbar { height: 8px; }
         #freeplay-keyboard-container::-webkit-scrollbar-track { background: rgba(255,255,255,0.1); border-radius: 4px; }
@@ -724,17 +726,23 @@
             align-items: center;
             justify-content: center;
             gap: 12px;
-            margin-bottom: 6px;
+            position: absolute;
+            top: 4px;
+            left: 0;
+            right: 0;
+            z-index: 10;
+            pointer-events: none;
         }
         .octave-arrow {
-            background: #333;
+            background: rgba(40, 40, 40, 0.85);
             border: 1px solid #555;
             color: #ccc;
             font-size: clamp(0.9rem, 3vw, 1.1rem);
-            padding: 6px 14px;
+            padding: 4px 10px;
             border-radius: 6px;
             cursor: pointer;
             touch-action: manipulation;
+            pointer-events: auto;
         }
         .octave-arrow:hover { background: #444; }
         .octave-arrow:active { background: #555; }
@@ -742,7 +750,11 @@
         .octave-arrow:disabled:hover { background: #333; }
         #freeplay-octave-label {
             font-size: clamp(0.75rem, 2.5vw, 0.85rem);
-            color: #888;
+            color: #ccc;
+            pointer-events: auto;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 2px 8px;
+            border-radius: 4px;
         }
         #freeplay-controls {
             margin-top: 10px;
@@ -875,12 +887,12 @@
         <div id="freeplay-staff-container">
             <div id="freeplay-staff"></div>
         </div>
-        <div id="freeplay-octave-row">
-            <button class="octave-arrow" id="freeplay-octave-down">&larr;</button>
-            <div id="freeplay-octave-label"></div>
-            <button class="octave-arrow" id="freeplay-octave-up">&rarr;</button>
-        </div>
         <div id="freeplay-keyboard-container">
+            <div id="freeplay-octave-row">
+                <button class="octave-arrow" id="freeplay-octave-down">&larr;</button>
+                <div id="freeplay-octave-label"></div>
+                <button class="octave-arrow" id="freeplay-octave-up">&rarr;</button>
+            </div>
             <div id="freeplay-keyboard"></div>
         </div>
         <div id="freeplay-controls">
