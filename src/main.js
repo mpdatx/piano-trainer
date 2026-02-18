@@ -1,7 +1,7 @@
 import state from './data/state.js';
 import { NOTATION_CHAPTERS } from './chapters/index.js';
 import { loadProgress, saveProgress, resetProgress, getCurrentProgress, resetLevelStats, saveNotationProgress } from './app/progress.js';
-import { showMainMenu, showQuizScreen, showWaitingState, updateLevelDisplay, updateStatsDisplay, rebuildKeyboard } from './app/ui.js';
+import { showMainMenu, showQuizScreen, showWaitingState, updateLevelDisplay, updateStatsDisplay, rebuildKeyboard, showFreePlayScreen, shiftFreePlayOctave, toggleFreePlayNoteTimes } from './app/ui.js';
 import { beginQuiz, replayCurrentNote, buildIntervalButtons, buildKeySigButtons, renderQuizNote, pickNextNote } from './app/quiz.js';
 import { showNotationChapterList, startChapter, showNotationLesson, showNotationQuiz, renderLessonPage } from './app/notation-mode.js';
 import { populateLevelPicker } from './app/ui.js';
@@ -25,8 +25,16 @@ document.getElementById("card-interval").addEventListener("click", async () => {
 document.getElementById("card-keysig").addEventListener("click", () => showQuizScreen("keysig"));
 document.getElementById("card-circle").addEventListener("click", () => showQuizScreen("circle"));
 document.getElementById("card-notation").addEventListener("click", () => showNotationChapterList());
+document.getElementById("card-freeplay").addEventListener("click", async () => {
+    await Tone.start();
+    showFreePlayScreen();
+});
 
 document.getElementById("back-to-menu").addEventListener("click", () => showMainMenu());
+document.getElementById("freeplay-back-menu").addEventListener("click", () => showMainMenu());
+document.getElementById("freeplay-octave-down").addEventListener("click", () => shiftFreePlayOctave(-1));
+document.getElementById("freeplay-octave-up").addEventListener("click", () => shiftFreePlayOctave(1));
+document.getElementById("freeplay-note-times").addEventListener("change", (e) => toggleFreePlayNoteTimes(e.target.checked));
 document.getElementById("notation-back-menu").addEventListener("click", () => showMainMenu());
 
 document.getElementById("lesson-prev").addEventListener("click", () => {

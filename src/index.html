@@ -60,6 +60,12 @@
                 <div class="mode-level" id="menu-circle-level">Level 1</div>
                 <div class="mode-accuracy" id="menu-circle-accuracy">No attempts yet</div>
             </div>
+            <div class="mode-card" id="card-freeplay">
+                <div class="mode-icon">&#x1F3B9;</div>
+                <h3>Free Play</h3>
+                <div class="mode-level" id="menu-freeplay-level">2 Octaves</div>
+                <div class="mode-accuracy" id="menu-freeplay-accuracy">Play freely</div>
+            </div>
             <div class="mode-card" id="card-notation">
                 <div class="mode-icon">&#x1F3BC;</div>
                 <h3>Music Notation</h3>
@@ -111,6 +117,25 @@
         <div id="stats">
             <h2>ACCURACY BY NOTE</h2>
             <div id="stats-grid"></div>
+        </div>
+    </div>
+
+    <!-- Free Play Screen -->
+    <div id="freeplay-screen">
+        <button class="back-btn" id="freeplay-back-menu">&larr; Back to Menu</button>
+        <div id="freeplay-staff-container">
+            <div id="freeplay-staff"></div>
+        </div>
+        <div id="freeplay-keyboard-row">
+            <button class="octave-arrow" id="freeplay-octave-down">&larr;</button>
+            <div id="freeplay-keyboard-container">
+                <div id="freeplay-keyboard"></div>
+            </div>
+            <button class="octave-arrow" id="freeplay-octave-up">&rarr;</button>
+        </div>
+        <div id="freeplay-octave-label"></div>
+        <div id="freeplay-controls">
+            <label><input type="checkbox" id="freeplay-note-times"> Note durations</label>
         </div>
     </div>
 

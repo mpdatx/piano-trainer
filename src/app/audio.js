@@ -46,6 +46,20 @@ export function playNoteStr(noteStr) {
     if (parsed) playNote(parsed.name + parsed.accidental, parsed.octave);
 }
 
+export function startNoteStr(noteStr) {
+    const parsed = parseNote(noteStr);
+    if (parsed && state.pianoLoaded) {
+        piano.triggerAttack(`${parsed.name}${parsed.accidental}${parsed.octave}`);
+    }
+}
+
+export function stopNoteStr(noteStr) {
+    const parsed = parseNote(noteStr);
+    if (parsed && state.pianoLoaded) {
+        piano.triggerRelease(`${parsed.name}${parsed.accidental}${parsed.octave}`);
+    }
+}
+
 export function parseNote(noteStr) {
     const match = noteStr.match(/^([A-G])(#|b)?(\d)$/);
     if (!match) return null;

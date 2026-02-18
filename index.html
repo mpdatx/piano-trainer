@@ -656,6 +656,96 @@
         .mc-btn:hover { background: #444; border-color: #777; }
         .mc-btn.correct { background: #2a6; border-color: #3c8; color: #fff; }
         .mc-btn.wrong { background: #a33; border-color: #c44; color: #fff; }
+        /* Free Play Screen */
+        #freeplay-screen {
+            display: none;
+            width: 100%;
+            flex-direction: column;
+            align-items: center;
+        }
+        #freeplay-screen.active { display: flex; }
+        #freeplay-staff-container {
+            background: #fff;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            overflow-x: auto;
+            width: 100%;
+            max-width: min(95vw, 700px);
+            display: flex;
+            justify-content: center;
+            min-height: 160px;
+        }
+        #freeplay-keyboard-container {
+            display: flex;
+            overflow-x: auto;
+            overflow-y: hidden;
+            width: 100%;
+            max-width: 100vw;
+            padding: 10px 0;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+        }
+        #freeplay-keyboard-container::-webkit-scrollbar { height: 8px; }
+        #freeplay-keyboard-container::-webkit-scrollbar-track { background: rgba(255,255,255,0.1); border-radius: 4px; }
+        #freeplay-keyboard-container::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 4px; }
+        #freeplay-keyboard {
+            display: flex;
+            position: relative;
+            cursor: pointer;
+            user-select: none;
+            touch-action: pan-x pan-y;
+            margin: 0 auto;
+            --key-width: 50px;
+            --key-height: 180px;
+        }
+        #freeplay-keyboard-row {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            gap: 6px;
+        }
+        .octave-arrow {
+            background: #333;
+            border: 1px solid #555;
+            color: #ccc;
+            font-size: clamp(1.2rem, 4vw, 1.5rem);
+            padding: 12px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            touch-action: manipulation;
+            flex-shrink: 0;
+        }
+        .octave-arrow:hover { background: #444; }
+        .octave-arrow:active { background: #555; }
+        .octave-arrow:disabled { opacity: 0.3; cursor: default; }
+        .octave-arrow:disabled:hover { background: #333; }
+        #freeplay-octave-label {
+            text-align: center;
+            font-size: clamp(0.75rem, 2.5vw, 0.85rem);
+            color: #888;
+            margin-top: 6px;
+        }
+        #freeplay-controls {
+            margin-top: 10px;
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            align-items: center;
+        }
+        #freeplay-controls label {
+            cursor: pointer;
+            font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        #freeplay-controls input {
+            cursor: pointer;
+            width: 18px;
+            height: 18px;
+        }
 
     </style>
 </head>
@@ -701,6 +791,12 @@
                 <h3>Circle of Fifths</h3>
                 <div class="mode-level" id="menu-circle-level">Level 1</div>
                 <div class="mode-accuracy" id="menu-circle-accuracy">No attempts yet</div>
+            </div>
+            <div class="mode-card" id="card-freeplay">
+                <div class="mode-icon">&#x1F3B9;</div>
+                <h3>Free Play</h3>
+                <div class="mode-level" id="menu-freeplay-level">2 Octaves</div>
+                <div class="mode-accuracy" id="menu-freeplay-accuracy">Play freely</div>
             </div>
             <div class="mode-card" id="card-notation">
                 <div class="mode-icon">&#x1F3BC;</div>
@@ -753,6 +849,25 @@
         <div id="stats">
             <h2>ACCURACY BY NOTE</h2>
             <div id="stats-grid"></div>
+        </div>
+    </div>
+
+    <!-- Free Play Screen -->
+    <div id="freeplay-screen">
+        <button class="back-btn" id="freeplay-back-menu">&larr; Back to Menu</button>
+        <div id="freeplay-staff-container">
+            <div id="freeplay-staff"></div>
+        </div>
+        <div id="freeplay-keyboard-row">
+            <button class="octave-arrow" id="freeplay-octave-down">&larr;</button>
+            <div id="freeplay-keyboard-container">
+                <div id="freeplay-keyboard"></div>
+            </div>
+            <button class="octave-arrow" id="freeplay-octave-up">&rarr;</button>
+        </div>
+        <div id="freeplay-octave-label"></div>
+        <div id="freeplay-controls">
+            <label><input type="checkbox" id="freeplay-note-times"> Note durations</label>
         </div>
     </div>
 
@@ -2851,6 +2966,18 @@ F major \u2192 <span class="highlight">D minor</span></p>
     const parsed = parseNote(noteStr);
     if (parsed) playNote(parsed.name + parsed.accidental, parsed.octave);
   }
+  function startNoteStr(noteStr) {
+    const parsed = parseNote(noteStr);
+    if (parsed && state_default.pianoLoaded) {
+      piano.triggerAttack(`${parsed.name}${parsed.accidental}${parsed.octave}`);
+    }
+  }
+  function stopNoteStr(noteStr) {
+    const parsed = parseNote(noteStr);
+    if (parsed && state_default.pianoLoaded) {
+      piano.triggerRelease(`${parsed.name}${parsed.accidental}${parsed.octave}`);
+    }
+  }
   function parseNote(noteStr) {
     const match = noteStr.match(/^([A-G])(#|b)?(\d)$/);
     if (!match) return null;
@@ -3281,6 +3408,7 @@ F major \u2192 <span class="highlight">D minor</span></p>
     state_default.isNotationQuizActive = false;
     document.getElementById("main-menu").classList.remove("hidden");
     document.getElementById("quiz-screen").classList.remove("active");
+    document.getElementById("freeplay-screen").classList.remove("active");
     document.getElementById("level-complete").style.display = "none";
     document.getElementById("interval-buttons").style.display = "none";
     document.getElementById("keysig-buttons").style.display = "none";
@@ -3580,6 +3708,259 @@ F major \u2192 <span class="highlight">D minor</span></p>
         setTimeout(onUp, 150);
       }
     }, { passive: false });
+  }
+  var { Factory: Factory19 } = Vex.Flow;
+  var CHROMATIC = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+  var WHITE_INDICES = /* @__PURE__ */ new Set([0, 2, 4, 5, 7, 9, 11]);
+  var freePlayStartMidi = 48;
+  var freePlayNoteTimes = false;
+  var FREEPLAY_MIN_START = 24;
+  var FREEPLAY_MAX_START = 84;
+  function showFreePlayScreen() {
+    document.getElementById("main-menu").classList.add("hidden");
+    document.getElementById("freeplay-screen").classList.add("active");
+    freePlayStartMidi = 48;
+    freePlayNoteBuffer = [];
+    renderEmptyGrandStaff();
+    buildFreePlayKeyboard();
+  }
+  function shiftFreePlayOctave(delta) {
+    const noteIdx = freePlayStartMidi % 12;
+    let shift;
+    if (delta > 0) {
+      shift = noteIdx === 0 ? 5 : 7;
+    } else {
+      shift = noteIdx === 0 ? -7 : -5;
+    }
+    const next = freePlayStartMidi + shift;
+    if (next < FREEPLAY_MIN_START || next > FREEPLAY_MAX_START) return;
+    freePlayStartMidi = next;
+    buildFreePlayKeyboard();
+  }
+  var freePlayNoteBuffer = [];
+  var BEAT_VALUES = { w: 4, h: 2, q: 1, "8": 0.5, "16": 0.25 };
+  var MAX_BEATS = 8;
+  function toggleFreePlayNoteTimes(enabled) {
+    freePlayNoteTimes = enabled;
+  }
+  function durationToNoteValue(ms) {
+    if (ms >= 1400) return "w";
+    if (ms >= 700) return "h";
+    if (ms >= 350) return "q";
+    if (ms >= 175) return "8";
+    return "16";
+  }
+  function addFreePlayNote(noteStr, duration) {
+    const dur = duration || "w";
+    const beats = BEAT_VALUES[dur] || 4;
+    const currentBeats = freePlayNoteBuffer.reduce((sum, n) => sum + n.beats, 0);
+    if (currentBeats + beats > MAX_BEATS) {
+      freePlayNoteBuffer = [];
+    }
+    freePlayNoteBuffer.push({ noteStr, dur, clef: getClefForNote(noteStr), beats });
+    renderFreePlayStaff();
+  }
+  function addFreePlayTouchHandlers(el, noteStr, handleDown, handleUp) {
+    let startX, startY, scrolled;
+    el.addEventListener("touchstart", (e) => {
+      const t = e.touches[0];
+      startX = t.clientX;
+      startY = t.clientY;
+      scrolled = false;
+      if (freePlayNoteTimes) {
+        handleDown();
+      }
+    }, { passive: true });
+    el.addEventListener("touchmove", (e) => {
+      if (scrolled) return;
+      const t = e.touches[0];
+      if (Math.abs(t.clientX - startX) > TOUCH_SCROLL_THRESHOLD || Math.abs(t.clientY - startY) > TOUCH_SCROLL_THRESHOLD) {
+        scrolled = true;
+        handleUp();
+      }
+    }, { passive: true });
+    el.addEventListener("touchend", (e) => {
+      if (scrolled) return;
+      e.preventDefault();
+      if (freePlayNoteTimes) {
+        handleUp();
+      } else {
+        handleDown();
+        setTimeout(handleUp, 150);
+      }
+    }, { passive: false });
+  }
+  function buildFreePlayKeyboard() {
+    const keyboard = document.getElementById("freeplay-keyboard");
+    keyboard.innerHTML = "";
+    const startMidi = freePlayStartMidi;
+    const endMidi = startMidi + 23;
+    const notes = [];
+    for (let midi = startMidi; midi <= endMidi; midi++) {
+      const octave = Math.floor(midi / 12) - 1;
+      const chrIdx = midi % 12;
+      const name = CHROMATIC[chrIdx];
+      notes.push({ name, octave, noteStr: `${name}${octave}`, isWhite: WHITE_INDICES.has(chrIdx) });
+    }
+    const whiteCount = notes.filter((n) => n.isWhite).length;
+    const availableWidth = window.innerWidth - 20;
+    const fittedKeyWidth = Math.floor(availableWidth / whiteCount);
+    const keyWidth = Math.min(50, Math.max(40, fittedKeyWidth));
+    keyboard.style.setProperty("--key-width", `${keyWidth}px`);
+    const keyHeight = Math.min(160, Math.max(120, keyWidth * 3));
+    keyboard.style.setProperty("--key-height", `${keyHeight}px`);
+    const groups = [];
+    let cur = null;
+    for (const note of notes) {
+      if (!cur || note.octave !== cur.octave) {
+        cur = { octave: note.octave, notes: [] };
+        groups.push(cur);
+      }
+      cur.notes.push(note);
+    }
+    for (let g = 0; g < groups.length; g++) {
+      const group = groups[g];
+      const wrapper = document.createElement("div");
+      wrapper.style.position = "relative";
+      wrapper.style.display = "flex";
+      if (groups.length > 1) {
+        const label = document.createElement("span");
+        label.className = "octave-label";
+        label.textContent = `Octave ${group.octave}`;
+        wrapper.appendChild(label);
+      }
+      for (const note of group.notes) {
+        const key = document.createElement("div");
+        key.className = note.isWhite ? "key white" : "key black";
+        key.dataset.note = note.noteStr;
+        const lbl = document.createElement("span");
+        lbl.className = "key-label";
+        lbl.textContent = note.noteStr;
+        key.appendChild(lbl);
+        const handleDown = () => {
+          key.classList.add("active");
+          if (freePlayNoteTimes) {
+            startNoteStr(note.noteStr);
+            key._noteStart = Date.now();
+          } else {
+            playNoteStr(note.noteStr);
+            addFreePlayNote(note.noteStr);
+          }
+        };
+        const handleUp = () => {
+          key.classList.remove("active");
+          if (key._noteStart) {
+            stopNoteStr(note.noteStr);
+            const ms = Date.now() - key._noteStart;
+            key._noteStart = null;
+            addFreePlayNote(note.noteStr, durationToNoteValue(ms));
+          }
+        };
+        key.addEventListener("mousedown", handleDown);
+        key.addEventListener("mouseup", handleUp);
+        key.addEventListener("mouseleave", handleUp);
+        addFreePlayTouchHandlers(key, note.noteStr, handleDown, handleUp);
+        wrapper.appendChild(key);
+      }
+      keyboard.appendChild(wrapper);
+      if (g < groups.length - 1) {
+        const sep = document.createElement("div");
+        sep.className = "octave-marker";
+        keyboard.appendChild(sep);
+      }
+    }
+    keyboard.classList.toggle("labels-hidden", !state_default.showLabels);
+    const noteIdx = startMidi % 12;
+    const upShift = noteIdx === 0 ? 5 : 7;
+    const downShift = noteIdx === 0 ? 7 : 5;
+    document.getElementById("freeplay-octave-down").disabled = startMidi - downShift < FREEPLAY_MIN_START;
+    document.getElementById("freeplay-octave-up").disabled = startMidi + upShift > FREEPLAY_MAX_START;
+    document.getElementById("freeplay-octave-label").textContent = `${midiToNote(startMidi)} \u2013 ${midiToNote(endMidi)}`;
+    const container = document.getElementById("freeplay-keyboard-container");
+    container.scrollLeft = (keyboard.scrollWidth - container.clientWidth) / 2;
+  }
+  function renderEmptyGrandStaff() {
+    const staffDiv = document.getElementById("freeplay-staff");
+    staffDiv.innerHTML = "";
+    try {
+      const containerWidth = Math.min(window.innerWidth * 0.9, 400);
+      const staffWidth = Math.max(containerWidth - 40, 140);
+      const staffHeight = Math.min(250, Math.max(window.innerHeight * 0.28, 180));
+      const factory = new Factory19({
+        renderer: { elementId: "freeplay-staff", width: containerWidth, height: staffHeight }
+      });
+      const score = factory.EasyScore();
+      const system = factory.System({ x: 0, y: 0, width: staffWidth });
+      const trebleVoice = score.voice(score.notes("B4/w/r", { clef: "treble" }));
+      const bassVoice = score.voice(score.notes("D3/w/r", { clef: "bass" }));
+      system.addStave({ voices: [trebleVoice] }).addClef("treble");
+      system.addStave({ voices: [bassVoice] }).addClef("bass");
+      system.addConnector("brace");
+      system.addConnector("singleLeft");
+      factory.draw();
+    } catch (error) {
+      console.error("Error rendering empty grand staff:", error);
+    }
+  }
+  function generateRestPadding(beats, restNote) {
+    const rests = [];
+    let remaining = Math.round(beats * 100) / 100;
+    for (const [dur, val] of [["w", 4], ["h", 2], ["q", 1], ["8", 0.5], ["16", 0.25]]) {
+      while (remaining >= val - 1e-3) {
+        rests.push(`${restNote}/${dur}/r`);
+        remaining = Math.round((remaining - val) * 100) / 100;
+      }
+    }
+    return rests;
+  }
+  function renderFreePlayStaff() {
+    const staffDiv = document.getElementById("freeplay-staff");
+    staffDiv.innerHTML = "";
+    if (freePlayNoteBuffer.length === 0) {
+      renderEmptyGrandStaff();
+      return;
+    }
+    try {
+      const totalBeats = freePlayNoteBuffer.reduce((sum, n) => sum + n.beats, 0);
+      const targetBeats = totalBeats <= 4 ? 4 : 8;
+      const remainingBeats = Math.round((targetBeats - totalBeats) * 100) / 100;
+      const trebleParts = [];
+      const bassParts = [];
+      for (const note of freePlayNoteBuffer) {
+        const parsed = parseNote(note.noteStr);
+        const vexNote = `${parsed.name}${parsed.accidental}${parsed.octave}/${note.dur}`;
+        if (note.clef === "treble") {
+          trebleParts.push(vexNote);
+          bassParts.push(`D3/${note.dur}/r`);
+        } else {
+          trebleParts.push(`B4/${note.dur}/r`);
+          bassParts.push(vexNote);
+        }
+      }
+      if (remainingBeats > 0) {
+        trebleParts.push(...generateRestPadding(remainingBeats, "B4"));
+        bassParts.push(...generateRestPadding(remainingBeats, "D3"));
+      }
+      const baseWidth = Math.min(window.innerWidth * 0.9, 400);
+      const containerWidth = targetBeats <= 4 ? baseWidth : Math.min(baseWidth * 1.6, window.innerWidth * 0.95);
+      const staffWidth = Math.max(containerWidth - 40, 140);
+      const staffHeight = Math.min(250, Math.max(window.innerHeight * 0.28, 180));
+      const timeStr = targetBeats <= 4 ? "4/4" : "8/4";
+      const factory = new Factory19({
+        renderer: { elementId: "freeplay-staff", width: containerWidth, height: staffHeight }
+      });
+      const score = factory.EasyScore();
+      const system = factory.System({ x: 0, y: 0, width: staffWidth });
+      const trebleVoice = score.voice(score.notes(trebleParts.join(", "), { clef: "treble" }), { time: timeStr });
+      const bassVoice = score.voice(score.notes(bassParts.join(", "), { clef: "bass" }), { time: timeStr });
+      system.addStave({ voices: [trebleVoice] }).addClef("treble");
+      system.addStave({ voices: [bassVoice] }).addClef("bass");
+      system.addConnector("brace");
+      system.addConnector("singleLeft");
+      factory.draw();
+    } catch (error) {
+      console.error("Error rendering free play staff:", error);
+    }
   }
 
   // src/app/progress.js
@@ -4169,7 +4550,15 @@ F major \u2192 <span class="highlight">D minor</span></p>
   document.getElementById("card-keysig").addEventListener("click", () => showQuizScreen("keysig"));
   document.getElementById("card-circle").addEventListener("click", () => showQuizScreen("circle"));
   document.getElementById("card-notation").addEventListener("click", () => showNotationChapterList());
+  document.getElementById("card-freeplay").addEventListener("click", async () => {
+    await Tone.start();
+    showFreePlayScreen();
+  });
   document.getElementById("back-to-menu").addEventListener("click", () => showMainMenu());
+  document.getElementById("freeplay-back-menu").addEventListener("click", () => showMainMenu());
+  document.getElementById("freeplay-octave-down").addEventListener("click", () => shiftFreePlayOctave(-1));
+  document.getElementById("freeplay-octave-up").addEventListener("click", () => shiftFreePlayOctave(1));
+  document.getElementById("freeplay-note-times").addEventListener("change", (e) => toggleFreePlayNoteTimes(e.target.checked));
   document.getElementById("notation-back-menu").addEventListener("click", () => showMainMenu());
   document.getElementById("lesson-prev").addEventListener("click", () => {
     if (state_default.currentLessonPage > 0) {
