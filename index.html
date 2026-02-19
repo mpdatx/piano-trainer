@@ -3744,7 +3744,7 @@ F major \u2192 <span class="highlight">D minor</span></p>
   var freePlayStartMidi = 48;
   var freePlayNoteTimes = false;
   var FREEPLAY_MIN_START = 24;
-  var FREEPLAY_MAX_START = 84;
+  var FREEPLAY_MAX_END = 108;
   function showFreePlayScreen() {
     document.getElementById("main-menu").classList.add("hidden");
     document.getElementById("freeplay-screen").classList.add("active");
@@ -3752,6 +3752,9 @@ F major \u2192 <span class="highlight">D minor</span></p>
     freePlayNoteBuffer = [];
     renderEmptyGrandStaff();
     buildFreePlayKeyboard();
+  }
+  function getFreePlayNoteCount() {
+    return window.innerWidth - 20 >= 840 ? 36 : 24;
   }
   function shiftFreePlayOctave(delta) {
     const noteIdx = freePlayStartMidi % 12;
@@ -3762,7 +3765,8 @@ F major \u2192 <span class="highlight">D minor</span></p>
       shift = noteIdx === 0 ? -7 : -5;
     }
     const next = freePlayStartMidi + shift;
-    if (next < FREEPLAY_MIN_START || next > FREEPLAY_MAX_START) return;
+    const maxStart = FREEPLAY_MAX_END - getFreePlayNoteCount() + 1;
+    if (next < FREEPLAY_MIN_START || next > maxStart) return;
     freePlayStartMidi = next;
     buildFreePlayKeyboard();
   }
@@ -3823,7 +3827,8 @@ F major \u2192 <span class="highlight">D minor</span></p>
     const keyboard = document.getElementById("freeplay-keyboard");
     keyboard.innerHTML = "";
     const startMidi = freePlayStartMidi;
-    const endMidi = startMidi + 23;
+    const noteCount = getFreePlayNoteCount();
+    const endMidi = startMidi + noteCount - 1;
     const notes = [];
     for (let midi = startMidi; midi <= endMidi; midi++) {
       const octave = Math.floor(midi / 12) - 1;
@@ -3906,8 +3911,9 @@ F major \u2192 <span class="highlight">D minor</span></p>
     const noteIdx = startMidi % 12;
     const upShift = noteIdx === 0 ? 5 : 7;
     const downShift = noteIdx === 0 ? 7 : 5;
+    const maxStart = FREEPLAY_MAX_END - noteCount + 1;
     document.getElementById("freeplay-octave-down").disabled = startMidi - downShift < FREEPLAY_MIN_START;
-    document.getElementById("freeplay-octave-up").disabled = startMidi + upShift > FREEPLAY_MAX_START;
+    document.getElementById("freeplay-octave-up").disabled = startMidi + upShift > maxStart;
     document.getElementById("freeplay-octave-label").textContent = `${midiToNote(startMidi)} \u2013 ${midiToNote(endMidi)}`;
     const container = document.getElementById("freeplay-keyboard-container");
     container.scrollLeft = (keyboard.scrollWidth - container.clientWidth) / 2;

@@ -379,7 +379,7 @@ const WHITE_INDICES = new Set([0, 2, 4, 5, 7, 9, 11]);
 let freePlayStartMidi = 48; // C3
 let freePlayNoteTimes = false;
 const FREEPLAY_MIN_START = 24;  // C1
-const FREEPLAY_MAX_START = 84;  // C6
+const FREEPLAY_MAX_END = 108;   // C8 (top of standard piano)
 
 export function showFreePlayScreen() {
     document.getElementById("main-menu").classList.add("hidden");
@@ -388,6 +388,10 @@ export function showFreePlayScreen() {
     freePlayNoteBuffer = [];
     renderEmptyGrandStaff();
     buildFreePlayKeyboard();
+}
+
+function getFreePlayNoteCount() {
+    return (window.innerWidth - 20) >= 840 ? 36 : 24;
 }
 
 export function shiftFreePlayOctave(delta) {
@@ -400,7 +404,8 @@ export function shiftFreePlayOctave(delta) {
         shift = noteIdx === 0 ? -7 : -5;
     }
     const next = freePlayStartMidi + shift;
-    if (next < FREEPLAY_MIN_START || next > FREEPLAY_MAX_START) return;
+    const maxStart = FREEPLAY_MAX_END - getFreePlayNoteCount() + 1;
+    if (next < FREEPLAY_MIN_START || next > maxStart) return;
     freePlayStartMidi = next;
     buildFreePlayKeyboard();
 }
@@ -469,7 +474,8 @@ function buildFreePlayKeyboard() {
     keyboard.innerHTML = "";
 
     const startMidi = freePlayStartMidi;
-    const endMidi = startMidi + 23;
+    const noteCount = getFreePlayNoteCount();
+    const endMidi = startMidi + noteCount - 1;
 
     // Build note list
     const notes = [];
@@ -570,8 +576,9 @@ function buildFreePlayKeyboard() {
     const noteIdx = startMidi % 12;
     const upShift = noteIdx === 0 ? 5 : 7;
     const downShift = noteIdx === 0 ? 7 : 5;
+    const maxStart = FREEPLAY_MAX_END - noteCount + 1;
     document.getElementById("freeplay-octave-down").disabled = startMidi - downShift < FREEPLAY_MIN_START;
-    document.getElementById("freeplay-octave-up").disabled = startMidi + upShift > FREEPLAY_MAX_START;
+    document.getElementById("freeplay-octave-up").disabled = startMidi + upShift > maxStart;
     document.getElementById("freeplay-octave-label").textContent = `${midiToNote(startMidi)} – ${midiToNote(endMidi)}`;
 
     const container = document.getElementById("freeplay-keyboard-container");
