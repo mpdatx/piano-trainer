@@ -427,7 +427,7 @@ function durationToNoteValue(ms) {
 }
 
 function addFreePlayNote(noteStr, duration) {
-    const dur = duration || "w";
+    const dur = duration || "q";
     const beats = BEAT_VALUES[dur] || 4;
     const currentBeats = freePlayNoteBuffer.reduce((sum, n) => sum + n.beats, 0);
     if (currentBeats + beats > MAX_BEATS) {
