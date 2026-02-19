@@ -1,4 +1,4 @@
-const APP_VERSION = '2.10.3';
+const APP_VERSION = '2.10.4';
 const CACHE_NAME = `piano-trainer-v${APP_VERSION}`;
 const ASSETS = [
   './',
