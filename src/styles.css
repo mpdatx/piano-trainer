@@ -678,7 +678,6 @@
             padding: 10px 0;
             -webkit-overflow-scrolling: touch;
             scrollbar-width: thin;
-            position: relative;
         }
         #freeplay-keyboard-container::-webkit-scrollbar { height: 8px; }
         #freeplay-keyboard-container::-webkit-scrollbar-track { background: rgba(255,255,255,0.1); border-radius: 4px; }
@@ -709,36 +708,26 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 12px;
-            position: absolute;
-            top: 4px;
-            left: 0;
-            right: 0;
-            z-index: 10;
-            pointer-events: none;
+            gap: 8px;
+            padding: 2px 0;
         }
         .octave-arrow {
-            background: rgba(40, 40, 40, 0.85);
+            background: #333;
             border: 1px solid #555;
             color: #ccc;
-            font-size: clamp(0.9rem, 3vw, 1.1rem);
-            padding: 4px 10px;
-            border-radius: 6px;
+            font-size: clamp(0.75rem, 2.5vw, 0.9rem);
+            padding: 2px 10px;
+            border-radius: 4px;
             cursor: pointer;
             touch-action: manipulation;
-            pointer-events: auto;
         }
         .octave-arrow:hover { background: #444; }
         .octave-arrow:active { background: #555; }
         .octave-arrow:disabled { opacity: 0.3; cursor: default; }
         .octave-arrow:disabled:hover { background: #333; }
         #freeplay-octave-label {
-            font-size: clamp(0.75rem, 2.5vw, 0.85rem);
-            color: #ccc;
-            pointer-events: auto;
-            background: rgba(0, 0, 0, 0.6);
-            padding: 2px 8px;
-            border-radius: 4px;
+            font-size: clamp(0.7rem, 2vw, 0.8rem);
+            color: #888;
         }
         #freeplay-controls {
             margin-top: 10px;
